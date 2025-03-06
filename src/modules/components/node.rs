@@ -1,4 +1,4 @@
-use super::*;
+use super::prelude::params::*;
 use dioxus::html::geometry::{euclid::Vector2D, *};
 use dioxus::prelude::*;
 use sai_backend::utils::prelude::*;
@@ -19,18 +19,23 @@ pub struct InternNode {
 }
 
 impl From<StrongNode> for InternNode {
-    fn from(node: StrongNode) -> Self {
-        let b = Self::builder().node(node.clone());
-        // if let Ok(data) = node.context.lock() {
-        //     return b
-        //         .params(Signal::new(
-        //             data.params
-        //                 .iter()
-        //                 .map(|param| InternParam::from(param.clone()))
-        //                 .collect(),
-        //         ))
-        //         .build();
-        // }
+    fn from(node_ctx: StrongNode) -> Self {
+        let b = Self::builder().node(node_ctx.clone());
+        let node = node_ctx.context.try_lock().unwrap();
+        let mut runtime_params = Vec::<InternRuntimeParam>::new();
+        let mut static_params = Vec::<InternStaticParam>::new();
+        node.params.iter().for_each(move |param_ctx| {
+            let param = param_ctx.context.try_lock().unwrap();
+            match param.kind {
+                ParamKind::Runtime { .. } => {
+                    runtime_params.push(InternRuntimeParam::from(param_ctx.clone()));
+                }
+                ParamKind::Static { .. } => {
+                    static_params.push(InternStaticParam::from(param_ctx.clone()));
+                }
+            }
+        });
+        dioxus::logger::tracing::debug!("creating");
         b.build()
     }
 }

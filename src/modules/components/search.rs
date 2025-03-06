@@ -1,13 +1,13 @@
 #[sai_macros::element("component")]
 pub fn Search(style: String, icons: Icons) -> Element {
-    use crate::components::{InternSearchResult, SearchResult};
+    use super::prelude::*;
     use sai_backend::utils::search::*;
 
     let mut search_results = use_signal(Vec::<InternSearchResult>::new);
 
     let onchange = move |e: FormEvent| {
         let mut results = search(e.value()).tree;
-        search_results.extend(
+        search_results.set(
             results
                 .iter_mut()
                 .map(|result| InternSearchResult::from(result.clone()))
@@ -22,6 +22,7 @@ pub fn Search(style: String, icons: Icons) -> Element {
     rsx! {
         style { { style } }
         div {
+            overflow: "visible",
             class: "Search",
             header {
                 input {
@@ -36,9 +37,13 @@ pub fn Search(style: String, icons: Icons) -> Element {
                 // }
             }
             main {
+                overflow: "visible",
                 div { class: "spacer" }
-                section { class: "results" }
-            {rendered_search_results}
+                section {
+                    class: "results",
+                    height: "100%",
+                    {rendered_search_results}
+                }
             }
         }
     }

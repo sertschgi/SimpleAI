@@ -1,6 +1,6 @@
 #[sai_macros::element("page")]
 pub fn Search(style: String) -> Element {
-    use crate::components::*;
+    use crate::components::prelude::*;
     rsx! {
         style { { style } }
         main {

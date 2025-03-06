@@ -15,7 +15,7 @@ sai_macros = { path = "extern/macros" }
 async-recursion = { version = "1.1.1" }
 chrono = { version = "0.4.38", features = ["serde"] }
 sai_backend = { path = "extern/backend" }
-dioxus = { git = "https://github.com/DioxusLabs/dioxus.git" }
+dioxus = { version = ">=0.6.3" }
 futures = "0.3.31"
 reqwest = { version = "0.12.9", features = ["json"] }
 serde = { version = "1.0.215", features = ["derive"] }
@@ -34,7 +34,7 @@ tokio = { version = "1.43.0", features = ["sync"]}
 [features]
 default = []
 desktop = ["dioxus/desktop"]
-web = ["dioxus/web", "dioxus/router"]
+web = ["dioxus/web", "dioxus/router", "sai_backend/web"]
 mobile = ["dioxus/mobile"]
 dev = ["dioxus/devtools", "dioxus/liveview"]
 

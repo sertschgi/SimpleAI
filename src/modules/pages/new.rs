@@ -1,6 +1,6 @@
 #[sai_macros::element("page")]
 pub fn New(style: String, icons: Icons) -> Element {
-    use crate::components::*;
+    use crate::components::prelude::*;
 
     rsx! {
         style { { style } }

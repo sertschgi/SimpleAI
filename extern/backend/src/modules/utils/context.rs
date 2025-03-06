@@ -18,9 +18,13 @@ where
     T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
-        let self_data = self.context.blocking_lock();
-        let other_data = other.context.blocking_lock();
-        *self_data == *other_data
+        //  TODO: try to make this reliable (with blocking_lock -> remove the error you'll get)
+        let self_data = self.context.try_lock();
+        let other_data = other.context.try_lock();
+        if self_data.is_err() || other_data.is_err() {
+            return true;
+        }
+        *self_data.unwrap() == *other_data.unwrap()
     }
 }
 

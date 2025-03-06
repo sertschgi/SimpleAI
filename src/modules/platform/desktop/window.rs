@@ -1,4 +1,4 @@
-use crate::platform::WindowLike;
+use super::super::WindowLike;
 use dioxus::desktop::Config;
 use dioxus::dioxus_core::Element;
 use dioxus::prelude::*;
