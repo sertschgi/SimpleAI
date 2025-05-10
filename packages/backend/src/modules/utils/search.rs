@@ -8,20 +8,21 @@ pub fn search(query: String) -> Vec<Node> {
 
     //  TODO: remove this:
     let mut c = Vec::<Node>::new();
-    c.push(
-        NodeBuilder::default()
-            .name("test_code_node".to_string())
-            .params(vec![])
-            .kind(NodeKind::Code {
-                code: "fn main() { println!(\"Hello, world!\"); }".to_string(),
-            })
-            .description("A simple code node".to_string())
-            .author("Author".to_string())
-            .compiled(None)
-            .environment(Environment { deps: vec![] })
-            .date(Utc::now())
-            .build()
-            .unwrap(),
-    );
+    // c.push(
+    //     NodeBuilder::default()
+    //         .name("test_code_node".to_string())
+    //         .params(vec![])
+    //         .kind(NodeKind::Code {
+    //             code: "fn main() { println!(\"Hello, world!\"); }".to_string(),
+    //         })
+    //         .description("A simple code node".to_string())
+    //         .author("Author".to_string())
+    //         .compiled(None)
+    //         .environment(Environment { deps: vec![] })
+    //         .date(Utc::now())
+    //         .build()
+    //         .unwrap(),
+    // );
     c
 }
+

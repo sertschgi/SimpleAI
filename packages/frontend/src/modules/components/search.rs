@@ -2,7 +2,7 @@ use crate::prelude::{
     components::prelude::{InternSearchResult, SearchResult},
     *,
 };
-use simple_ai_backend::utils::prelude::{search::*, *};
+use simple_ai_backend::utils::prelude::*;
 
 #[component]
 pub fn Search() -> Element {
