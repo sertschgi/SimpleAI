@@ -1,0 +1,8 @@
+[package]
+name = "simple-ai-desktop"
+version = { workspace = true }
+edition = "2021"
+
+[dependencies]
+dioxus = { workspace = true, features = ["desktop"]}
+simple-ai-frontend = { workspace = true }

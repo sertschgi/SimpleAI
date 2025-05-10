@@ -1,0 +1,8 @@
+[package]
+name  = "simple-ai-web"
+version = { workspace = true }
+edition = "2021"
+
+[dependencies]
+dioxus = { workspace = true, features = ["web", "router"]}
+simple-ai-frontend = { workspace = true }

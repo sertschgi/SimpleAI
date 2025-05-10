@@ -1,0 +1,20 @@
+[package]
+name = "simple-ai-frontend"
+version = { workspace = true }
+edition = "2021"
+
+[dependencies]
+dioxus = { workspace = true, features = ["router"]}
+simple-ai-backend = { workspace = true }
+simple-ai-macros = { workspace = true }
+async-recursion = { version = "1.1.1" }
+futures = "0.3.31"
+reqwest = { version = "0.12.9", features = ["json"] }
+serde = { version = "1.0.215", features = ["derive"] }
+serde_json = { version = "1.0.133" }
+toml = { version = "0.8.19" }
+anyhow = { version = "1.0.95" }
+colored = { version = "3.0.0" }
+regex = { version = "1.11.1" }
+derive-new = { version = "0.7.0" }
+derive_builder = { version = "0.20.2" }
