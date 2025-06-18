@@ -1,6 +1,10 @@
-use crate::prelude::{components::prelude::params::*, *};
-use simple_ai_backend::utils::prelude::*;
+// %%% components / runtime_param.rs %%%
 
+// %% includes %%
+use super::connection::{Connection, InternConnection};
+use super::utils::*;
+
+// %% main %%
 #[derive(PartialEq, Props, Clone)]
 pub struct InternRuntimeParam {
     pub param: StrongParam,

@@ -1,5 +1,9 @@
-use crate::prelude::*;
+// %%% components / divider.rs %%%
 
+// %% includes %%
+use super::utils::*;
+
+// %% main %%
 #[component]
 pub fn Divider(children: Element) -> Element {
     let script = r#####"

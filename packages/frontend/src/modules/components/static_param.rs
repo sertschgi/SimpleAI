@@ -1,6 +1,10 @@
-use crate::prelude::*;
+// %%% components / static_param.rs %%%
+
+// %% includes %%
+use super::utils::*;
 use simple_ai_backend::utils::prelude::*;
 
+// %% main %%
 #[derive(PartialEq, Props, Clone)]
 pub struct InternStaticParam {
     pub param: StrongParam,

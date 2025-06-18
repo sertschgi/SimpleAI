@@ -13,6 +13,9 @@ fn main() {
     dioxus::launch(App);
 }
 
+#[component]
 fn App() -> Element {
-    rsx! { Router::<Route> {} }
+    rsx! {
+        Router::<Route> {}
+    }
 }

@@ -1,5 +1,10 @@
-use crate::prelude::{components::prelude::*, *};
+// %%% components / draggable.rs %%%
 
+// %% includes %%
+use super::drag_area::DragContext;
+use super::utils::*;
+
+// %% main %%
 #[component]
 pub fn Draggable(
     #[props(default)] ondraggingstart: Callback<PageVector>,

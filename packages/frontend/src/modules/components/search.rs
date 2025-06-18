@@ -1,9 +1,10 @@
-use crate::prelude::{
-    components::prelude::{InternSearchResult, SearchResult},
-    *,
-};
-use simple_ai_backend::utils::prelude::*;
+// %%% components / search.rs %%%
 
+// %% includes %%
+use super::search_result::{InternSearchResult, SearchResult};
+use super::utils::*;
+
+// %% main %%
 #[component]
 pub fn Search() -> Element {
     let mut intern_search_results = use_signal(Vec::<InternSearchResult>::new);

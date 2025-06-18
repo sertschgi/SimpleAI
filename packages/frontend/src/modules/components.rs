@@ -1,3 +1,6 @@
+// %%% components.rs %%%
+
+// %% exports %%
 pub mod connection;
 pub mod divider;
 pub mod drag_area;
@@ -11,6 +14,7 @@ pub mod search_result;
 pub mod static_param;
 pub mod viewport;
 
+// %% prelude %%
 pub mod prelude {
     pub use super::divider::*;
     pub use super::drag_area::*;
@@ -26,4 +30,10 @@ pub mod prelude {
         pub use super::super::runtime_param::*;
         pub use super::super::static_param::*;
     }
+}
+
+// %% utils %%
+pub(crate) mod utils {
+    pub use crate::utils::*;
+    pub use simple_ai_backend::utils::prelude::*;
 }

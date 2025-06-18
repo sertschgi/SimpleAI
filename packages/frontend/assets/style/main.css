@@ -1,0 +1,14 @@
+svg {
+  height: 100%;
+  width: 100%;
+}
+
+.icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.button {
+  padding: 1rem;
+  margin: 1rem;
+}

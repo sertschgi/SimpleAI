@@ -1,6 +1,10 @@
-use crate::prelude::*;
+// %%% components / viewport.rs %%%
+
+// %% includes %%
+use super::utils::*;
 use simple_ai_backend::utils::prelude::*;
 
+// %% main %%
 #[derive(Clone)]
 pub struct ViewportNodeContainer {
     pub backend_node_container: NodeContainer,
@@ -72,15 +76,15 @@ pub fn Viewport(
     };
 
     use_resource(move || async move {
-        let mut ctx = DRAG_NODE();
-        if let Some(mut node) = ctx.take() {
-            dioxus::logger::tracing::debug!("NODE: {:?}", node.name);
-            let position = (PageVector::from(node.position.unwrap_or_default())
-                - get_client_rect().await.origin.to_vector().cast_unit())
-                / *scale.peek();
-            node.position = Some((position.x, position.y));
-            node_container().push_context(StrongNode::from(node));
-        }
+        // let mut ctx = DRAG_NODE();
+        // if let Some(mut node) = ctx.take() {
+        //     dioxus::logger::tracing::debug!("NODE: {:?}", node.name);
+        //     let position = (PageVector::from(node.position.unwrap_or_default())
+        //         - get_client_rect().await.origin.to_vector().cast_unit())
+        //         / *scale.peek();
+        //     node.position = Some((position.x, position.y));
+        //     node_container().push_context(StrongNode::from(node));
+        // }
     });
 
     // ------------------------------ EVENTS ------------------------------ //
@@ -130,9 +134,9 @@ pub fn Viewport(
         if let Some(mut connection) = pressed_connection() {
             connection.dimensions.set(get_diff(&e));
             connection.pressed.set(false);
-            if let Some(mut c) = CONNECTION() {
-                c.foreign_dimensions.set((connection.dimensions)());
-            }
+            // if let Some(mut c) = CONNECTION() {
+            //     c.foreign_dimensions.set((connection.dimensions)());
+            // }
             pressed_connection.set(None);
         } else if let Some(mut node) = pressed_node() {
             node.cursor.set("grab".into());

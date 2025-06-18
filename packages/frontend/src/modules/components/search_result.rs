@@ -1,6 +1,10 @@
-use crate::prelude::{components::prelude::Draggable, *};
-use simple_ai_backend::utils::prelude::*;
+// %%% components / search_result.rs %%%
 
+// %% includes %%
+use super::draggable::Draggable;
+use super::utils::*;
+
+// %% main %%
 #[derive(PartialEq, Props, Clone, Copy)]
 pub struct InternSearchResult {
     pub node: Signal<Node>,
@@ -17,7 +21,7 @@ pub fn SearchResult(intern: InternSearchResult) -> Element {
     let draggingend = move |v: PageVector| {
         let mut node = intern.node.cloned();
         node.position = Some((v.x, v.y));
-        *DRAG_NODE.write() = Some(node);
+        // *DRAG_NODE.write() = Some(node);
     };
 
     rsx! {

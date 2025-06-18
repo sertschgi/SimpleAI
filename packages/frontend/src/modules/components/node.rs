@@ -1,6 +1,11 @@
-use crate::prelude::{components::prelude::params::*, *};
-use simple_ai_backend::utils::prelude::*;
+// %%% components / node.rs %%%
 
+// %% includes %%
+use super::runtime_param::{InternRuntimeParam, RuntimeParam};
+use super::static_param::{InternStaticParam, StaticParam};
+use super::utils::*;
+
+// %% main %%
 #[derive(PartialEq, Props, Clone)]
 pub struct InternNode {
     pub node: StrongNode,

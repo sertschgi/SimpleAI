@@ -1,5 +1,9 @@
-use crate::prelude::*;
+// %%% components / rag_area.rs %%%
 
+// %% includes %%
+use super::utils::*;
+
+// %% main %%
 #[derive(Default, Clone, Copy)]
 pub struct DragContext {
     pub cursor_start_position: Signal<PageVector>,

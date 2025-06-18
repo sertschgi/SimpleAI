@@ -1,5 +1,9 @@
-use crate::prelude::*;
+// %%% components / labeled_box.rs %%%
 
+// %% includes %%
+use super::utils::*;
+
+// %% main %%
 #[component]
 pub fn LabeledBox(children: Element) -> Element {
     let script = r#####"

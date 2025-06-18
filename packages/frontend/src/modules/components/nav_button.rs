@@ -1,5 +1,10 @@
-use crate::prelude::*;
+// %%% components / nav_button.rs %%%
+
+// %% includes %%
+use super::utils::*;
 use dioxus::router::prelude::*;
+
+// %% main %%
 
 #[component]
 pub fn NavButton(
@@ -10,7 +15,7 @@ pub fn NavButton(
     let class_unw = class.unwrap_or_default();
     rsx! {
         Link {
-            class: "NavbarButton {class_unw}",
+            class: "NavbarButton button {class_unw}",
             to: to,
             div {
                 {children}

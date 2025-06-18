@@ -30,4 +30,5 @@ inherits = "dev"
 [profile.android-dev]
 inherits = "dev"
 
-
+[profile.dev]
+overflow-checks = false

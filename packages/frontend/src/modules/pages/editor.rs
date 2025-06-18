@@ -1,5 +1,9 @@
-use crate::prelude::{components::prelude::*, *};
+// %%% pages / editor.rs %%%
 
+// %% includes %%
+use super::utils::*;
+
+// %% main %%
 #[page]
 pub fn Editor() -> Element {
     rsx! {

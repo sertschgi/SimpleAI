@@ -1,5 +1,9 @@
-use crate::prelude::{components::prelude::*, *};
+// %%% pages / new.rs %%%
 
+// %% includes %%
+use super::utils::*;
+
+// %% main %%
 #[page]
 pub fn New() -> Element {
     rsx! {
