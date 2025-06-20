@@ -57,7 +57,6 @@ impl Parse for Field {
                     }
                     value.push_str(&p);
                 }
-                println!("value {}", value);
                 value
             },
         })
@@ -92,7 +91,6 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
         let block = write_block_out(&svg_body).expect("failed writing block");
         let svg = TokenStream::from_str(&block).unwrap();
         let classes = format!("Icon {}", function_name);
-        println!("block: {}", block);
         quote! {
             pub fn #function_ident() -> Element {
                 rsx! {
