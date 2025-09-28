@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 dioxus = { workspace = true, features = ["desktop"]}
 simple-ai-frontend = { workspace = true }
+simple-ai-macros = { workspace = true }

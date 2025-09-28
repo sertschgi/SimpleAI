@@ -2,7 +2,7 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
 
-use crate::utils::prelude::*;
+use crate::modules::utils::prelude::*;
 
 pub fn delete_node(name: String, version: Option<String>) -> Result<(), String> {
     let node_path = Path::new("nodes/").join(&name);

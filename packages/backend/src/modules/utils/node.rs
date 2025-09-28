@@ -1,4 +1,4 @@
-use super::prelude::{save::*, *};
+use super::prelude::*;
 use derive_builder::Builder;
 use std::collections::HashMap;
 // -------------------- NODE KIND -------------------- //
@@ -7,19 +7,20 @@ pub enum NodeKind {
     Code { code: String },
     Bundled { bundle: NodeContainer },
 }
-
 // -------------------- NODE -------------------- //
 pub type StrongNode = StrongContext<Node>;
 pub type WeakNode = WeakContext<Node>;
 
 #[derive(Builder, Clone, PartialEq)]
 pub struct Node {
+    #[builder(setter(into))]
     pub name: String,
     pub params: Vec<StrongParam>,
     pub version: Version,
     pub kind: NodeKind,
     pub description: String,
     pub author: String,
+    #[builder(default)]
     pub compiled: Option<String>, // or and bytes...
     pub date: Date,
     #[builder(default)]

@@ -18,10 +18,9 @@ pub fn LabeledBox(children: Element) -> Element {
 })(document.currentScript);
 "#####;
     rsx! {
-        div {
-            class: "LabeledBox",
-            script { { script } }
-            { children }
+        div { class: "LabeledBox",
+            script { {script} }
+            {children}
         }
     }
 }

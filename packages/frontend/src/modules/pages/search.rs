@@ -7,8 +7,6 @@ use super::utils::*;
 #[page]
 pub fn Search() -> Element {
     rsx! {
-        main {
-            Search {}
-        }
+        main { Search {} }
     }
 }

@@ -2,24 +2,19 @@
 
 // %% includes %%
 use super::utils::*;
-use dioxus::router::prelude::*;
+use dioxus::router::NavigationTarget;
 
 // %% main %%
 
-#[component]
+#[item]
 pub fn NavButton(
     children: Element,
-    class: Option<String>,
     #[props(into)] to: NavigationTarget,
+    #[props(extends = GlobalAttributes)] attributes: Vec<Attribute>,
 ) -> Element {
-    let class_unw = class.unwrap_or_default();
     rsx! {
-        Link {
-            class: "NavbarButton button {class_unw}",
-            to: to,
-            div {
-                {children}
-            }
+        Link { to, class: "asdf",
+            div { ..attributes,{children} }
         }
     }
 }

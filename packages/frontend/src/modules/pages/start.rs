@@ -2,7 +2,7 @@
 
 // %% includes %%
 use super::utils::*;
-use dioxus::router::prelude::*;
+use dioxus::router::NavigationTarget;
 
 // %% main %%
 #[page]
@@ -13,11 +13,18 @@ pub fn Start(
 ) -> Element {
     rsx! {
         main {
-            article {
-                section {
-                    NavButton { class: "search", to: search_route, SearchIcon {}}
-                    NavButton { class: "new", to: new_route, NewIcon {} }
-                    NavButton { class: "editor", to: editor_route, EditorIcon {} }
+            div { class: "button-container",
+                NavButton { class: "search", to: search_route,
+                    SearchIcon {}
+                    p { "search" }
+                }
+                NavButton { class: "new", to: new_route,
+                    NewIcon {}
+                    p { "new" }
+                }
+                NavButton { class: "editor", to: editor_route,
+                    EditorIcon {}
+                    p { "editor" }
                 }
             }
         }

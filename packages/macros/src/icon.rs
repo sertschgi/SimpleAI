@@ -22,14 +22,14 @@ use syn::{
 struct Field {
     member: Ident,
     svg: String,
-    colon: Token![:],
+    _colon: Token![:],
 }
 
 impl Parse for Field {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         Ok(Self {
             member: input.parse()?,
-            colon: input.parse()?,
+            _colon: input.parse()?,
             svg: {
                 let mut value = String::new();
                 let mut needs_space = false;
@@ -81,8 +81,7 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
     let fields: FieldValues = parse2(item).unwrap();
     let mut out: TokenStream = quote! {
             use dioxus::prelude::*;
-    }
-    .into();
+    };
     for field in fields.fields {
         let function_name = pascal_case(&format!("{}Icon", field.member));
         let function_ident = Ident::new(&function_name, Span::call_site());

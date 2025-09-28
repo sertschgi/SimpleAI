@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::utils::prelude::{save::*, *};
+use crate::modules::utils::prelude::*;
 use walkdir::WalkDir;
 
 pub fn get_all_nodes() -> Result<NodeContainer, String> {
@@ -31,7 +31,7 @@ pub fn get_all_nodes() -> Result<NodeContainer, String> {
 }
 
 /// This function searches through all available Nodes and returns a NodeContainer containing all Nodes available for the inferred environment.
-pub fn query(query_filter: Vec<QueryFilter>) -> NodeContainer {
+pub fn query_nodes(query_filter: Vec<QueryFilter>) -> NodeContainer {
     let all_nodes = get_all_nodes().expect("Error walking directory!");
 
     all_nodes

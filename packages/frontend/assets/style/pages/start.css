@@ -1,0 +1,19 @@
+/* %%% pages / start.css %%% */
+main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div .button-container {
+  width: 30rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.NavbarButton .Icon {
+  height: 3rem;
+  width: 3rem;
+}

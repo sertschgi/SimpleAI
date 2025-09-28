@@ -1,0 +1,25 @@
+.Divider {
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+}
+
+.Divider > .wrapper {
+  height: 100%;
+  width: 1rem;
+  margin: 0 calc(-0.5rem + var(--border-width) / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Divider > .wrapper:hover {
+  cursor: col-resize;
+}
+
+.Divider > .wrapper > .inner {
+  background-color: rgba(var(--background-highlight-color), 0.5);
+  height: 100%;
+  width: var(--border-width);
+  z-index: 100;
+}

@@ -1,8 +1,10 @@
 // %%% components / viewport.rs %%%
 
+use crate::modules::pages::utils::NODE_TRANSFERER;
+
 // %% includes %%
 use super::utils::*;
-use simple_ai_backend::utils::prelude::*;
+use simple_ai_backend::prelude::*;
 
 // %% main %%
 #[derive(Clone)]
@@ -75,16 +77,16 @@ pub fn Viewport(
         }
     };
 
-    use_resource(move || async move {
-        // let mut ctx = DRAG_NODE();
-        // if let Some(mut node) = ctx.take() {
-        //     dioxus::logger::tracing::debug!("NODE: {:?}", node.name);
-        //     let position = (PageVector::from(node.position.unwrap_or_default())
-        //         - get_client_rect().await.origin.to_vector().cast_unit())
-        //         / *scale.peek();
-        //     node.position = Some((position.x, position.y));
-        //     node_container().push_context(StrongNode::from(node));
-        // }
+    let _ = use_resource(move || async move {
+        let mut ctx = NODE_TRANSFERER();
+        if let Some(mut node) = ctx.take() {
+            dioxus::logger::tracing::debug!("NODE: {:?}", node.name);
+            let position = (PageVector::from(node.position.unwrap_or_default())
+                - get_client_rect().await.origin.to_vector().cast_unit())
+                / *scale.peek();
+            node.position = Some((position.x, position.y));
+            node_container().push_context(StrongNode::from(node));
+        }
     });
 
     // ------------------------------ EVENTS ------------------------------ //
@@ -170,7 +172,7 @@ pub fn Viewport(
     };
 
     rsx! {
-        body {
+        article {
             class: "Viewport",
             cursor: "{cursor}",
             overflow: "hidden",

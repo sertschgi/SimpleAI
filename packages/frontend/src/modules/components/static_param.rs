@@ -2,7 +2,7 @@
 
 // %% includes %%
 use super::utils::*;
-use simple_ai_backend::utils::prelude::*;
+use simple_ai_backend::prelude::*;
 
 // %% main %%
 #[derive(PartialEq, Props, Clone)]

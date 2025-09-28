@@ -6,6 +6,11 @@ use super::static_param::{InternStaticParam, StaticParam};
 use super::utils::*;
 
 // %% main %%
+// % transferrer % //
+pub static NODE_TRANSFERER: GlobalSignal<Option<simple_ai_backend::prelude::Node>> =
+    GlobalSignal::new(|| None);
+
+// % Node % //
 #[derive(PartialEq, Props, Clone)]
 pub struct InternNode {
     pub node: StrongNode,

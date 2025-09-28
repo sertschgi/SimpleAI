@@ -4,41 +4,64 @@
 use super::utils::*;
 
 // %% main %%
-#[page]
+#[component]
 pub fn New() -> Element {
     rsx! {
         main {
             form {
                 LabeledBox {
-                    label { for: "name", "node name" }
-                    input { id: "name", name: "name", type: "text", required: "true", placeholder: "SampleProject"}
+                    label { r#for: "name", "node name" }
+                    input {
+                        id: "name",
+                        name: "name",
+                        r#type: "text",
+                        required: "true",
+                        placeholder: "SampleProject",
+                    }
                 }
                 LabeledBox {
-                    input { id: "name", name: "name", type: "text", required: "true", placeholder: "SampleProject"}
-                    label { for: "name", "project name" }
+                    input {
+                        id: "name",
+                        name: "name",
+                        r#type: "text",
+                        required: "true",
+                        placeholder: "SampleProject",
+                    }
+                    label { r#for: "name", "project name" }
                 }
-                input { type: "text" }
+                input { r#type: "text" }
                 LabeledBox {
-                    label { for: "name", "project name" }
-                    input { id: "name", name: "name", type: "text", required: "true", placeholder: "SampleProject"}
+                    label { r#for: "name", "project name" }
+                    input {
+                        id: "name",
+                        name: "name",
+                        r#type: "text",
+                        required: "true",
+                        placeholder: "SampleProject",
+                    }
                 }
                 LabeledBox {
-                    input { id: "name", name: "name", type: "text", required: "true", placeholder: "SampleProject"}
-                    label { for: "name", "project name" }
+                    input {
+                        id: "name",
+                        name: "name",
+                        r#type: "text",
+                        required: "true",
+                        placeholder: "SampleProject",
+                    }
+                    label { r#for: "name", "project name" }
                 }
-                input { type: "file" }
-                input { type: "range" }
+                input { r#type: "file" }
+                input { r#type: "range" }
 
-                input { type: "list", list: "options" }
+                input { r#type: "list", list: "options" }
 
-                datalist {
-                    id: "options",
+                datalist { id: "options",
                     option { value: "1", "1" }
                     option { value: "2", "2" }
                     option { value: "3", "3" }
                 }
 
-                button { type: "submit", "create" }
+                button { r#type: "submit", "create" }
             }
         }
     }

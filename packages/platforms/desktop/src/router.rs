@@ -1,4 +1,5 @@
 use crate::prelude::{pages::prelude::*, *};
+use simple_ai_macros::entry;
 
 fn StartPage() -> Element {
     rsx! {
@@ -11,15 +12,21 @@ fn StartPage() -> Element {
 }
 
 fn SearchPage() -> Element {
-    rsx! { Search {} }
+    rsx! {
+        Search {}
+    }
 }
 
 fn NewPage() -> Element {
-    rsx! { New {} }
+    rsx! {
+        New {}
+    }
 }
 
 fn EditorPage() -> Element {
-    rsx! { Editor {} }
+    rsx! {
+        Editor {}
+    }
 }
 
 #[derive(Debug, Clone, Routable, PartialEq)]

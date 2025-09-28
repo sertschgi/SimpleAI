@@ -5,12 +5,15 @@ pub mod connection;
 pub mod divider;
 pub mod drag_area;
 pub mod draggable;
+pub mod focus_button;
+pub mod focus_button_array;
 pub mod labeled_box;
 pub mod nav_button;
 pub mod node;
 pub mod runtime_param;
 pub mod search;
 pub mod search_result;
+pub mod section_toggle;
 pub mod static_param;
 pub mod viewport;
 
@@ -19,11 +22,14 @@ pub mod prelude {
     pub use super::divider::*;
     pub use super::drag_area::*;
     pub use super::draggable::*;
+    pub use super::focus_button::*;
+    pub use super::focus_button_array::*;
     pub use super::labeled_box::*;
     pub use super::nav_button::*;
     pub use super::node::*;
     pub use super::search::*;
     pub use super::search_result::*;
+    pub use super::section_toggle::*;
     pub use super::viewport::*;
     pub mod params {
         pub use super::super::connection::*;
@@ -34,6 +40,7 @@ pub mod prelude {
 
 // %% utils %%
 pub(crate) mod utils {
+    pub use crate::modules::utils::*;
     pub use crate::utils::*;
-    pub use simple_ai_backend::utils::prelude::*;
+    pub use simple_ai_backend::prelude::*;
 }

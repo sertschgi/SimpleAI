@@ -121,7 +121,7 @@ pub fn Connection(intern: InternConnection) -> Element {
                     path {
                         class: "Curve",
                         stroke_width: "{stroke_width()}px",
-                        d: "{svg_path()}"
+                        d: "{svg_path()}",
                     }
                 }
             }

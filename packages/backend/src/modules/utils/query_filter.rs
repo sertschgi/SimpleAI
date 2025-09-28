@@ -1,4 +1,4 @@
-use crate::utils::prelude::*;
+use crate::modules::utils::prelude::*;
 use fuzzy_matcher::{skim::SkimMatcherV2, FuzzyMatcher};
 
 // ---------------- QUERY FILTER ---------------- //

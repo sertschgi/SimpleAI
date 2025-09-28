@@ -1,0 +1,7 @@
+.Node {
+  border-width: var(--border-width);
+  background-color: rgba(var(--accent-color), 0.5);
+  border-color: rgb(var(--border-color));
+  border-radius: var(--border-radius);
+  border-style: solid;
+}

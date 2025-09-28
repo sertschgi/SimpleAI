@@ -14,3 +14,10 @@ change-case = { version = "0.2.0" }
 dioxus-rsx-rosetta = { version = "0.6" }
 dioxus-autofmt = { version = "0.6" }
 rstml = { version = "0.12" }
+toml = { version = "0.9" }
+serde = { version = "1.0" }
+dioxus-rsx = { version = "0.7.0-rc.0"}
+
+[dev-dependencies]
+dioxus = { workspace = true }
+macrotest = { version = "1.2" }

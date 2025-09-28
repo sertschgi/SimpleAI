@@ -9,14 +9,14 @@ members = [
 ]
 
 [workspace.package]
-version = "0.6.3"
+version = "0.0.1"
 
 [workspace.dependencies]
 simple-ai-backend = { path = "packages/backend" }
 simple-ai-frontend = { path = "packages/frontend" }
 simple-ai-macros = { path = "packages/macros" }
 
-dioxus = { version = "0.6.3" }
+dioxus = { version = "0.7.0-rc.0" }
 
 [profile]
 

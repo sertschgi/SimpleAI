@@ -1,0 +1,187 @@
+/* %%% entry.css %%% */
+
+/* %% root %% */
+:root {
+  /* % color palette % */
+  --color-1: 17, 18, 19;
+  --color-2: 66, 69, 76;
+  --color-3: 95, 101, 115;
+  --color-4: 206, 214, 232;
+  --color-5: 250, 250, 250;
+
+  /* % colors % */
+  --background-color: var(--color-1);
+  --main-color: var(--color-4);
+  --text-color: var(--color-5);
+  --accent-color: var(--color-3);
+  --background-highlight-color: var(--color-2);
+
+  /* % border % */
+  --border-width: 0.15rem;
+  --border-color: var(--accent-color);
+  --border-radius: 1rem;
+}
+
+/* %% general %% */
+/* % full size % */
+html,
+body,
+main,
+#main,
+svg,
+section,
+article,
+aside {
+  height: 100%;
+  width: 100%;
+}
+
+/* % no spacing % */
+html,
+body,
+main,
+section,
+article,
+aside,
+div {
+  margin: 0;
+  padding: 0;
+}
+
+/* %% elements %% */
+/* % * % */
+* {
+  user-select: none;
+}
+
+/* % html % */
+html {
+  background-color: rgb(var(--background-color));
+  color: rgb(var(--text-color));
+}
+
+/* % Icon % */
+.Icon {
+  color: rgb(var(--accent-color));
+  width: 2rem;
+  height: 2rem;
+  margin: 0.5rem;
+  padding: 0.5rem;
+}
+
+/* % button % */
+button {
+  padding: 1rem;
+  margin: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* % NavbarButton % */
+.NavbarButton {
+  color: rgb(var(--accent-color));
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+}
+
+.NavbarButton p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+/* % a % */
+a {
+  text-decoration: none;
+  color: rgb(var(--text-color));
+}
+
+/* % form % */
+form {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+  justify-content: space-around;
+  width: 90%;
+}
+
+/* % header % */
+header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+}
+
+/* % input % */
+input {
+  border-width: var(--border-width);
+  background-color: rgba(var(--accent-color), 0.5);
+  border-color: rgb(var(--border-color));
+  border-radius: var(--border-radius);
+  border-style: none;
+  caret-shape: block;
+  height: 3rem;
+  width: 100%;
+  color: rgb(var(--text-color));
+  padding: 1rem;
+  margin: 1rem;
+}
+
+input:focus {
+  outline: none;
+}
+
+input::placeholder {
+  color: var(--input-grayed-out);
+  font-style: italic;
+}
+
+/* input:focus::placeholder { */
+/*   color: rgb(var(--accent-color)); */
+/* } */
+
+input::-webkit-file-upload-button {
+  height: 100%;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  color: rgb(var(--border-color));
+  font-weight: bold;
+}
+
+input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 10px;
+  border-radius: 5px;
+  background: transparent;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--background-color);
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+}
+
+input[type="range"]::-webkit-slider-thumb:focus {
+  background-color: rgb(var(--border-color));
+}

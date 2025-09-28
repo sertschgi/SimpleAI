@@ -2,9 +2,12 @@
 
 // %% includes %%
 use super::draggable::Draggable;
+use super::node::NODE_TRANSFERER;
 use super::utils::*;
 
 // %% main %%
+
+// % Search Result % //
 #[derive(PartialEq, Props, Clone, Copy)]
 pub struct InternSearchResult {
     pub node: Signal<Node>,
@@ -21,7 +24,7 @@ pub fn SearchResult(intern: InternSearchResult) -> Element {
     let draggingend = move |v: PageVector| {
         let mut node = intern.node.cloned();
         node.position = Some((v.x, v.y));
-        // *DRAG_NODE.write() = Some(node);
+        *NODE_TRANSFERER.write() = Some(node);
     };
 
     rsx! {
@@ -32,12 +35,10 @@ pub fn SearchResult(intern: InternSearchResult) -> Element {
                 div {
                     class: "wrapper items",
                     h3 { span { id: "name", "{intern.node.cloned().name}" } }
-
                     div {
-                            class: "wrapper",
+                        class: "wrapper",
                         div {
                             class: "wrapper i",
-
                             div { id: "open", class: "icon" }
                         }
                     }
