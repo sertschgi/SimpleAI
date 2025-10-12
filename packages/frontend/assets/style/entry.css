@@ -23,17 +23,26 @@
 }
 
 /* %% general %% */
+
 /* % full size % */
 html,
 body,
-main,
 #main,
-svg,
-section,
-article,
-aside {
+svg {
   height: 100%;
   width: 100%;
+}
+
+main,
+article,
+aside,
+section {
+  flex-grow: 1;
+}
+
+#main {
+  display: flex;
+  flex-direction: column;
 }
 
 /* % no spacing % */

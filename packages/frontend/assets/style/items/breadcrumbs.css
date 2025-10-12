@@ -1,11 +1,11 @@
 .Breadcrumbs {
-  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: left;
   align-items: center;
   padding: 1rem;
   box-sizing: content-box;
+  position: sticky;
   background-color: rgba(var(--color-2), 0.3);
 }
 

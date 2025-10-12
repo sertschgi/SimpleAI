@@ -1,8 +1,9 @@
 /* %%% pages / start.css %%% */
-main {
+.Start {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-grow: 1;
 }
 
 div .button-container {
