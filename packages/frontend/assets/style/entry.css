@@ -100,6 +100,12 @@ a {
   color: rgb(var(--text-color));
 }
 
+/* % h1 % */
+h1 {
+  padding: 0;
+  margin: 0;
+}
+
 /* % form % */
 form {
   align-items: center;

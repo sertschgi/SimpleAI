@@ -4,14 +4,9 @@
 
 // %% includes %%
 // % extern %
-use crate::element::rsx_ast::{Attribute, Attributes, Element};
-use dioxus_rsx::{
-    AttributeName, AttributeValue, BodyNode, CallBody, Component, DynIdx, HotLiteral,
-    HotReloadFormattedSegment, IfmtInput, RsxBlock, RsxItem, Segment, TemplateBody,
-};
 use proc_macro2::{Span, TokenStream};
 use quote::*;
-use syn::{parse::Parser, parse2, parse_quote, Expr, Ident, LitStr, Macro, Stmt};
+use syn::{parse2, parse_quote, LitStr};
 
 // % intern %
 use super::{
@@ -27,6 +22,7 @@ pub struct ElementHandler {
 
 impl ElementHandler {
     pub fn new(attr: TokenStream, item: TokenStream) -> Self {
+        println!("-----------------------------------------------------------------------------");
         Self {
             attrs: parse2(attr).expect("Could not parse the function attributes"),
             function: parse2(item).expect("Could not parse the function itself"),
@@ -52,7 +48,7 @@ impl ElementHandler {
         if self.attrs.entry {
             self.attrs.kind = ElementKind::Entry;
             self.attrs.no_css = false;
-            self.handle_css(rsx_main_element);
+            self.handle_css();
         }
     }
 
@@ -61,7 +57,10 @@ impl ElementHandler {
         self.handle_as_entries();
         self.handle_class();
 
-        let func = &self.function.into_token_stream();
+        let func = &self.function;
+
+        println!("{}", func.into_token_stream());
+
         quote! {
             #[dioxus::prelude::component]
             #func
@@ -81,34 +80,49 @@ impl ElementHandler {
         let style_file_lit =
             LitStr::new(style_file.to_str().unwrap_or_default(), Span::call_site());
 
-        rsx_main_element.elmts.push(parse_quote! {
-        document::Link {
-            rel: "stylesheet",
-            href: asset!(#style_file_lit)
-        }});
+        quote! {
+            document::Link {
+                rel: "stylesheet",
+                href: asset!(#style_file_lit)
+            }
+        }
+        .to_tokens(&mut self.function.macro_ast.body);
     }
 
     fn handle_class(&mut self) {
         if self.attrs.no_class {
             return;
         }
+        println!("BEFORE ELM");
         let elm = {
-            if let Some(elm) = rsx_main_element
+            if let Some(elm) = self
+                .function
+                .macro_ast
                 .attrs
                 .iter_mut()
                 .find(|attr| attr.name == "class")
             {
                 elm
             } else {
-                rsx_main_element.attrs.push(parse_quote! { class: "", });
-                rsx_main_element.attrs.last_mut().unwrap()
+                self.function
+                    .macro_ast
+                    .attrs
+                    .insert(0, parse_quote! { class: "" });
+                // if only the class attribute is present there needs to be trailing puncuation
+                if self.function.macro_ast.attrs.len() == 1 {
+                    self.function.macro_ast.attrs.push_punct(parse_quote! {,});
+                }
+                self.function.macro_ast.attrs.first_mut().unwrap()
             }
         };
-        let val = parse2::<LitStr>(elm.value.clone()).expect("Couldn't parse attribute value");
-        elm.value = LitStr::new(
-            &format!("{} Element {}", val.value(), self.function.name),
+        println!("ELM");
+        let previous_value = match elm.value.clone() {
+            Some(value) => value.value(),
+            None => elm.name.to_string(),
+        };
+        elm.value = Some(LitStr::new(
+            &format!("{} Element {}", previous_value, self.function.name),
             Span::call_site(),
-        )
-        .into_token_stream();
+        ));
     }
 }

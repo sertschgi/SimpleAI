@@ -2,7 +2,7 @@
 
 // %% includes %%
 use super::utils::*;
-use dioxus::router::NavigationTarget;
+use dioxus::{core::AttributeValue, router::NavigationTarget};
 
 // %% main %%
 
@@ -12,9 +12,14 @@ pub fn NavButton(
     #[props(into)] to: NavigationTarget,
     #[props(extends = GlobalAttributes)] attributes: Vec<Attribute>,
 ) -> Element {
-    rsx! {
-        Link { to, class: "asdf",
-            div { ..attributes,{children} }
+    let mut other_classes = String::new();
+    if let Some(pos) = attributes.iter().position(|x| x.name == "class") {
+        let value = attributes.remove(pos).value;
+        if let AttributeValue::Text(text) = value {
+            other_classes = text;
         }
+    }
+    rsx! {
+        Link { class: "{other_classes}", to, attributes, {children} }
     }
 }

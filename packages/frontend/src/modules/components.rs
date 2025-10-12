@@ -1,6 +1,7 @@
 // %%% components.rs %%%
 
 // %% exports %%
+pub mod breadcrumbs;
 pub mod connection;
 pub mod divider;
 pub mod drag_area;
@@ -19,6 +20,7 @@ pub mod viewport;
 
 // %% prelude %%
 pub mod prelude {
+    pub use super::breadcrumbs::*;
     pub use super::divider::*;
     pub use super::drag_area::*;
     pub use super::draggable::*;
@@ -40,7 +42,6 @@ pub mod prelude {
 
 // %% utils %%
 pub(crate) mod utils {
-    pub use crate::modules::utils::*;
     pub use crate::utils::*;
     pub use simple_ai_backend::prelude::*;
 }

@@ -18,6 +18,8 @@ pub(crate) mod utils {
     pub use simple_ai_macros::*;
     // % icons %
     pub use super::modules::icons::*;
+    // % router %
+    pub use crate::modules::router::prelude::*;
     // % custom types %
     pub type PageVector = Vector2D<f64, PageSpace>;
 }

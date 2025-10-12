@@ -2,29 +2,20 @@
 
 // %% includes %%
 use super::utils::*;
-use dioxus::router::NavigationTarget;
 
 // %% main %%
 #[page]
-pub fn Start(
-    #[props(into)] search_route: NavigationTarget,
-    #[props(into)] new_route: NavigationTarget,
-    #[props(into)] editor_route: NavigationTarget,
-) -> Element {
+pub fn Start() -> Element {
     rsx! {
         main {
             div { class: "button-container",
-                NavButton { class: "search", to: search_route,
-                    SearchIcon {}
-                    p { "search" }
+                NavButton { class: "editor", to: Route::Projects {},
+                    ProjectsIcon {}
+                    p { "projects" }
                 }
-                NavButton { class: "new", to: new_route,
+                NavButton { class: "new", to: Route::New {},
                     NewIcon {}
-                    p { "new" }
-                }
-                NavButton { class: "editor", to: editor_route,
-                    EditorIcon {}
-                    p { "editor" }
+                    p { "new project" }
                 }
             }
         }

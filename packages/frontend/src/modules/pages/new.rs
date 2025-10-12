@@ -4,7 +4,7 @@
 use super::utils::*;
 
 // %% main %%
-#[component]
+#[page]
 pub fn New() -> Element {
     rsx! {
         main {

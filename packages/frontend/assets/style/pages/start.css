@@ -10,10 +10,11 @@ div .button-container {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
-.NavbarButton .Icon {
-  height: 3rem;
-  width: 3rem;
+.NavButton .Icon {
+  border-radius: 4rem;
+  border-style: solid;
+  border-width: 0.2rem;
 }
