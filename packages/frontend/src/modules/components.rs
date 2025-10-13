@@ -16,7 +16,9 @@ pub mod search;
 pub mod search_result;
 pub mod section_toggle;
 pub mod static_param;
+pub mod top_nav;
 pub mod viewport;
+pub mod window_decorations;
 
 // %% prelude %%
 pub mod prelude {
@@ -32,7 +34,9 @@ pub mod prelude {
     pub use super::search::*;
     pub use super::search_result::*;
     pub use super::section_toggle::*;
+    pub use super::top_nav::*;
     pub use super::viewport::*;
+    pub use super::window_decorations::*;
     pub mod params {
         pub use super::super::connection::*;
         pub use super::super::runtime_param::*;

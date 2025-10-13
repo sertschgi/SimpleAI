@@ -7,3 +7,6 @@ edition = "2021"
 dioxus = { workspace = true, features = ["desktop"]}
 simple-ai-frontend = { workspace = true }
 simple-ai-macros = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+gtk = { version = "0.18.2", package = "gtk" }

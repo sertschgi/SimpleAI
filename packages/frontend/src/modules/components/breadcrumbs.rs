@@ -12,7 +12,7 @@ pub fn Breadcrumbs() -> Element {
     crumbs.pop();
     let mut assembled = String::new();
     rsx! {
-        div {
+        main {
             Link { to: Route::Start {}, HomeIcon {} }
             for crumb in crumbs.iter() {
                 RightBracketIcon {}

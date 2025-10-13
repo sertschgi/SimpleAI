@@ -1,0 +1,5 @@
+.TopNav {
+  display: flex;
+  flex-direction: row;
+  background-color: rgba(var(--color-2), 0.3);
+}

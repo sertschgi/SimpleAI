@@ -1,18 +1,12 @@
 pub mod core {
+    use super::super::components::top_nav::TopNavLayout;
     use super::super::pages::prelude::*;
-    use crate::{modules::pages::utils::Breadcrumbs, utils::*};
-
-    fn TopNav() -> Element {
-        rsx! {
-            Breadcrumbs {}
-            Outlet::<Route> {}
-        }
-    }
+    use crate::utils::*;
 
     #[derive(Debug, Clone, Routable, PartialEq)]
     #[rustfmt::skip]
     pub enum Route {
-        #[layout(TopNav)]
+        #[layout(TopNavLayout)]
             #[route("/")]
             Start {},
             #[nest("/projects")]

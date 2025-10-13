@@ -1,4 +1,7 @@
+pub mod platform;
+
 pub mod prelude {
+    pub(crate) use super::App;
     pub(crate) use dioxus::prelude::*;
     pub(crate) use simple_ai_frontend::prelude::*;
 }
@@ -7,7 +10,7 @@ use prelude::*;
 
 fn main() {
     dioxus::logger::init(dioxus::logger::tracing::Level::DEBUG).expect("failed to init logger");
-    dioxus::launch(App);
+    platform::launch();
 }
 
 #[component]
