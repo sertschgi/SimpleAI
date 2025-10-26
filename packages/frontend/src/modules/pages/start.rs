@@ -8,7 +8,7 @@ use super::utils::*;
 pub fn Start() -> Element {
     rsx! {
         main {
-            div { class: "button-container",
+            NavigationPage {
                 NavButton { class: "editor", to: Route::Projects {},
                     ProjectsIcon {}
                     p { "projects" }

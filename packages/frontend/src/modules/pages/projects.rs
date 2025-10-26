@@ -1,16 +1,36 @@
-// %%% pages / start.rs %%%
-
-// %% includes %%
+use super::super::components::project::Project;
 use super::utils::*;
+use chrono::{DateTime, Utc};
 use dioxus::router::NavigationTarget;
 
-// %% main %%
 #[page]
 pub fn Projects() -> Element {
     rsx! {
         main {
-            h1 { class: "projects-heading", "Projects" }
-            div { class: "projects-view" }
+            article { class: "projects-wrapper",
+                div { class: "projects-view",
+                    Project {
+                        name: "sample project",
+                        date: Utc::now(),
+                        desc: "this is a sample Project for development",
+                    }
+                    Project {
+                        name: "sample project",
+                        date: Utc::now(),
+                        desc: "this is a sample Project for development",
+                    }
+                    Project {
+                        name: "sample project",
+                        date: Utc::now(),
+                        desc: "this is a sample Project for development",
+                    }
+                    Project {
+                        name: "sample project",
+                        date: Utc::now(),
+                        desc: "this is a sample Project for development",
+                    }
+                }
+            }
         }
     }
 }

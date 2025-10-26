@@ -1,0 +1,20 @@
+.NavigationPage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.NavigationPage .button-container {
+  width: 30rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.NavButton .Icon {
+  border-radius: 4rem;
+  border-style: solid;
+  border-width: 0.2rem;
+}

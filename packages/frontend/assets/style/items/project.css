@@ -1,0 +1,36 @@
+.Project {
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: row;
+  border-style: solid;
+  border-width: 0.15rem;
+  border-radius: 1rem;
+}
+
+.Project .infos {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.Project .actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.Project .actions .Icon {
+  flex-grow: 1;
+}
+
+.Project > h3 {
+}
+
+.Project > .date {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.Project > .desc {
+}

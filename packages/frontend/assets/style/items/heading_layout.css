@@ -1,0 +1,14 @@
+.HeadingLayout {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.HeadingLayout > h1 {
+  padding: 0 0 1rem 0;
+}
+
+.HeadingLayout > article {
+  display: flex;
+  flex-direction: column;
+}

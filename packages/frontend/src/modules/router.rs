@@ -1,6 +1,8 @@
 pub mod core {
-    use super::super::components::top_nav::TopNavLayout;
-    use super::super::pages::prelude::*;
+    use super::super::{
+        components::{heading_layout::HeadingLayout, top_nav::TopNavLayout},
+        pages::prelude::*,
+    };
     use crate::utils::*;
 
     #[derive(Debug, Clone, Routable, PartialEq)]
@@ -9,13 +11,20 @@ pub mod core {
         #[layout(TopNavLayout)]
             #[route("/")]
             Start {},
-            #[nest("/projects")]
+            #[nest("/editor")]
                 #[route("/")]
-                Projects {},
+                Editor {},
             #[end_nest]
-            #[nest("/new")]
-                #[route("/")]
-                New {},
+            #[layout(HeadingLayout)]
+                #[nest("/projects")]
+                    #[route("/")]
+                    Projects {},
+                    #[route("/projects_nav")]
+                    ProjectNav {},
+                #[end_nest]
+                #[nest("/new")]
+                    #[route("/")]
+                    New {},
     }
 }
 

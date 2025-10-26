@@ -1,9 +1,6 @@
-// %%% components / top_nav.rs %%%
-// %% includes %%
 use super::utils::*;
 use super::{breadcrumbs::Breadcrumbs, window_decorations::WindowDecorations};
 
-// %% main %%
 #[item]
 pub fn TopNav() -> Element {
     rsx! {
@@ -14,9 +11,12 @@ pub fn TopNav() -> Element {
     }
 }
 
+#[item]
 pub fn TopNavLayout() -> Element {
     rsx! {
-        TopNav {}
-        Outlet::<Route> {}
+        div {
+            TopNav {}
+            article { Outlet::<Route> {} }
+        }
     }
 }

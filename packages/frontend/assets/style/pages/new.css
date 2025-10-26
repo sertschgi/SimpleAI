@@ -1,0 +1,32 @@
+.New {
+  display: flex;
+}
+
+.New > form {
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.New .LabeledBox {
+  width: 100%;
+}
+
+.New button {
+  height: 8rem;
+  width: 8rem;
+  border-radius: 5rem;
+  background-color: rgb(var(--background-highlight-color));
+  border-style: none;
+  color: rgb(var(--text-color));
+}
+
+.New button .Icon {
+  scale: 1.2;
+  color: rgb(var(--text-color));
+}
+
+.New .button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,15 +1,10 @@
-// %%% components / breadcrumbs.rs %%%
-/// The top navigation which shows you where you are.
-//
-// %% includes %%
 use super::utils::*;
 
-// %% main %%
 #[item]
 pub fn Breadcrumbs() -> Element {
     let route_str = router().full_route_string();
-    let mut crumbs: Vec<&str> = route_str.rsplit_terminator("/").collect();
-    crumbs.pop();
+    let mut crumbs: Vec<&str> = route_str.split_terminator("/").collect();
+    crumbs.remove(0);
     let mut assembled = String::new();
     rsx! {
         main {

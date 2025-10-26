@@ -1,0 +1,13 @@
+.LabeledBox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.LabeledBox > h5 {
+  padding: 1rem;
+}
+
+.LabeledBox > input {
+  flex-grow: 1;
+}

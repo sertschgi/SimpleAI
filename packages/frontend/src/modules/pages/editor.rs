@@ -5,7 +5,7 @@ use super::utils::*;
 use std::collections::HashMap;
 
 // %% main %%
-#[component]
+#[page]
 pub fn Editor() -> Element {
     let mut section_contents_map = use_signal(HashMap::new);
 
