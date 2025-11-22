@@ -12,6 +12,7 @@ pub fn Project(name: String, date: DateTime<Utc>, desc: String) -> Element {
                 br { class: "spacer" }
                 p { class: "desc", {desc} }
             }
+            div { class: "divider" }
             section { class: "actions",
                 Link { to: Route::ProjectNav {}, class: "open", FolderOpenIcon {} }
                 Link { to: Route::Editor {}, class: "edit", SettingsIcon {} }

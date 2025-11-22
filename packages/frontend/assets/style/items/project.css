@@ -1,36 +1,86 @@
 .Project {
-  padding: 1rem;
+  --project-padding: 1rem;
+  --project-border-radius: 1rem;
+  --project-items-border-radius: calc(
+    var(--project-border-radius) - var(--project-padding) / 2
+  );
+
+  padding: var(--project-padding);
   margin: 1rem 0;
   display: flex;
   flex-direction: row;
-  border-style: solid;
-  border-width: 0.15rem;
-  border-radius: 1rem;
+  background-color: var(--color-box-bg);
+  border-radius: var(--project-border-radius);
+  gap: 1rem;
+}
+
+.Project .divider {
+  background-color: var(--color-text-fg-ll);
+  width: 0.1rem;
 }
 
 .Project .infos {
+  box-sizing: border-box;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+.Project .infos .date {
+  font-size: 0.8rem;
+  position: absolute;
+  right: 0;
 }
 
 .Project .actions {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 1rem;
 }
-
 .Project .actions .Icon {
   flex-grow: 1;
+  color: var(--color-text-fg);
+  margin: 0;
 }
 
-.Project > h3 {
+.Project .actions a {
+  height: 100%;
+  flex-grow: 1;
+  border-radius: var(--project-items-border-radius);
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 
-.Project > .date {
-  font-size: 0.8rem;
-  font-style: italic;
+.Project .actions a {
+  opacity: 0.7;
+  scale: 1;
+  transition:
+    opacity 0.3s ease-in-out,
+    scale 0.1s ease-in-out;
+}
+.Project .actions a:hover {
+  opacity: 1;
+  scale: 1.1;
 }
 
-.Project > .desc {
+.Project .actions .open {
+  background-color: var(--color-ok-bg);
+}
+.Project .actions .open:hover {
+  background-color: var(--color-ok-bg);
+}
+.Project .actions .edit {
+  background-color: var(--color-edit-bg);
+}
+.Project .actions .edit:hover {
+  background-color: var(--color-edit-bg);
+}
+.Project .actions .delete {
+  background-color: var(--color-delete-bg);
+}
+.Project .actions .delete:hover {
+  background-color: var(--color-delete-bg);
 }

@@ -2,11 +2,6 @@
   display: flex;
 }
 
-.New > form {
-  flex-grow: 1;
-  justify-content: space-between;
-}
-
 .New .LabeledBox {
   width: 100%;
 }

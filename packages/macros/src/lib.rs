@@ -1,15 +1,11 @@
-// %%% SimpleAI macros lib.rs %%%
-// %% tests %%
 mod tests;
 
-// %% icon %%
 mod icon;
 #[proc_macro]
 pub fn icon(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     icon::macro_impl(syn::parse_macro_input!(item)).into()
 }
 
-// %% element %%
 mod element;
 #[proc_macro_attribute]
 pub fn element(
@@ -19,7 +15,6 @@ pub fn element(
     element::macro_impl(syn::parse_macro_input!(attr), syn::parse_macro_input!(item)).into()
 }
 
-// %% component %%
 mod item;
 #[proc_macro_attribute]
 pub fn item(
@@ -29,7 +24,6 @@ pub fn item(
     item::macro_impl(syn::parse_macro_input!(attr), syn::parse_macro_input!(item)).into()
 }
 
-// %% page %%
 mod page;
 #[proc_macro_attribute]
 pub fn page(
@@ -39,7 +33,6 @@ pub fn page(
     page::macro_impl(syn::parse_macro_input!(attr), syn::parse_macro_input!(item)).into()
 }
 
-// %% entry %%
 mod entry;
 #[proc_macro_attribute]
 pub fn entry(
@@ -47,4 +40,10 @@ pub fn entry(
     item: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
     entry::macro_impl(syn::parse_macro_input!(attr), syn::parse_macro_input!(item)).into()
+}
+
+mod formifiable;
+#[proc_macro_derive(Formifiable)]
+pub fn formifiable(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    formifiable::macro_impl(syn::parse_macro_input!(item)).into()
 }

@@ -1,26 +1,37 @@
 use super::utils::*;
 
+#[derive(Formifiable)]
+pub struct Project {
+    pub name: String,
+    pub description: String,
+}
+
 #[page]
 pub fn New() -> Element {
+    let mut proj = Project {
+        name: "".into(),
+        description: "".into(),
+    };
     rsx! {
         main {
-            form {
-                LabeledBox {
-                    name: "name",
-                    kind: "text",
-                    required: true,
-                    placeholder: "SampleProject",
-                }
-                LabeledBox {
-                    name: "description",
-                    kind: "text",
-                    required: false,
-                    placeholder: "this is a description",
-                }
-                section { class: "button-wrapper",
-                    button { r#type: "submit", NewIcon {} }
-                }
-            }
+            {proj.rsx_form()}
+                // form {
+        //     LabeledBox {
+        //         name: "name",
+        //         kind: "text",
+        //         required: true,
+        //         placeholder: "SampleProject",
+        //     }
+        //     LabeledBox {
+        //         name: "description",
+        //         kind: "text",
+        //         required: false,
+        //         placeholder: "this is a description",
+        //     }
+        //     section { class: "button-wrapper",
+        //         button { r#type: "submit", NewIcon {} }
+        //     }
+        // }
         }
     }
 }

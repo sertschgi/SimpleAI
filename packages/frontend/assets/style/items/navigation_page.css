@@ -15,6 +15,11 @@
 
 .NavButton .Icon {
   border-radius: 4rem;
-  border-style: solid;
-  border-width: 0.2rem;
+  padding: 0.8rem;
+  margin: 1rem;
+  background-color: var(--color-primary-300);
+}
+
+.NavButton .Icon > svg {
+  color: var(--color-bg);
 }
