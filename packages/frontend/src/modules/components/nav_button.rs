@@ -1,10 +1,5 @@
-// %%% components / nav_button.rs %%%
-
-// %% includes %%
 use super::utils::*;
 use dioxus::{core::AttributeValue, router::NavigationTarget};
-
-// %% main %%
 
 #[item]
 pub fn NavButton(

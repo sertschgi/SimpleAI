@@ -1,100 +1,30 @@
-/* %%% entry.css %%% */
-
-/* %% root %% */
 :root {
-  /* % color palette % */
-  --color-1: 17, 18, 19;
-  --color-2: 66, 69, 76;
-  --color-3: 95, 101, 115;
-  --color-4: 206, 214, 232;
-  --color-5: 250, 250, 250;
+  --color-1: 200, 50%;
+  --color-2: 0, 50%;
+  --color-3: 40, 50%;
+  --color-4: 180, 50%;
 
-  --color-primary-50: #f7f8fc;
-  --color-primary-100: #ecedf8;
-  --color-primary-200: #d9daf2;
-  --color-primary-300: #bbbde8;
-  --color-primary-400: #767bd0;
-  --color-primary-500: #3c42af;
-  --color-primary-600: #2b2f7d;
-  --color-primary-700: #1f225b;
-  --color-primary-800: #121435;
-  --color-primary-900: #090a1b;
-  --color-primary-950: #05060f;
-  --color-secondary-50: #f8f7fc;
-  --color-secondary-100: #eeecf8;
-  --color-secondary-200: #ddd9f2;
-  --color-secondary-300: #c1bbe8;
-  --color-secondary-400: #8476d0;
-  --color-secondary-500: #4d3caf;
-  --color-secondary-600: #372b7d;
-  --color-secondary-700: #281f5b;
-  --color-secondary-800: #171235;
-  --color-secondary-900: #0c091b;
-  --color-secondary-950: #07050f;
-  --color-tertiary-50: #f9f7fc;
-  --color-tertiary-100: #f0ecf8;
-  --color-tertiary-200: #e2d9f2;
-  --color-tertiary-300: #cabbe8;
-  --color-tertiary-400: #9676d0;
-  --color-tertiary-500: #643caf;
-  --color-tertiary-600: #482b7d;
-  --color-tertiary-700: #341f5b;
-  --color-tertiary-800: #1e1235;
-  --color-tertiary-900: #0f091b;
-  --color-tertiary-950: #09050f;
-  --color-quaternary-50: #fcf7fc;
-  --color-quaternary-100: #f8ecf7;
-  --color-quaternary-200: #f2d9ee;
-  --color-quaternary-300: #e8bbe1;
-  --color-quaternary-400: #d076c3;
-  --color-quaternary-500: #af3c9e;
-  --color-quaternary-600: #7d2b71;
-  --color-quaternary-700: #5b1f52;
-  --color-quaternary-800: #351230;
-  --color-quaternary-900: #1b0918;
-  --color-quaternary-950: #0f050e;
-  --color-quinary-50: #fafcf7;
-  --color-quinary-100: #f2f8ec;
-  --color-quinary-200: #e4f2d9;
-  --color-quinary-300: #cfe8bb;
-  --color-quinary-400: #9fd076;
-  --color-quinary-500: #70af3c;
-  --color-quinary-600: #507d2b;
-  --color-quinary-700: #3a5b1f;
-  --color-quinary-800: #223512;
-  --color-quinary-900: #111b09;
-  --color-quinary-950: #0a0f05;
+  --color-bg: var(--color-1), 5%;
+  --color-text-fg: var(--color-1), 90%;
+  --color-box-fg: var(--color-1), 90%;
+  --color-box-bg: var(--color-1), 20%;
+  --color-button-fg: var(--color-box-fg);
+  --color-button-bg: var(--color-box-bg);
+  --color-icon-bg: transparent;
+  --color-icon-fg: var(--color-button-fg);
 
-  /* color with names */
-  --color-bg: var(--color-primary-950);
-  --color-text-fg: var(--color-primary-50);
-  --color-text-fg-ll: var(--color-primary-400);
-  --color-icon-bg: var(--color-primary-700);
-  --color-box-bg: var(--color-primary-700);
-  --color-border-ll: var(--color-primary-800);
-  --color-delete-fg: var(--color-quaternary-400);
-  --color-delete-bg: var(--color-quaternary-500);
-  --color-edit-fg: var(--color-primary-400);
-  --color-edit-bg: var(--color-primary-400);
-  --color-ok-fg: var(--color-quinary-400);
-  --color-ok-bg: var(--color-quinary-500);
+  --color-delete-fg: var(--color-2), 90%;
+  --color-delete-bg: var(--color-2), 30%;
+  --color-edit-fg: var(--color-3), 90%;
+  --color-edit-bg: var(--color-3), 30%;
+  --color-ok-fg: var(--color-4), 90%;
+  --color-ok-bg: var(--color-4), 30%;
 
-  /* % colors legacy % */
-  --background-color: var(--color-1);
-  --main-color: var(--color-4);
-  --text-color: var(--color-5);
-  --accent-color: var(--color-3);
-  --background-highlight-color: var(--color-2);
-
-  /* % border % */
   --border-width: 0.15rem;
   --border-color: var(--accent-color);
   --border-radius: 1rem;
 }
 
-/* %% general %% */
-
-/* % full size % */
 html,
 body,
 #main,
@@ -136,12 +66,13 @@ p {
 }
 
 html {
-  background-color: rgb(var(--background-color));
-  color: rgb(var(--text-color));
+  background-color: hsl(var(--color-bg));
+  color: hsl(var(--color-text-fg));
 }
 
 .Icon {
-  color: rgb(var(--accent-color));
+  color: hsl(var(--color-icon-fg));
+  background-color: hsl(var(--color-icon-bg));
   width: 2rem;
   height: 2rem;
   margin: 0.5rem;
@@ -149,35 +80,36 @@ html {
 }
 
 button {
-  padding: 1rem;
-  margin: 1rem;
+  padding: 0.5rem;
   display: flex;
-  background-color: var(--color-primary-700);
+  background-color: hsl(var(--color-button-bg));
+  color: hsl(var(--color-button-fg));
   justify-content: center;
   align-items: center;
-  border-radius: 2rem;
+  border-radius: 3rem;
+  border: none;
   cursor: pointer;
 }
 
-.NavbarButton {
-  color: rgb(var(--accent-color));
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-  align-items: center;
-}
-
-.NavbarButton p {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-}
+/* .NavbarButton { */
+/*   color: rgb(var(--accent-color)); */
+/*   display: flex; */
+/*   justify-content: space-between; */
+/*   flex-direction: column; */
+/*   align-items: center; */
+/* } */
+/**/
+/* .NavbarButton p { */
+/*   display: flex; */
+/*   justify-content: center; */
+/*   align-items: center; */
+/*   margin: 0; */
+/* } */
 
 /* % a % */
 a {
   text-decoration: none;
-  color: rgb(var(--text-color));
+  color: hsl(var(--color-link-fg));
 }
 
 /* % h1 % */

@@ -11,6 +11,7 @@ pub mod focus_button_array;
 pub mod heading_layout;
 pub mod labeled_box;
 pub mod nav_button;
+pub mod navigation_link;
 pub mod navigation_page;
 pub mod node;
 pub mod project;
@@ -34,6 +35,7 @@ pub mod prelude {
     pub use super::heading_layout::*;
     pub use super::labeled_box::*;
     pub use super::nav_button::*;
+    pub use super::navigation_link::*;
     pub use super::navigation_page::*;
     pub use super::node::*;
     pub use super::project;

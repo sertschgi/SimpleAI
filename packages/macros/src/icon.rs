@@ -80,8 +80,9 @@ impl Parse for FieldValues {
 pub fn macro_impl(item: TokenStream) -> TokenStream {
     let fields: FieldValues = parse2(item).unwrap();
     let mut out: TokenStream = quote! {
-            use dioxus::prelude::*;
+        use dioxus::{core::AttributeValue, prelude::*};
     };
+    println!("ICON: --------------------------------------------------------------");
     for field in fields.fields {
         let function_name = pascal_case(&format!("{}Icon", field.member));
         let function_ident = Ident::new(&function_name, Span::call_site());
@@ -89,12 +90,25 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
         let svg_body = rsx_from_html(&svg_dom);
         let block = write_block_out(&svg_body).expect("failed writing block");
         let svg = TokenStream::from_str(&block).unwrap();
+        println!("svg: {}", svg);
         let classes = format!("Icon {}", function_name);
         quote! {
-            pub fn #function_ident() -> Element {
+            #[component]
+            pub fn #function_ident(
+                // #[props(extends = GlobalAttributes)] attributes: Vec<Attribute>
+            ) -> Element {
+                let mut other_classes = String::new();
+                // if let Some(pos) = attributes.iter().position(|x| x.name == "class") {
+                //     let value = attributes.remove(pos).value;
+                //     if let AttributeValue::Text(text) = value {
+                //         other_classes = text;
+                //     }
+                // }
+                let class = format!("{}{other_classes}", #classes);
                 rsx! {
                     div {
-                        class: #classes,
+                        class,
+                        // ..attributes,
                         #svg
                     }
                 }
@@ -102,5 +116,9 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
         }
         .to_tokens(&mut out);
     }
+    println!(
+        "\n -------------------------------------------- ICON OUT:\n{}",
+        out
+    );
     out
 }

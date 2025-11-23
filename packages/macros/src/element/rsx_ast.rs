@@ -71,7 +71,6 @@ impl ToTokens for Element {
     }
 }
 
-// % Attribute %
 #[derive(Clone)]
 pub struct Attribute {
     pub spread: Option<Token![..]>,
@@ -98,7 +97,7 @@ impl Parse for Attribute {
         };
 
         let value: Option<LitStr> = if colon.is_some() {
-            Some(input.parse()?)
+            input.parse().ok()
         } else {
             None
         };

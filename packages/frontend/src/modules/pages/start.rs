@@ -9,14 +9,8 @@ pub fn Start() -> Element {
     rsx! {
         main {
             NavigationPage {
-                NavButton { class: "editor", to: Route::Projects {},
-                    ProjectsIcon {}
-                    p { "projects" }
-                }
-                NavButton { class: "new", to: Route::New {},
-                    NewIcon {}
-                    p { "new project" }
-                }
+                NavigationLink { to: Route::Projects {}, label: "projects", ProjectsIcon {} }
+                NavigationLink { to: Route::New {}, label: "new project", NewIcon {} }
             }
         }
     }

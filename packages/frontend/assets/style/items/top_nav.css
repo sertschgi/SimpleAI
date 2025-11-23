@@ -2,6 +2,6 @@
   width: 100%;
   display: flex;
   flex-direction: row;
-  background-color: rgba(var(--color-2), 0.3);
+  background-color: hsl(var(--color-box-bg));
   z-index: 100;
 }

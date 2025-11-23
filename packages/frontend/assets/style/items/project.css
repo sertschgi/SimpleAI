@@ -9,13 +9,13 @@
   margin: 1rem 0;
   display: flex;
   flex-direction: row;
-  background-color: var(--color-box-bg);
+  background-color: hsl(var(--color-box-bg));
   border-radius: var(--project-border-radius);
   gap: 1rem;
 }
 
 .Project .divider {
-  background-color: var(--color-text-fg-ll);
+  background-color: hsl(var(--color-text-fg));
   width: 0.1rem;
 }
 
@@ -41,7 +41,7 @@
 }
 .Project .actions .Icon {
   flex-grow: 1;
-  color: var(--color-text-fg);
+  color: hsl(var(--color-text-fg));
   margin: 0;
 }
 
@@ -67,20 +67,20 @@
 }
 
 .Project .actions .open {
-  background-color: var(--color-ok-bg);
+  background-color: hsl(var(--color-ok-bg));
 }
 .Project .actions .open:hover {
-  background-color: var(--color-ok-bg);
+  background-color: hsl(var(--color-ok-bg));
 }
 .Project .actions .edit {
-  background-color: var(--color-edit-bg);
+  background-color: hsl(var(--color-edit-bg));
 }
 .Project .actions .edit:hover {
-  background-color: var(--color-edit-bg);
+  background-color: hsl(var(--color-edit-bg));
 }
 .Project .actions .delete {
-  background-color: var(--color-delete-bg);
+  background-color: hsl(var(--color-delete-bg));
 }
 .Project .actions .delete:hover {
-  background-color: var(--color-delete-bg);
+  background-color: hsl(var(--color-delete-bg));
 }

@@ -1,19 +1,11 @@
-// %%% ipl.rs %%%
-// this is the implementation of the element macro, which is for handling the style assets and the
-// creation of new dioxus components
-
-// %% includes %%
-// % extern %
 use proc_macro2::{Span, TokenStream};
 use quote::*;
 use syn::{parse2, parse_quote, LitStr};
 
-// % intern %
 use super::{
     attrs::ElementAttrs, function::ElementFunction, kind::ElementKind, manifest::ElementConfig,
 };
 
-// %% main %%
 pub struct ElementHandler {
     pub attrs: ElementAttrs,
     pub function: ElementFunction,
