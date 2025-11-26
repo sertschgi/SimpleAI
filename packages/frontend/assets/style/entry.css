@@ -12,6 +12,8 @@
   --color-button-bg: var(--color-box-bg);
   --color-icon-bg: transparent;
   --color-icon-fg: var(--color-button-fg);
+  --color-input-bg: var(--color-1);
+  --color-input-fg: var(--color-1);
 
   --color-delete-fg: var(--color-2), 90%;
   --color-delete-bg: var(--color-2), 30%;
@@ -131,18 +133,20 @@ form {
 }
 
 input {
-  background-color: var();
+  background-color: hsl(var(--color-input-bg), 15%);
   border-radius: 5rem;
   border-style: none;
   caret-shape: block;
   height: 3rem;
   width: 100%;
   box-sizing: border-box;
-  color: var(--color-primary-50);
+  color: hsl(var(--color-input-fg), 90%);
   padding: 1rem;
+  transition: background-color 0.5s ease-in-out;
 }
 
 input:focus {
+  background-color: hsl(var(--color-input-bg), 20%);
   outline: none;
 }
 

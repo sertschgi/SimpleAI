@@ -1,4 +1,11 @@
 .Projects {
+}
+
+.Projects .projects-wrapper {
+  padding: 1rem 0;
+}
+
+.Projects .projects-view {
   display: flex;
   flex-direction: column;
   gap: 1rem;

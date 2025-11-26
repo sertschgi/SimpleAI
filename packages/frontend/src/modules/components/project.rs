@@ -8,7 +8,7 @@ pub fn Project(name: String, date: DateTime<Utc>, desc: String) -> Element {
         div {
             section { class: "infos",
                 h3 { class: "name", {name} }
-                p { class: "date", {date.naive_local().date().to_string()} }
+                // p { class: "date", {date.naive_local().date().to_string()} }
                 br { class: "spacer" }
                 p { class: "desc", {desc} }
             }

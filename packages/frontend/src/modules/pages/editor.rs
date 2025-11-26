@@ -7,35 +7,12 @@ use std::collections::HashMap;
 // %% main %%
 #[page]
 pub fn Editor() -> Element {
-    let mut section_contents_map = use_signal(HashMap::new);
-
+    document::eval(r#"console.log("hello world"); window.run_editor(); window.run_hello();"#);
     rsx! {
         main {
-            DragArea {
-                Divider {
-                    section { Viewport {} }
-                    aside { z_index: 2,
-                        nav {
-                            FocusButton {
-                                onfocus: move || {
-                                    section_contents_map.write().insert("search", rsx! {
-                                        Search {}
-                                        "Hello"
-                                    });
-                                },
-                                onunfocus: move || {
-                                    section_contents_map.write().remove("search");
-                                },
-                                SearchIcon {}
-                            }
-                        }
-                        section {
-                            for (_ , e) in section_contents_map() {
-                                {e}
-                            }
-                        }
-                    }
-                }
+            section { id: "viewport",
+                canvas { id: "draw" }
+                document::Script { src: asset!("/assets/scripts/viewport.js"), defer: true }
             }
         }
     }

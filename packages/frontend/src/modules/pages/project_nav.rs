@@ -5,14 +5,7 @@ pub fn ProjectNav() -> Element {
     rsx! {
         main {
             NavigationPage {
-                NavButton { to: Route::Projects {},
-                    ProjectsIcon {}
-                    p { "onnx-editor" }
-                }
-                NavButton { to: Route::Projects {},
-                    ProjectsIcon {}
-                    p { "export" }
-                }
+                NavigationLink { to: Route::Editor {}, label: "onnx editor", ProjectsIcon {} }
             }
         }
     }
