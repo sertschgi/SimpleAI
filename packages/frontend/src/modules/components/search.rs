@@ -7,7 +7,7 @@ use chrono::Utc;
 use simple_ai_backend::modules::utils::node::NodeBuilder;
 
 // %% main %%
-#[component]
+#[item]
 pub fn Search(#[props(extends = GlobalAttributes)] attributes: Vec<Attribute>) -> Element {
     let mut intern_search_results = use_signal(Vec::<InternSearchResult>::new);
     let mut search_results = use_signal(Container::new);
@@ -48,25 +48,18 @@ pub fn Search(#[props(extends = GlobalAttributes)] attributes: Vec<Attribute>) -
     );
 
     rsx! {
-        article {
-            class: "Search",
-            ..attributes,
+        article { class: "Search", ..attributes,
             header {
-                input {
-                    oninput: input,
-                    type: "search",
-                    placeholder: "search"
-                }
-                // nav {
-                // 	button { "your nodes" }
-                // 	button { "installed nodes" }
-                // 	button { "profiles" }
-                // }
+                input { oninput: input, r#type: "search", placeholder: "search" }
+                        // nav {
+            // 	button { "your nodes" }
+            // 	button { "installed nodes" }
+            // 	button { "profiles" }
+            // }
             }
             main {
                 div { class: "spacer" }
-                section {
-                    class: "results",
+                section { class: "results",
                     for intern in intern_search_results() {
                         SearchResult { intern }
                     }

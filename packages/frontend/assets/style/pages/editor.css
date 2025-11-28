@@ -7,3 +7,15 @@
 #paint {
   flex-grow: 1;
 }
+
+.Editor {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+aside {
+  background-color: hsl(var(--color-1), 10%);
+  backdrop-filter: blur(1rem);
+  padding: 1rem;
+}

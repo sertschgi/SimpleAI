@@ -6,8 +6,9 @@
 
   --color-bg: var(--color-1), 5%;
   --color-text-fg: var(--color-1), 90%;
-  --color-box-fg: var(--color-1), 90%;
-  --color-box-bg: var(--color-1), 20%;
+  --color-box: var(--color-1);
+  --color-box-fg: var(--color-box), 90%;
+  --color-box-bg: var(--color-box), 20%;
   --color-button-fg: var(--color-box-fg);
   --color-button-bg: var(--color-box-bg);
   --color-icon-bg: transparent;

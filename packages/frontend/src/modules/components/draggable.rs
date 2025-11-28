@@ -116,7 +116,6 @@ pub fn Draggable(
 
     rsx! {
         div {
-            class: "Draggable",
             top: 0,
             left: 0,
             height: height_handle,
@@ -131,7 +130,7 @@ pub fn Draggable(
             onmounted: mounted,
             onmouseenter: mouseenter,
             onmouseleave: mouseleave,
-            { children }
+            {children}
         }
     }
 }

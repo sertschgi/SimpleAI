@@ -19,7 +19,7 @@ impl From<Node> for InternSearchResult {
     }
 }
 
-#[component]
+#[item]
 pub fn SearchResult(intern: InternSearchResult) -> Element {
     let draggingend = move |v: PageVector| {
         let mut node = intern.node.cloned();
@@ -28,31 +28,11 @@ pub fn SearchResult(intern: InternSearchResult) -> Element {
     };
 
     rsx! {
-        Draggable {
-            ondraggingend: draggingend,
-            div {
-                class: "SearchResult",
-                div {
-                    class: "wrapper items",
-                    h3 { span { id: "name", "{intern.node.cloned().name}" } }
-                    div {
-                        class: "wrapper",
-                        div {
-                            class: "wrapper i",
-                            div { id: "open", class: "icon" }
-                        }
-                    }
-                }
-                h5 { id: "version", r#"{intern.node.cloned().date.format("%d/%m/%Y")}"# }
-                p {
-                    id: "description",
-                    "{intern.node.cloned().description}"
-                }
-                address {
-                    id: "author",
-                    "{intern.node.cloned().author}"
-                }
+        article {
+            h3 {
+                span { id: "name", "{intern.node.cloned().name}" }
             }
+            p { id: "description", "{intern.node.cloned().description}" }
         }
     }
 }

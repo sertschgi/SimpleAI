@@ -4,7 +4,6 @@
   flex-direction: column;
   justify-content: stretch;
   align-items: center;
-  background-color: rgba(var(--background-highlight-color), 0.35);
 }
 
 .Search main {
@@ -13,6 +12,7 @@
   justify-content: stretch;
   align-items: center;
   overflow-y: scroll;
+  padding: 1rem 0;
 }
 
 .Search header {
@@ -21,4 +21,7 @@
 }
 
 .Search .results {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }

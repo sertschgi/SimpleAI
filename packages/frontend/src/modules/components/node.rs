@@ -82,7 +82,9 @@ pub fn Node(intern: InternNode) -> Element {
     let rendered_params = intern
         .runtime_params
         .iter()
-        .map(|intern| rsx! { RuntimeParam { intern: intern.clone() } });
+        .map(|intern| rsx! {
+            RuntimeParam { intern: intern.clone() }
+        });
 
     rsx! {
         body {
@@ -98,17 +100,16 @@ pub fn Node(intern: InternNode) -> Element {
                 user_select: "none",
                 onmousedown: mousedown,
                 onmouseover: move |_| { intern.cursor.set("grab".into()) },
-                h1 { {   } }
+                h1 { {} }
             }
             main {
                 display: "flex",
                 flex_direction: "column",
                 justify_content: "space-evenly",
                 align_items: "center",
-                { rendered_params }
+                {rendered_params}
             }
             footer {
-
             }
         }
     }

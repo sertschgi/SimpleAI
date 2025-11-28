@@ -2,6 +2,7 @@
 
 // %% includes %%
 use super::utils::*;
+use crate::modules::components::search::*;
 use std::collections::HashMap;
 
 // %% main %%
@@ -17,9 +18,9 @@ vp.addNode(new window.VNode(100, 100, "A", [new window.Parameter("output", "outA
     rsx! {
         main {
             section { id: "viewport",
-                // canvas { id: "draw" }
-                document::Script { src: asset!("/assets/scripts/viewport.js"), defer: true }
+                document::Script { src: asset!("/assets/scripts/viewport.js") }
             }
+            aside { Search {} }
         }
     }
 }

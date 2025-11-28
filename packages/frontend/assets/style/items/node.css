@@ -1,7 +1,4 @@
 .Node {
-  border-width: var(--border-width);
-  background-color: rgba(var(--accent-color), 0.5);
-  border-color: rgb(var(--border-color));
-  border-radius: var(--border-radius);
-  border-style: solid;
+  background-color: hsl(var(--color-box-bg));
+  border-radius: 1rem;
 }
