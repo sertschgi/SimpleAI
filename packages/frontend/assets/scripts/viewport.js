@@ -1,11 +1,52 @@
+// A reusable, instantiable node-editor viewport module.
+// Usage:
+//   import { Viewport, VNode, Parameter, Connection } from './viewport.js';
+//   const vp = new Viewport(document.getElementById('editor'));
+//   vp.addNode(new VNode(100,100,'A',[new Parameter('output','outA')]));
+//   ... etc.
+
+class Parameter {
+  constructor(type = "input", name = "") {
+    this.type = type; // "input" or "output"
+    this.name = name;
+    // visual defaults (can be overridden externally)
+    this.radius = 12;
+    this.fillInput = "#48e";
+    this.fillOutput = "#fa3";
+    this.textColor = "#fff";
+  }
+
+  // draw the parameter socket and its label. `pos` is {x,y}.
+  draw(ctx, pos, isInput) {
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, this.radius, 0, 2 * Math.PI);
+    ctx.fillStyle = isInput ? this.fillInput : this.fillOutput;
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = this.textColor;
+    // Labels are drawn to the right for inputs, to the left for outputs
+    if (isInput) {
+      ctx.fillText(this.name, pos.x + 16, pos.y + 6);
+    } else {
+      ctx.fillText(this.name, pos.x - 60, pos.y + 6);
+    }
+  }
+}
+
 class VNode {
-  constructor(x, y, label, params) {
+  constructor(x = 0, y = 0, label = "Node", params = []) {
     this.x = x;
     this.y = y;
     this.label = label;
-    // params: [{ type: "input" | "output", name: "param" }];
-    this.inputs = params.filter((p) => p.type === "input");
-    this.outputs = params.filter((p) => p.type === "output");
+    // params is array of Parameter instances or plain objects {type,name}
+    this.params = params.map((p) =>
+      p instanceof Parameter ? p : new Parameter(p.type, p.name),
+    );
+    this.inputs = this.params.filter((p) => p.type === "input");
+    this.outputs = this.params.filter((p) => p.type === "output");
+
+    // visual defaults
     this.paramSpacing = 32;
     this.width = 160;
     this.height = Math.max(
@@ -13,19 +54,28 @@ class VNode {
       32 +
         Math.max(this.inputs.length, this.outputs.length) * this.paramSpacing,
     );
+
+    this.fillStyle = "#374565";
+    this.strokeStyle = "#58a";
+    this.titleColor = "#fff";
+    this.titleFont = "16px sans-serif";
   }
+
+  // compute input socket coordinates
   getInputCoords(i) {
     return {
       x: this.x,
       y: this.y + 32 + i * this.paramSpacing,
     };
   }
+  // compute output socket coordinates
   getOutputCoords(i) {
     return {
       x: this.x + this.width,
       y: this.y + 32 + i * this.paramSpacing,
     };
   }
+
   contains(px, py) {
     return (
       px > this.x &&
@@ -34,6 +84,7 @@ class VNode {
       py < this.y + this.height
     );
   }
+
   inputHit(px, py) {
     for (let i = 0; i < this.inputs.length; ++i) {
       let p = this.getInputCoords(i);
@@ -41,6 +92,7 @@ class VNode {
     }
     return null;
   }
+
   outputHit(px, py) {
     for (let i = 0; i < this.outputs.length; ++i) {
       let p = this.getOutputCoords(i);
@@ -48,218 +100,291 @@ class VNode {
     }
     return null;
   }
+
+  // snap size to gridSpacing
+  fitToGrid(gridSpacing) {
+    this.width = Math.ceil(this.width / gridSpacing) * gridSpacing;
+    this.height = Math.ceil(this.height / gridSpacing) * gridSpacing;
+  }
+
+  // draw the whole node including its parameters (uses Parameter.draw)
+  draw(ctx, viewport) {
+    // Ensure node size aligns to grid for consistent visuals
+    this.fitToGrid(viewport.gridSpacing);
+
+    ctx.fillStyle = this.fillStyle;
+    ctx.strokeStyle = this.strokeStyle;
+    ctx.lineWidth = 2;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+    ctx.fillStyle = this.titleColor;
+    ctx.font = this.titleFont;
+    ctx.fillText(this.label, this.x + 10, this.y + 22);
+
+    // draw inputs (left)
+    this.inputs.forEach((input, i) => {
+      const p = this.getInputCoords(i);
+      input.draw(ctx, p, true);
+    });
+
+    // draw outputs (right)
+    this.outputs.forEach((output, i) => {
+      const p = this.getOutputCoords(i);
+      output.draw(ctx, p, false);
+    });
+  }
 }
+
 class Connection {
   constructor(fromNode, fromOutput, toNode, toInput) {
     this.fromNode = fromNode;
     this.fromOutput = fromOutput;
     this.toNode = toNode;
     this.toInput = toInput;
+
+    // visual defaults
+    this.color = "#fb0";
+    this.width = 3;
   }
-}
 
-const canvas = document.getElementById("draw");
-const viewport = document.getElementById("viewport");
-const ctx = canvas.getContext("2d");
-
-const gridSpacing = 40;
-const dotRadius = 2;
-let zoom = 1;
-let offsetX = 0,
-  offsetY = 0;
-
-let nodes = [
-  new VNode(100, 100, "A", [{ type: "output", name: "outA" }]),
-  new VNode(400, 200, "B", [{ type: "input", name: "inB" }]),
-  new VNode(200, 320, "C", [
-    { type: "input", name: "inC" },
-    { type: "output", name: "outC" },
-    { type: "output", name: "outC2" },
-  ]),
-];
-
-let connections = [];
-let mouse = { x: 0, y: 0 };
-let draggingNode = null,
-  dragOffsetX,
-  dragOffsetY;
-let connectingFrom = null; // { node, outIdx }
-let isPanning = false;
-let panStart = { x: 0, y: 0 },
-  panOrigin = { x: 0, y: 0 };
-
-function fitNodeSizeToGrid(node) {
-  node.width = Math.ceil(node.width / gridSpacing) * gridSpacing;
-  node.height = Math.ceil(node.height / gridSpacing) * gridSpacing;
-}
-
-function resize() {
-  const rect = viewport.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  draw();
-}
-window.addEventListener("resize", resize);
-
-function toEditor(x, y) {
-  return {
-    x: (x - offsetX) / zoom,
-    y: (y - offsetY) / zoom,
-  };
-}
-
-function draw() {
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.setTransform(zoom, 0, 0, zoom, offsetX, offsetY);
-
-  // Grid
-  ctx.fillStyle = "#3a3c40";
-  const [w, h] = [
-    (canvas.width - offsetX) / zoom,
-    (canvas.height - offsetY) / zoom,
-  ];
-  const startX = Math.floor(-offsetX / zoom / gridSpacing) * gridSpacing;
-  const startY = Math.floor(-offsetY / zoom / gridSpacing) * gridSpacing;
-  for (let x = startX; x < w + gridSpacing; x += gridSpacing)
-    for (let y = startY; y < h + gridSpacing; y += gridSpacing) {
-      ctx.beginPath();
-      ctx.arc(x, y, dotRadius, 0, 2 * Math.PI);
-      ctx.fill();
-    }
-
-  // Connections
-  for (let c of connections) {
-    const from = c.fromNode.getOutputCoords(c.fromOutput);
-    const to = c.toNode.getInputCoords(c.toInput);
-    ctx.strokeStyle = "#fb0";
-    ctx.lineWidth = 3;
+  draw(ctx /*, viewport - not required here but kept for parity */) {
+    const from = this.fromNode.getOutputCoords(this.fromOutput);
+    const to = this.toNode.getInputCoords(this.toInput);
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = this.width;
     ctx.beginPath();
     ctx.moveTo(from.x, from.y);
     ctx.bezierCurveTo(from.x + 40, from.y, to.x - 40, to.y, to.x, to.y);
     ctx.stroke();
   }
-  // Live connect preview
-  if (connectingFrom) {
-    const from = connectingFrom.node.getOutputCoords(connectingFrom.outIdx);
-    ctx.strokeStyle = "#fb0";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(from.x, from.y);
-    ctx.bezierCurveTo(
-      from.x + 40,
-      from.y,
-      mouse.x - 40,
-      mouse.y,
-      mouse.x,
-      mouse.y,
-    );
-    ctx.stroke();
-  }
-
-  // Nodes
-  for (let n of nodes) {
-    fitNodeSizeToGrid(n);
-
-    ctx.fillStyle = "#374565";
-    ctx.strokeStyle = "#58a";
-    ctx.lineWidth = 2;
-    ctx.fillRect(n.x, n.y, n.width, n.height);
-    ctx.strokeRect(n.x, n.y, n.width, n.height);
-    ctx.fillStyle = "#fff";
-    ctx.font = "16px sans-serif";
-    ctx.fillText(n.label, n.x + 10, n.y + 22);
-
-    // Inputs (left)
-    n.inputs.forEach((input, i) => {
-      const p = n.getInputCoords(i);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 12, 0, 2 * Math.PI);
-      ctx.fillStyle = "#48e";
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = "#fff";
-      ctx.fillText(input.name, p.x + 16, p.y + 6);
-    });
-
-    // Outputs (right)
-    n.outputs.forEach((output, i) => {
-      const p = n.getOutputCoords(i);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 12, 0, 2 * Math.PI);
-      ctx.fillStyle = "#fa3";
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = "#fff";
-      ctx.fillText(output.name, p.x - 60, p.y + 6);
-    });
-  }
-
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
-function add_listeners() {
-  viewport.addEventListener("mousedown", (e) => {
-    console.log("FIRED!");
-    const p = toEditor(e.offsetX, e.offsetY);
-    mouse = p;
+class Viewport {
+  constructor(containerElement, options = {}) {
+    if (!(containerElement instanceof HTMLElement)) {
+      throw new Error("Viewport constructor requires a DOM container element");
+    }
+    // options and defaults
+    this.gridSpacing = options.gridSpacing || 40;
+    this.dotRadius = options.dotRadius || 2;
+    this.minZoom = options.minZoom || 0.4;
+    this.maxZoom = options.maxZoom || 2.5;
+
+    // internal state
+    this.zoom = options.zoom || 1;
+    this.offsetX = options.offsetX || 0;
+    this.offsetY = options.offsetY || 0;
+
+    this.nodes = [];
+    this.connections = [];
+
+    this.mouse = { x: 0, y: 0 };
+    this.draggingNode = null;
+    this.dragOffsetX = 0;
+    this.dragOffsetY = 0;
+    this.connectingFrom = null; // { node, outIdx }
+    this.isPanning = false;
+    this.panStart = { x: 0, y: 0 };
+    this.panOrigin = { x: 0, y: 0 };
+
+    // create canvas and append to container
+    this.container = containerElement;
+    this.canvas = document.createElement("canvas");
+    this.canvas.style.width = "100%";
+    this.canvas.style.height = "100%";
+    this.canvas.style.display = "block";
+    this.container.appendChild(this.canvas);
+    this.ctx = this.canvas.getContext("2d");
+
+    // bind methods
+    this._onResize = this._onResize.bind(this);
+    this._onMouseDown = this._onMouseDown.bind(this);
+    this._onMouseMove = this._onMouseMove.bind(this);
+    this._onMouseUp = this._onMouseUp.bind(this);
+    this._onWheel = this._onWheel.bind(this);
+
+    // event listeners
+    window.addEventListener("resize", this._onResize);
+    this.canvas.addEventListener("mousedown", this._onMouseDown);
+    this.canvas.addEventListener("mousemove", this._onMouseMove);
+    this.canvas.addEventListener("mouseup", this._onMouseUp);
+    this.canvas.addEventListener("wheel", this._onWheel, { passive: false });
+
+    // initial sizing and draw
+    this._onResize();
+  }
+
+  // convenience factory
+  createNode(x, y, label, params = []) {
+    const node = new VNode(x, y, label, params);
+    this.addNode(node);
+    return node;
+  }
+
+  addNode(node) {
+    this.nodes.push(node);
+    this.draw();
+  }
+
+  addConnection(conn) {
+    this.connections.push(conn);
+    this.draw();
+  }
+
+  clear() {
+    this.nodes = [];
+    this.connections = [];
+    this.draw();
+  }
+
+  // convert canvas pixel coords to editor coordinates (considering transform)
+  toEditor(x, y) {
+    return {
+      x: (x - this.offsetX) / this.zoom,
+      y: (y - this.offsetY) / this.zoom,
+    };
+  }
+
+  // resizing helper
+  _onResize() {
+    const rect = this.container.getBoundingClientRect();
+    this.canvas.width = rect.width;
+    this.canvas.height = rect.height;
+    this.draw();
+  }
+
+  // central draw method for the viewport (required)
+  draw() {
+    const ctx = this.ctx;
+    // reset transform & clear
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // apply zoom + pan transform
+    ctx.setTransform(this.zoom, 0, 0, this.zoom, this.offsetX, this.offsetY);
+
+    // Grid dots
+    ctx.fillStyle = "#3a3c40";
+    const w = (this.canvas.width - this.offsetX) / this.zoom;
+    const h = (this.canvas.height - this.offsetY) / this.zoom;
+    const startX =
+      Math.floor(-this.offsetX / this.zoom / this.gridSpacing) *
+      this.gridSpacing;
+    const startY =
+      Math.floor(-this.offsetY / this.zoom / this.gridSpacing) *
+      this.gridSpacing;
+    for (let x = startX; x < w + this.gridSpacing; x += this.gridSpacing) {
+      for (let y = startY; y < h + this.gridSpacing; y += this.gridSpacing) {
+        ctx.beginPath();
+        ctx.arc(x, y, this.dotRadius, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    }
+
+    // Connections
+    for (let c of this.connections) {
+      c.draw(ctx, this);
+    }
+
+    // Live connect preview
+    if (this.connectingFrom) {
+      const from = this.connectingFrom.node.getOutputCoords(
+        this.connectingFrom.outIdx,
+      );
+      ctx.strokeStyle = "#fb0";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.bezierCurveTo(
+        from.x + 40,
+        from.y,
+        this.mouse.x - 40,
+        this.mouse.y,
+        this.mouse.x,
+        this.mouse.y,
+      );
+      ctx.stroke();
+    }
+
+    // VNodes
+    for (let n of this.nodes) {
+      n.draw(ctx, this);
+    }
+
+    // reset transform for any overlay drawing in screen space if desired
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+
+  // -------- Input handlers ----------
+  _onMouseDown(e) {
+    const p = this.toEditor(e.offsetX, e.offsetY);
+    this.mouse = p;
+
     // output hit first (for drag to input)
-    for (let node of nodes) {
+    for (let node of this.nodes) {
       let outIdx = node.outputHit(p.x, p.y);
       if (outIdx !== null) {
-        connectingFrom = { node, outIdx };
+        this.connectingFrom = { node, outIdx };
+        // prevent pan from starting when clicking a socket
+        e.preventDefault();
         return;
       }
     }
-    // hit test nodes
-    for (let node of nodes) {
+
+    // hit test nodes (dragging)
+    for (let node of this.nodes) {
       if (node.contains(p.x, p.y)) {
-        draggingNode = node;
-        dragOffsetX = p.x - node.x;
-        dragOffsetY = p.y - node.y;
+        this.draggingNode = node;
+        this.dragOffsetX = p.x - node.x;
+        this.dragOffsetY = p.y - node.y;
         return;
       }
     }
-    // Panning
-    isPanning = true;
-    panOrigin.x = offsetX;
-    panOrigin.y = offsetY;
-    panStart.x = e.offsetX;
-    panStart.y = e.offsetY;
-  });
 
-  viewport.addEventListener("mousemove", (e) => {
-    const p = toEditor(e.offsetX, e.offsetY);
-    mouse = p;
-    if (draggingNode) {
-      let newX = Math.round((p.x - dragOffsetX) / gridSpacing) * gridSpacing;
-      let newY = Math.round((p.y - dragOffsetY) / gridSpacing) * gridSpacing;
-      draggingNode.x = newX;
-      draggingNode.y = newY;
-      fitNodeSizeToGrid(draggingNode);
-      draw();
-    } else if (isPanning) {
-      offsetX = panOrigin.x + (e.offsetX - panStart.x);
-      offsetY = panOrigin.y + (e.offsetY - panStart.y);
-      draw();
-    } else if (connectingFrom) {
-      draw();
+    // start panning
+    this.isPanning = true;
+    this.panOrigin.x = this.offsetX;
+    this.panOrigin.y = this.offsetY;
+    this.panStart.x = e.offsetX;
+    this.panStart.y = e.offsetY;
+  }
+
+  _onMouseMove(e) {
+    const p = this.toEditor(e.offsetX, e.offsetY);
+    this.mouse = p;
+    if (this.draggingNode) {
+      let newX =
+        Math.round((p.x - this.dragOffsetX) / this.gridSpacing) *
+        this.gridSpacing;
+      let newY =
+        Math.round((p.y - this.dragOffsetY) / this.gridSpacing) *
+        this.gridSpacing;
+      this.draggingNode.x = newX;
+      this.draggingNode.y = newY;
+      this.draggingNode.fitToGrid(this.gridSpacing);
+      this.draw();
+    } else if (this.isPanning) {
+      this.offsetX = this.panOrigin.x + (e.offsetX - this.panStart.x);
+      this.offsetY = this.panOrigin.y + (e.offsetY - this.panStart.y);
+      this.draw();
+    } else if (this.connectingFrom) {
+      this.draw();
     }
-  });
+  }
 
-  viewport.addEventListener("mouseup", (e) => {
-    const p = toEditor(e.offsetX, e.offsetY);
-    if (draggingNode) {
-      draggingNode = null;
-      draw();
-    } else if (connectingFrom) {
-      for (let node of nodes) {
+  _onMouseUp(e) {
+    const p = this.toEditor(e.offsetX, e.offsetY);
+    if (this.draggingNode) {
+      this.draggingNode = null;
+      this.draw();
+    } else if (this.connectingFrom) {
+      for (let node of this.nodes) {
         let inIdx = node.inputHit(p.x, p.y);
-        if (inIdx !== null && node !== connectingFrom.node) {
-          connections.push(
+        if (inIdx !== null && node !== this.connectingFrom.node) {
+          this.connections.push(
             new Connection(
-              connectingFrom.node,
-              connectingFrom.outIdx,
+              this.connectingFrom.node,
+              this.connectingFrom.outIdx,
               node,
               inIdx,
             ),
@@ -267,34 +392,44 @@ function add_listeners() {
           break;
         }
       }
-      connectingFrom = null;
-      draw();
-    } else if (isPanning) {
-      isPanning = false;
-      draw();
+      this.connectingFrom = null;
+      this.draw();
+    } else if (this.isPanning) {
+      this.isPanning = false;
+      this.draw();
     }
-  });
+  }
 
-  viewport.addEventListener("wheel", (e) => {
+  _onWheel(e) {
     let scale = 1 + (e.deltaY < 0 ? 0.1 : -0.1);
     let mx = e.offsetX,
       my = e.offsetY;
-    const before = toEditor(mx, my);
-    zoom = Math.max(0.4, Math.min(2.5, zoom * scale));
-    const after = toEditor(mx, my);
-    offsetX += (after.x - before.x) * zoom;
-    offsetY += (after.y - before.y) * zoom;
-    draw();
+    const before = this.toEditor(mx, my);
+    this.zoom = Math.max(
+      this.minZoom,
+      Math.min(this.maxZoom, this.zoom * scale),
+    );
+    const after = this.toEditor(mx, my);
+    // Adjust offsets so that the point under the mouse stays stationary in editor space
+    this.offsetX += (after.x - before.x) * this.zoom;
+    this.offsetY += (after.y - before.y) * this.zoom;
+    this.draw();
     e.preventDefault();
-  });
+  }
+
+  // cleanup listeners when you want to destroy the viewport
+  destroy() {
+    window.removeEventListener("resize", this._onResize);
+    this.canvas.removeEventListener("mousedown", this._onMouseDown);
+    this.canvas.removeEventListener("mousemove", this._onMouseMove);
+    this.canvas.removeEventListener("mouseup", this._onMouseUp);
+    this.canvas.removeEventListener("wheel", this._onWheel);
+    if (this.canvas.parentElement) {
+      this.canvas.parentElement.removeChild(this.canvas);
+    }
+  }
 }
 
-function run() {
-  console.log("RUNNING");
-  add_listeners();
-  resize();
-  draw();
-}
-
-window.run_editor = run;
-window.run_editor();
+window.Parameter = Parameter;
+window.VNode = VNode;
+window.Viewport = Viewport;

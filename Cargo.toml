@@ -16,7 +16,7 @@ simple-ai-backend = { path = "packages/backend" }
 simple-ai-frontend = { path = "packages/frontend" }
 simple-ai-macros = { path = "packages/macros" }
 
-dioxus = { version = "0.7.0" }
+dioxus = { version = "0.7.1" }
 
 [profile]
 
