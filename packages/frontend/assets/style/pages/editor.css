@@ -16,6 +16,4 @@
 
 aside {
   background-color: hsl(var(--color-1), 10%);
-  backdrop-filter: blur(1rem);
-  padding: 1rem;
 }

@@ -5,6 +5,7 @@ use super::search_result::{InternSearchResult, SearchResult};
 use super::utils::*;
 use chrono::Utc;
 use simple_ai_backend::modules::utils::node::NodeBuilder;
+use tokio::time::*;
 
 // %% main %%
 #[item]
@@ -47,29 +48,49 @@ pub fn Search(#[props(extends = GlobalAttributes)] attributes: Vec<Attribute>) -
             .unwrap(),
     );
 
+    let future = use_resource(move || async move {
+        // You can create as many eval instances as you want
+        let mut eval = document::eval(r#"console.log("HELLOO")"#);
+        // let mut eval = document::eval(
+        //     r#"console.log("helloworld"); const di = new window.OnnxDragIn(document.getElementById("onnx-drag-in"), document.getElementById("search"), document.getElementById("nodeContainer")); console.log(di);"#,
+        // );
+    });
+
     rsx! {
-        article { class: "Search", ..attributes,
+        article {
+            class: "Search",
+            id: "onnx-drag-in",
+            onmounted: move |_| async move {
+                sleep(Duration::from_millis(100)).await;
+                _ = document::eval(
+                    r#"const di = new window.OnnxDragIn(document.getElementById("onnx-drag-in"), document.getElementById("search"), document.getElementById("nodeContainer"));"#,
+                );
+            },
+            ..attributes,
+            document::Script { src: asset!("/assets/scripts/onnx-drag-in.js"), defer: true }
             header {
-                input { oninput: input, r#type: "search", placeholder: "search" }
+                input {
+                    oninput: input,
+                    r#type: "search",
+                    placeholder: "search",
+                    id: "search",
+                }
                         // nav {
             // 	button { "your nodes" }
             // 	button { "installed nodes" }
             // 	button { "profiles" }
             // }
             }
-            main {
-                div { class: "spacer" }
-                section { class: "results",
-                    for intern in intern_search_results() {
-                        SearchResult { intern }
-                    }
-                    SearchResult { intern }
-                    SearchResult { intern }
-                    SearchResult { intern }
-                    SearchResult { intern }
-                    SearchResult { intern }
+            main { id: "nodeContainer",
+                for intern in intern_search_results() {
                     SearchResult { intern }
                 }
+                SearchResult { intern }
+                SearchResult { intern }
+                SearchResult { intern }
+                SearchResult { intern }
+                SearchResult { intern }
+                SearchResult { intern }
             }
         }
     }

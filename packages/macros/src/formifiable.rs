@@ -27,16 +27,24 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
         .to_tokens(&mut inputs);
     }
     quote! {
-        use dioxus::prelude::*;
-        impl #struct_ident {
-            pub fn rsx_form(&mut self) -> Element {
-                rsx! {
-                    form {
-                         class: "FormifyForm",
-                         #inputs
+            use dioxus::prelude::*;
+            impl #struct_ident {
+                pub fn rsx_form(&mut self) -> Element {
+                    rsx! {
+                        form {
+                             class: "FormifyForm",
+
+                            div {
+    class: "FormifyInputs",
+                             #inputs
+                        }
+                            button {
+                                class: "FormifyButton",
+                                "confirm"
+                            }
+                        }
                     }
                 }
             }
         }
-    }
 }

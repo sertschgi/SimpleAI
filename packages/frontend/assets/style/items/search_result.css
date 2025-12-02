@@ -1,6 +1,6 @@
 .SearchResult {
   background-color: hsl(var(--color-box-bg));
-  flex-grow: 1;
+  flex-grow: 0;
   padding: 1rem;
   border-radius: 1rem;
 }

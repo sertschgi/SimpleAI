@@ -1,4 +1,6 @@
 .Projects {
+  display: flex;
+  gap: 1rem;
 }
 
 .Projects .projects-wrapper {

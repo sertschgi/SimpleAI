@@ -7,6 +7,7 @@ use dioxus::router::NavigationTarget;
 pub fn Projects() -> Element {
     rsx! {
         main {
+            input { r#type: "search" }
             article { class: "projects-wrapper",
                 div { class: "projects-view",
                     Project {
