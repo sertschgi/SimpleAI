@@ -92,6 +92,11 @@ button {
   border-radius: 3rem;
   border: none;
   cursor: pointer;
+  transition: padding 0.2s;
+}
+
+button:hover {
+  padding: 1rem;
 }
 
 /* .NavbarButton { */

@@ -17,7 +17,7 @@ pub fn Breadcrumbs() -> Element {
                         assembled.push_str(crumb);
                         assembled.parse::<NavigationTarget<Route>>().unwrap()
                     },
-                    {crumb.to_string()}
+                    p { {crumb.to_string()} }
                 }
             }
         }

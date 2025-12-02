@@ -6,6 +6,8 @@
 .WindowDecorations .Icon {
   margin: 0;
   padding: 0.2rem;
+  border-radius: 5rem;
+  transition: background-color 200ms;
 }
 .WindowDecorations section {
   flex-grow: 1;
@@ -15,7 +17,7 @@
   align-items: center;
   cursor: pointer;
 }
+
 .WindowDecorations .Icon:hover {
-  border-radius: 5rem;
-  background-color: rgba(var(--background-highlight-color), 0.3);
+  background-color: hsl(var(--color-1), 30%);
 }

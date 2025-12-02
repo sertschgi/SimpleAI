@@ -9,9 +9,14 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: hsl(var(--color-box-bg));
+  background-color: hsl(var(--color-box-bg), 70%);
   border-radius: var(--project-border-radius);
   gap: 1rem;
+  transition: background-color 1s;
+}
+
+.Project:hover {
+  background-color: hsl(var(--color-box-bg), 100%);
 }
 
 .Project .divider {
