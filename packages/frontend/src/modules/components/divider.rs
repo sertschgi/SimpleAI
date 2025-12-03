@@ -1,28 +1,25 @@
-// %%% components / divider.rs %%%
-
-// %% includes %%
 use super::utils::*;
+use tokio::time::*;
 
-// %% main %%
-#[component]
-pub fn Divider(children: Element) -> Element {
-    let script = r#"
-        let l = document.currentScript.parentElement;
-        let middleIndex = Math.floor(l.children.length / 2);
-        let wrapper = document.createElement("div");
-        wrapper.className = "wrapper";
-        let div = document.createElement("div");
-        div.className = "inner";
-        wrapper.appendChild(div);
-        l.insertBefore(wrapper, l.children[middleIndex + 1]);
-    "#;
+#[item]
+pub fn Divider(id: String, orientation: char, children: Element) -> Element {
+    let script: String = format!(
+        r#"console.log("before divider"); window.divider = new window.Divider(document.getElementById("{}"), "{}");"#,
+        id.clone(),
+        orientation,
+    );
     rsx! {
-         article {
-             class: "Divider",
-             script {
-                 { script }
-             }
-             { children }
-         }
+        div {
+            class: "Divider",
+            id,
+            onmounted: move |e| {
+                let script = script.clone();
+                async move {
+                    sleep(Duration::from_millis(100)).await;
+                    dioxus::document::eval(&script);
+                }
+            },
+            document::Script { src: asset!("/assets/scripts/divider.js") }
+        }
     }
 }

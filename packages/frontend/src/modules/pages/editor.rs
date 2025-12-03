@@ -9,11 +9,12 @@ pub fn Editor() -> Element {
                 sleep(Duration::from_millis(100)).await;
                 dioxus::document::eval(
                     r#"
-                                    window.activeOnnxViewport = new window.Viewport(document.getElementById("viewport"));
-                                "#,
+                                                                                    window.activeOnnxViewport = new window.Viewport(document.getElementById("viewport"));
+                                                                                "#,
                 );
             },
             section { id: "viewport" }
+            Divider { id: "editor-aside-viewport", orientation: 'v' }
             aside { Search {} }
             document::Script { src: asset!("/assets/scripts/onnx-viewport.js") }
         }
