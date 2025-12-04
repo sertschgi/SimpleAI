@@ -23,7 +23,7 @@ pub fn get_all_nodes() -> Result<NodeContainer, String> {
         let save_node: SaveNode = bincode::deserialize(&data)
             .map_err(|e| format!("Failed to deserialize {}: {}", path.display(), e))?;
 
-        let node = Node::from(save_node);
+        let node = Node::from_save_node(save_node, None);
         nc.push_context(StrongNode::from(node));
     }
 

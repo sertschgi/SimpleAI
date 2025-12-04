@@ -5,6 +5,7 @@ pub mod dtype;
 pub mod environment;
 pub mod metadata;
 pub mod node;
+pub mod node_type;
 pub mod param;
 pub mod query_filter;
 pub mod save_node;
@@ -18,6 +19,7 @@ pub mod prelude {
     pub use super::environment::*;
     pub use super::metadata::*;
     pub use super::node::*;
+    pub use super::node_type::*;
     pub use super::param::*;
     pub use super::query_filter::*;
     pub use super::save_node::*;
