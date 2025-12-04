@@ -3,18 +3,18 @@
 // %% includes %%
 use super::search_result::{InternSearchResult, SearchResult};
 use super::utils::*;
+use simple_ai_backend::modules::nodes::query::query_nodes;
+use simple_ai_backend::modules::utils::prelude::NodeQueryFilter;
 use tokio::time::*;
 
 // %% main %%
 #[item]
 pub fn Search(#[props(extends = GlobalAttributes)] attributes: Vec<Attribute>) -> Element {
     let mut intern_search_results = use_signal(Vec::<InternSearchResult>::new);
-    let mut search_results = use_signal(Container::new);
+    let mut search_results = use_signal(|| query_nodes(vec![]));
 
     let input = move |e: FormEvent| {
-        search_results.set(query::query_nodes(vec![QueryFilter::Name {
-            name: e.value(),
-        }]));
+        search_results.set(query_nodes(vec![NodeQueryFilter::Name { name: e.value() }]));
         intern_search_results.clear();
     };
 

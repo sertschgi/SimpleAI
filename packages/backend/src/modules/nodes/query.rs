@@ -31,13 +31,13 @@ pub fn get_all_nodes() -> Result<NodeContainer, String> {
 }
 
 /// This function searches through all available Nodes and returns a NodeContainer containing all Nodes available for the inferred environment.
-pub fn query_nodes(query_filter: Vec<QueryFilter>) -> NodeContainer {
+pub fn query_nodes(query_filters: Vec<NodeQueryFilter>) -> NodeContainer {
     let all_nodes = get_all_nodes().expect("Error walking directory!");
 
     all_nodes
         .iter()
         .filter(|node| {
-            query_filter.iter().all(|filter| {
+            query_filters.iter().all(|filter| {
                 filter
                     .clone()
                     .is_ok(node.context.try_lock().unwrap().to_owned())

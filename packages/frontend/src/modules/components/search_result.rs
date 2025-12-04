@@ -1,5 +1,7 @@
 // %%% components / search_result.rs %%%
 
+use simple_ai_backend::modules::utils::node::Node;
+
 // %% includes %%
 use super::node::NODE_TRANSFERER;
 use super::utils::*;

@@ -7,6 +7,7 @@ pub mod metadata;
 pub mod node;
 pub mod node_type;
 pub mod param;
+pub mod project;
 pub mod query_filter;
 pub mod save_node;
 pub mod save_param;
@@ -21,6 +22,7 @@ pub mod prelude {
     pub use super::node::*;
     pub use super::node_type::*;
     pub use super::param::*;
+    pub use super::project::*;
     pub use super::query_filter::*;
     pub use super::save_node::*;
     pub use super::save_param::*;
