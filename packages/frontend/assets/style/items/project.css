@@ -1,0 +1,88 @@
+.Project {
+  --project-padding: 1rem;
+  --project-border-radius: 1rem;
+  --project-items-border-radius: calc(
+    var(--project-border-radius) - var(--project-padding) / 2
+  );
+
+  padding: var(--project-padding);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: hsl(var(--color-box-bg), 70%);
+  border-radius: var(--project-border-radius);
+  gap: 1rem;
+  transition: background-color 1s;
+}
+
+.Project:hover {
+  background-color: hsl(var(--color-box-bg), 100%);
+}
+
+.Project .divider {
+  background-color: hsl(var(--color-text-fg));
+  width: 0.1rem;
+}
+
+.Project .infos {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.Project .infos .date {
+  font-size: 0.8rem;
+  position: absolute;
+  right: 0;
+}
+
+.Project .actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 1rem;
+}
+.Project .actions .Icon {
+  flex-grow: 1;
+  color: hsl(var(--color-text-fg));
+  margin: 0;
+}
+
+.Project .actions a {
+  height: 100%;
+  flex-grow: 1;
+  border-radius: var(--project-items-border-radius);
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.Project .actions a {
+  opacity: 0.7;
+  scale: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+.Project .actions a:hover {
+  opacity: 1;
+}
+
+.Project .actions .open {
+  background-color: hsl(var(--color-ok-bg));
+}
+.Project .actions .open:hover {
+  background-color: hsl(var(--color-ok-bg));
+}
+.Project .actions .edit {
+  background-color: hsl(var(--color-edit-bg));
+}
+.Project .actions .edit:hover {
+  background-color: hsl(var(--color-edit-bg));
+}
+.Project .actions .delete {
+  background-color: hsl(var(--color-delete-bg));
+}
+.Project .actions .delete:hover {
+  background-color: hsl(var(--color-delete-bg));
+}

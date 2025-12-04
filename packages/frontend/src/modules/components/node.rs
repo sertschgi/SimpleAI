@@ -1,6 +1,16 @@
-use crate::prelude::{components::prelude::params::*, *};
-use simple_ai_backend::utils::prelude::*;
+// %%% components / node.rs %%%
 
+// %% includes %%
+use super::runtime_param::{InternRuntimeParam, RuntimeParam};
+use super::static_param::{InternStaticParam, StaticParam};
+use super::utils::*;
+
+// %% main %%
+// % transferrer % //
+pub static NODE_TRANSFERER: GlobalSignal<Option<simple_ai_backend::prelude::Node>> =
+    GlobalSignal::new(|| None);
+
+// % Node % //
 #[derive(PartialEq, Props, Clone)]
 pub struct InternNode {
     pub node: StrongNode,
@@ -72,7 +82,9 @@ pub fn Node(intern: InternNode) -> Element {
     let rendered_params = intern
         .runtime_params
         .iter()
-        .map(|intern| rsx! { RuntimeParam { intern: intern.clone() } });
+        .map(|intern| rsx! {
+            RuntimeParam { intern: intern.clone() }
+        });
 
     rsx! {
         body {
@@ -88,17 +100,16 @@ pub fn Node(intern: InternNode) -> Element {
                 user_select: "none",
                 onmousedown: mousedown,
                 onmouseover: move |_| { intern.cursor.set("grab".into()) },
-                h1 { {   } }
+                h1 { {} }
             }
             main {
                 display: "flex",
                 flex_direction: "column",
                 justify_content: "space-evenly",
                 align_items: "center",
-                { rendered_params }
+                {rendered_params}
             }
             footer {
-
             }
         }
     }

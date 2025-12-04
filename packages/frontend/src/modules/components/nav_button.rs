@@ -1,20 +1,20 @@
-use crate::prelude::*;
-use dioxus::router::prelude::*;
+use super::utils::*;
+use dioxus::{core::AttributeValue, router::NavigationTarget};
 
-#[component]
+#[item]
 pub fn NavButton(
     children: Element,
-    class: Option<String>,
     #[props(into)] to: NavigationTarget,
+    #[props(extends = GlobalAttributes)] attributes: Vec<Attribute>,
 ) -> Element {
-    let class_unw = class.unwrap_or_default();
-    rsx! {
-        Link {
-            class: "NavbarButton {class_unw}",
-            to: to,
-            div {
-                {children}
-            }
+    let mut other_classes = String::new();
+    if let Some(pos) = attributes.iter().position(|x| x.name == "class") {
+        let value = attributes.remove(pos).value;
+        if let AttributeValue::Text(text) = value {
+            other_classes = text;
         }
+    }
+    rsx! {
+        Link { class: "{other_classes}", to, attributes, {children} }
     }
 }

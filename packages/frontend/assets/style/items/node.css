@@ -1,0 +1,4 @@
+.Node {
+  background-color: hsl(var(--color-box-bg));
+  border-radius: 1rem;
+}

@@ -1,0 +1,39 @@
+.Breadcrumbs {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  padding: 0.5rem;
+  box-sizing: content-box;
+  position: sticky;
+}
+
+.Breadcrumbs .HomeIcon {
+  scale: 0.7;
+}
+
+.Breadcrumbs .Icon {
+  padding: 0;
+  margin: 0;
+}
+
+/* .Breadcrumbs .Icon, */
+/* .Breadcrumbs p { */
+/*   color: hsl(var(--color-1), 60%); */
+/*   transition: color 0.5s; */
+/* } */
+/**/
+/* .Breadcrumbs .Icon:hover, */
+/* .Breadcrumbs p:hover { */
+/*   color: hsl(var(--color-1), 90%); */
+/* } */
+
+.Breadcrumbs a {
+  padding: 0.5rem;
+  border-radius: 1rem;
+  transition: 400ms background-color;
+}
+
+.Breadcrumbs a:hover {
+  background-color: hsl(var(--color-1), 30%);
+}

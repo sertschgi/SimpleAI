@@ -1,6 +1,9 @@
-use crate::prelude::*;
-use simple_ai_backend::utils::prelude::*;
+// %%% components / connection.rs %%%
 
+// %% includes %%
+use super::utils::*;
+
+// %% main %%
 #[derive(PartialEq, Props, Clone)]
 pub struct InternConnection {
     pub kind: RuntimeParamKind,
@@ -81,7 +84,7 @@ pub fn Connection(intern: InternConnection) -> Element {
     };
 
     let div_mouseup = move |e: MouseEvent| {
-        *CONNECTION.write() = Some(intern.clone());
+        // *CONNECTION.write() = Some(intern.clone());
     };
 
     let div_mounted = move |e: MountedEvent| async move {
@@ -118,7 +121,7 @@ pub fn Connection(intern: InternConnection) -> Element {
                     path {
                         class: "Curve",
                         stroke_width: "{stroke_width()}px",
-                        d: "{svg_path()}"
+                        d: "{svg_path()}",
                     }
                 }
             }

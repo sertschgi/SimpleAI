@@ -1,13 +1,24 @@
 [package]
 name = "simple-ai-macros"
 version = { workspace = true }
-edition = "2021"
+edition = "2024"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-proc-macro2 = { version = "1" }
+proc-macro2 = { version = "1.0" }
 syn = { version = "2.0", features = ["full", "printing", "parsing"] }
 quote = { version = "1.0" }
 change-case = { version = "0.2.0" }
+dioxus-rsx-rosetta = { version = "0.6" }
+dioxus-autofmt = { version = "0.6" }
+rstml = { version = "0.12" }
+toml = { version = "0.9" }
+serde = { version = "1.0" }
+dioxus = { version = "0.7.1" }
+dioxus-rsx = { version = "0.7.0-rc.0"}
+
+[dev-dependencies]
+dioxus = { workspace = true }
+macrotest = { version = "1.2" }

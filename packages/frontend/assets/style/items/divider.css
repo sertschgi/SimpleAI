@@ -1,0 +1,48 @@
+.Divider {
+  --divider-size: 0.5rem;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.Divider.horizontal {
+  width: 100%;
+  height: var(--divider-size);
+  cursor: row-resize;
+}
+
+.Divider.vertical {
+  height: 100%;
+  width: var(--divider-size);
+  cursor: col-resize;
+}
+
+.Divider:hover,
+.Divider.active {
+  background: hsl(var(--color-box-bg));
+}
+
+/* .Divider { */
+/*   display: flex; */
+/*   align-items: center; */
+/*   justify-content: stretch; */
+/* } */
+/**/
+/* .Divider > .wrapper { */
+/*   height: 100%; */
+/*   width: 1rem; */
+/*   margin: 0 calc(-0.5rem + var(--border-width) / 2); */
+/*   display: flex; */
+/*   align-items: center; */
+/*   justify-content: center; */
+/* } */
+/**/
+/* .Divider > .wrapper:hover { */
+/*   cursor: col-resize; */
+/* } */
+/**/
+/* .Divider > .wrapper > .inner { */
+/*   background-color: rgba(var(--background-highlight-color), 0.5); */
+/*   height: 100%; */
+/*   width: var(--border-width); */
+/*   z-index: 100; */
+/* } */

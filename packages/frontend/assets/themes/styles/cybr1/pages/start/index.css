@@ -1,8 +1,0 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SECTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-section {
-  display: flex;
-  height: fit-content;
-  justify-content: space-evenly;
-  width: 20rem;
-}

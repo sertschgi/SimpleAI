@@ -1,6 +1,12 @@
-use crate::prelude::*;
-use simple_ai_backend::utils::prelude::*;
+// %%% components / viewport.rs %%%
 
+use crate::modules::pages::utils::NODE_TRANSFERER;
+
+// %% includes %%
+use super::utils::*;
+use simple_ai_backend::prelude::*;
+
+// %% main %%
 #[derive(Clone)]
 pub struct ViewportNodeContainer {
     pub backend_node_container: NodeContainer,
@@ -71,8 +77,8 @@ pub fn Viewport(
         }
     };
 
-    use_resource(move || async move {
-        let mut ctx = DRAG_NODE();
+    let _ = use_resource(move || async move {
+        let mut ctx = NODE_TRANSFERER();
         if let Some(mut node) = ctx.take() {
             dioxus::logger::tracing::debug!("NODE: {:?}", node.name);
             let position = (PageVector::from(node.position.unwrap_or_default())
@@ -130,9 +136,9 @@ pub fn Viewport(
         if let Some(mut connection) = pressed_connection() {
             connection.dimensions.set(get_diff(&e));
             connection.pressed.set(false);
-            if let Some(mut c) = CONNECTION() {
-                c.foreign_dimensions.set((connection.dimensions)());
-            }
+            // if let Some(mut c) = CONNECTION() {
+            //     c.foreign_dimensions.set((connection.dimensions)());
+            // }
             pressed_connection.set(None);
         } else if let Some(mut node) = pressed_node() {
             node.cursor.set("grab".into());
@@ -166,7 +172,7 @@ pub fn Viewport(
     };
 
     rsx! {
-        body {
+        article {
             class: "Viewport",
             cursor: "{cursor}",
             overflow: "hidden",

@@ -1,0 +1,25 @@
+.NavigationPage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.NavigationPage .button-container {
+  width: 30rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.NavButton .Icon {
+  border-radius: 4rem;
+  padding: 0.8rem;
+  margin: 1rem;
+  background-color: var(--color-primary-300);
+}
+
+.NavButton .Icon > svg {
+  color: var(--color-bg);
+}

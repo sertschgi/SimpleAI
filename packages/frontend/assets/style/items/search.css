@@ -1,0 +1,21 @@
+.Search {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  align-items: center;
+  padding: 1rem;
+}
+
+.Search > header {
+  position: sticky;
+  background-color: rgba(var(--background-highlight-color), 0.5);
+}
+
+.Search > main {
+  padding: 1rem 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

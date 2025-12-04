@@ -1,0 +1,20 @@
+#viewport {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+#paint {
+  flex-grow: 1;
+}
+
+.Editor {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+aside {
+  min-width: 300px;
+  background-color: hsl(var(--color-1), 10%);
+}

@@ -1,0 +1,11 @@
+.TopNavLayout {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.TopNavLayout > article {
+  overflow: scroll;
+  display: flex;
+}

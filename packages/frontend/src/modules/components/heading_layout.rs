@@ -1,0 +1,19 @@
+use super::utils::*;
+use change_case::pascal_case;
+
+#[item]
+pub fn HeadingLayout() -> Element {
+    let route_str = router().full_route_string();
+    let mut route_elms: Vec<&str> = route_str.split_terminator("/").collect();
+    let unfmt_name = route_elms.last().expect(&format!(
+        "Heading Layout errored because of unsatisfied route elements: {:?}",
+        route_elms,
+    ));
+    let name = pascal_case(unfmt_name);
+    rsx! {
+        main {
+            h1 { {name} }
+            article { Outlet::<Route> {} }
+        }
+    }
+}

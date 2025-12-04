@@ -1,0 +1,23 @@
+.WindowDecorations {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.WindowDecorations .Icon {
+  margin: 0;
+  padding: 0.2rem;
+  border-radius: 5rem;
+  transition: background-color 200ms;
+}
+.WindowDecorations section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  margin: 0 0.5rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.WindowDecorations .Icon:hover {
+  background-color: hsl(var(--color-1), 30%);
+}

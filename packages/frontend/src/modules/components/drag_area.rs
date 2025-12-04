@@ -1,10 +1,15 @@
-use crate::prelude::*;
+// %%% components / rag_area.rs %%%
 
+// %% includes %%
+use super::utils::*;
+
+// %% main %%
 #[derive(Default, Clone, Copy)]
 pub struct DragContext {
-    pub cursor_start_position: Signal<PageVector>,
-    pub dragging: Signal<bool>,
-    pub distance: Signal<PageVector>,
+    pub cursor_handle: Signal<String>,
+    cursor_start_position: Signal<PageVector>,
+    dragging: Signal<bool>,
+    distance: Signal<PageVector>,
 }
 impl DragContext {
     pub fn new() -> Self {
@@ -27,10 +32,13 @@ impl DragContext {
         self.distance.take();
     }
     pub fn dragging(&self) -> bool {
-        self.dragging.cloned()
+        (self.dragging)()
     }
     pub fn distance(&self) -> PageVector {
-        self.distance.cloned()
+        (self.distance)()
+    }
+    pub fn reset_cursor(&mut self) {
+        self.cursor_handle.set("unset".into());
     }
 }
 
@@ -39,12 +47,11 @@ pub fn DragArea(children: Element) -> Element {
     let mut context = use_context_provider(DragContext::new);
     let mousedown = move |e: MouseEvent| context.init(e);
     let mousemove = move |e: MouseEvent| context.moving(e);
-    let mouseup = move |e: MouseEvent| {
-        context.end(e);
-    };
+    let mouseup = move |e: MouseEvent| context.end(e);
     rsx! {
-        div {
+        article {
             class: "DragArea",
+            cursor: "{(context.cursor_handle)()}",
             onmousedown: mousedown,
             onmousemove: mousemove,
             onmouseup: mouseup,
