@@ -280,7 +280,8 @@ class Viewport {
     this._onKeyDown = this._onKeyDown.bind(this);
 
     // event listeners
-    window.addEventListener("resize", this._onResize);
+    this._containerResizeObserver = new ResizeObserver(this._onResize);
+    this._containerResizeObserver.observe(this.container);
     this.canvas.addEventListener("mousedown", this._onMouseDown);
     this.canvas.addEventListener("mousemove", this._onMouseMove);
     this.canvas.addEventListener("mouseup", this._onMouseUp);
@@ -589,7 +590,7 @@ class Viewport {
   }
 
   destroy() {
-    window.removeEventListener("resize", this._onResize);
+    // window.removeEventListener("resize", this._onResize);
     this.canvas.removeEventListener("mousedown", this._onMouseDown);
     this.canvas.removeEventListener("mousemove", this._onMouseMove);
     this.canvas.removeEventListener("mouseup", this._onMouseUp);

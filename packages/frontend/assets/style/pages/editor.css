@@ -15,5 +15,6 @@
 }
 
 aside {
+  min-width: 300px;
   background-color: hsl(var(--color-1), 10%);
 }

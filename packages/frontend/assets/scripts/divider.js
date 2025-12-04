@@ -8,14 +8,12 @@ class Divider {
     this.firstPane = this.divider.previousSibling;
     this.secondPane = this.divider.nextSibling;
 
-    console.log(this.firstPane, this.secondPane);
-
     this._startFirstPane = null;
     this._startCursor = null;
 
     this._onMouseDown = this._onMouseDown.bind(this);
+    this._onMouseUp = this._onMouseUp.bind(this);
     this._onMouseMove = this._onMouseMove.bind(this);
-    this._onMouseMove = this._onMouseUp.bind(this);
 
     switch (orientation) {
       case "h":
@@ -24,6 +22,8 @@ class Divider {
         this._getCursorStyle = this._getHorizontalCursorStyle;
         this.divider.classList.add("horizontal");
         this._setSize = this._setHorizontalSize;
+        this._getContainerSize = this._getHorizontalContainerSize;
+        this._getDividerSize = this._getHorizontalDividerSize;
         break;
 
       case "v":
@@ -32,6 +32,8 @@ class Divider {
         this._getCursorStyle = this._getVerticalCursorStyle;
         this.divider.classList.add("vertical");
         this._setSize = this._setVerticalSize;
+        this._getContainerSize = this._getVerticalContainerSize;
+        this._getDividerSize = this._getVerticalDividerSize;
         break;
 
       default:
@@ -40,19 +42,26 @@ class Divider {
         );
     }
 
-    this.divider.addEventListener("mousedown", this._onMouseDown);
-    window.addEventListener("mouseup", this._onMouseUp);
-    document.addEventListener("mousemove", this._onMouseMove);
+    this._addListeners();
+  }
 
-    console.log(this);
+  _addListeners() {
+    this.divider.addEventListener("mousedown", (e) => {
+      this._onMouseDown(e);
+      window.addEventListener("mousemove", this._onMouseMove);
+    });
+    window.addEventListener("mouseup", (e) => {
+      this._onMouseUp(e);
+      window.removeEventListener("mousemove", this._onMouseMove);
+    });
   }
 
   _getHorizontalStartCursor(e) {
-    return e.x;
+    return e.y;
   }
 
   _getVerticalStartCursor(e) {
-    return e.y;
+    return e.x;
   }
 
   _getHorizontalStartFirstPane() {
@@ -88,28 +97,41 @@ class Divider {
     document.body.style.cursor = this._getCursorStyle();
   }
 
-  _onMouseMove(e) {
-    console.log("movement");
-    if (!this.isDragging) return;
-    const movement = e.clientY - this._startCursor;
+  _getHorizontalContainerSize() {
+    return this.divider.parentElement.getBoundingClientRect().heigth;
+  }
 
-    console.log(movement);
+  _getVerticalContainerSize() {
+    return this.divider.parentElement.getBoundingClientRect().width;
+  }
+
+  _getHorizontalDividerSize() {
+    return this.divider.offsetHeight;
+  }
+
+  _getVerticalDividerSize() {
+    return this.divider.offsetWidth;
+  }
+
+  _onMouseMove(e) {
+    if (!this.isDragging) return;
+    const movement = this._getStartCursor(e) - this._startCursor;
+
     let newFirstPaneSize = this._startFirstPane + movement;
-    const containerRect = this.divider.parent.getBoundingClientRect();
-    const minPaneSize = 30;
+    const minPaneSize = 300;
 
     // Clamp values
     newFirstPaneSize = Math.max(newFirstPaneSize, minPaneSize);
     newFirstPaneSize = Math.min(
       newFirstPaneSize,
-      containerRect.height - minPaneSize - this.divider.offsetHeight,
+      this._getContainerSize() - minPaneSize - this._getDividerSize(),
     );
 
-    this.firstPane.style.flex = "none";
-    this.secondPane.style.flex = "none";
+    console.log(newFirstPaneSize);
+
     this._setSize(
-      newTopHeight,
-      containerRect.height - newFirstPaneSize - this.divider.offsetHeight,
+      newFirstPaneSize,
+      this._getContainerSize() - newFirstPaneSize - this._getDividerSize(),
     );
   }
 
