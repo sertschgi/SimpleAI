@@ -14,7 +14,7 @@ const CREATE_VIEWPORT: &str = r#"
 //     -> convert to Node of backend (serde json)
 //     -> add something like simple_ai_backend :: onnx :: Project . save_nodes(Vec<Nodes>)
 #[page]
-pub fn Editor() -> Element {
+pub fn Editor(children: Element) -> Element {
     rsx! {
         main {
             onmounted: move |e| async move {
