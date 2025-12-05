@@ -15,7 +15,7 @@ pub fn Project(name: String, date: DateTime<Utc>, desc: String) -> Element {
             div { class: "divider" }
             section { class: "actions",
                 Link { to: Route::ProjectNav {}, class: "open", FolderOpenIcon {} }
-                Link { to: Route::Editor {}, class: "edit", SettingsIcon {} }
+                Link { to: Route::Edit {}, class: "edit", SettingsIcon {} }
                 Link { to: Route::Editor {}, class: "delete", TrashIcon {} }
             }
         }

@@ -7,14 +7,14 @@ pub struct Project {
 }
 
 #[page]
-pub fn New() -> Element {
+pub fn Edit() -> Element {
     let mut proj = Project {
         name: "".into(),
         description: "".into(),
     };
     rsx! {
         main {
-            {proj.rsx_creation_form(|e| { debug!("creating {:?}", e) })}
+            {proj.rsx_edit_form(|e| { debug!("editing {:?}", e) })}
                 // form {
         //     LabeledBox {
         //         name: "name",

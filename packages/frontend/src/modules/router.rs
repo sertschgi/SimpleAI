@@ -11,17 +11,20 @@ pub mod core {
         #[layout(TopNavLayout)]
             #[route("/")]
             Start {},
-            #[nest("/editor")]
-                #[route("/")]
-                Editor {},
             #[end_nest]
-            #[layout(HeadingLayout)]
                 #[nest("/projects")]
+                    #[layout(HeadingLayout)]
                     #[route("/")]
                     Projects {},
                     #[route("/projects_nav")]
                     ProjectNav {},
+                    #[route("/edit")]
+                    Edit {},
+                    #[end_layout]
+                    #[route("/editor")]
+                    Editor {},
                 #[end_nest]
+                #[layout(HeadingLayout)]
                 #[nest("/new")]
                     #[route("/")]
                     New {},
