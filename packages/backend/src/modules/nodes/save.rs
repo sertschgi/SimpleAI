@@ -1,5 +1,4 @@
-use crate::modules::nodes::check_name;
-use crate::modules::utils::prelude::*;
+use crate::modules::utils::{check_name, prelude::*};
 use anyhow::Result;
 use std::fs::{self, create_dir, create_dir_all, File};
 use std::io::Write;

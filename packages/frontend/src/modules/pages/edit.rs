@@ -3,35 +3,38 @@ use super::utils::*;
 #[derive(Formifiable)]
 pub struct Project {
     pub name: String,
+    pub author: String,
     pub description: String,
+    pub basenode: String,
 }
 
 #[page]
 pub fn Edit() -> Element {
+    // TODO: Query actual information from caller to edit
     let mut proj = Project {
         name: "".into(),
+        author: "".into(),
         description: "".into(),
+        basenode: "".into(),
     };
+
     rsx! {
         main {
-            {proj.rsx_edit_form(|e| { debug!("editing {:?}", e) })}
-                // form {
-        //     LabeledBox {
-        //         name: "name",
-        //         kind: "text",
-        //         required: true,
-        //         placeholder: "SampleProject",
-        //     }
-        //     LabeledBox {
-        //         name: "description",
-        //         kind: "text",
-        //         required: false,
-        //         placeholder: "this is a description",
-        //     }
-        //     section { class: "button-wrapper",
-        //         button { r#type: "submit", NewIcon {} }
-        //     }
-        // }
+            {
+                proj.rsx_creation_form(|e| {
+                    let p: Project = e.parsed_values().unwrap();
+                    let _ = create_project(
+                        simple_ai_backend::modules::utils::prelude::Project::from_values(
+                            p.name.clone(),
+                            p.description,
+                            p.author,
+                            Some(p.name),
+                        ),
+                        true,
+                    );
+                    // TODO: Popup that shows potential error messages + opens project / goes back to home / project page
+                })
+            }
         }
     }
 }
