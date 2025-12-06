@@ -232,10 +232,13 @@ class Connection {
 }
 
 class Viewport {
-  constructor(containerElement, options = {}) {
+  constructor(dioxus, containerElement, options = {}) {
     if (!(containerElement instanceof HTMLElement)) {
       throw new Error("Viewport constructor requires a DOM container element");
     }
+
+    this.dioxus = dioxus;
+
     // options and defaults
     this.gridSpacing = options.gridSpacing || 40;
     this.dotRadius = options.dotRadius || 2;
@@ -304,13 +307,16 @@ class Viewport {
     this.draw();
   }
 
-  addNodeFromId(id, options = {}) {
+  async addNodeFromId(id, options = {}) {
     let rect = this.container.getBoundingClientRect();
     const {
       position = { x: rect.width / 2 + rect.x, y: rect.height / 2 + rect.y },
     } = options;
 
     let { x, y } = this.toEditor(position.x - rect.x, position.y - rect.y);
+
+    this.dioxus.send({ AddNode: "00000000-0000-0000-0000-000000000000" });
+    this.dioxus.recv();
 
     this.addNode(
       new window.VNode(x, y, "SampleNODE", [
