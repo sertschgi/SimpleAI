@@ -1,6 +1,8 @@
+use serde::Deserialize;
+
 use super::utils::*;
 
-#[derive(Formifiable)]
+#[derive(Formifiable, Deserialize)]
 pub struct Project {
     pub name: String,
     pub author: String,
@@ -23,7 +25,7 @@ pub fn Edit() -> Element {
             {
                 proj.rsx_creation_form(|e| {
                     let p: Project = e.parsed_values().unwrap();
-                    let _ = create_project(
+                    let _ = simple_ai_backend::modules::projects::create::create_project(
                         simple_ai_backend::modules::utils::prelude::Project::from_values(
                             p.name.clone(),
                             p.description,
