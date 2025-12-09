@@ -98,7 +98,7 @@ class VNode {
     this.height = Math.max(
       48,
       32 +
-        Math.max(this.inputs.length, this.outputs.length) * this.paramSpacing,
+      Math.max(this.inputs.length, this.outputs.length) * this.paramSpacing,
     );
     this.x = x - this.width / 2;
     this.y = y - this.height / 2;
@@ -309,7 +309,7 @@ class Viewport {
     let { x, y } = this.toEditor(position.x - rect.x, position.y - rect.y);
 
     this.dioxus.send({
-      AddNode: { id: "00000000-0000-0000-0000-000000000000", x: x, y: y },
+      AddNode: { id: id, x: x, y: y },
     });
   }
 

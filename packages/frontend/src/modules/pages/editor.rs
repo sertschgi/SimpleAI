@@ -1,6 +1,7 @@
 use super::utils::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;
+use simple_ai_backend::modules::utils::{node::NodeKind, prelude::NodeQueryFilter};
 use tokio::time::*;
 use uuid::Uuid;
 
@@ -8,7 +9,7 @@ const CREATE_VIEWPORT: &str = r#"
     window.activeOnnxViewport = new window.Viewport(dioxus, document.getElementById("viewport"));
 "#;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 struct VNodeParameter {
     r#type: String,
     name: String,
@@ -63,23 +64,37 @@ impl ViewportEvent {
     pub fn exec(self) {
         match self {
             Self::AddNode(AddNodeData { id, x, y }) => {
-                // TODO: let node = simple_ai_backend::modules::nodes::query_onnx();
+                let node = simple_ai_backend::modules::nodes::query::query_nodes(vec![
+                    NodeQueryFilter::Id { id },
+                ])
+                .tree
+                .first()
+                .unwrap()
+                .context
+                .try_lock()
+                .unwrap() // TODO: That thing panics if no correct node exists
+                .clone();
 
-                // then remove this
-                let params = vec![
-                    VNodeParameter {
-                        r#type: "input".into(),
-                        name: "in1".into(),
-                    },
-                    VNodeParameter {
-                        r#type: "output".into(),
-                        name: "out1".into(),
-                    },
-                ];
+                let params: Vec<VNodeParameter> = node
+                    .get_params()
+                    .iter()
+                    .filter(|p| p.context.try_lock().unwrap().is_output())
+                    .map(|p| {
+                        let param = p.context.try_lock().unwrap();
+                        VNodeParameter {
+                            r#type: if param.is_input() {
+                                "input".into()
+                            } else {
+                                "output".into()
+                            },
+                            name: param.name.clone(),
+                        }
+                    })
+                    .collect();
                 let node = VNode {
                     x,
                     y,
-                    label: "sample".into(),
+                    label: node.name.clone(),
                     params,
                 };
 

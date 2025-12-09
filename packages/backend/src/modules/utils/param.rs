@@ -32,3 +32,19 @@ pub struct Param {
     pub kind: ParamKind,
     pub dtype: DType,
 }
+
+impl Param {
+    pub fn is_input(&self) -> bool {
+        match &self.kind {
+            ParamKind::Runtime { kind, .. } => *kind == RuntimeParamKind::Input,
+            ParamKind::Static { .. } => true,
+        }
+    }
+
+    pub fn is_output(&self) -> bool {
+        match &self.kind {
+            ParamKind::Runtime { kind, .. } => *kind == RuntimeParamKind::Output,
+            ParamKind::Static { .. } => false,
+        }
+    }
+}

@@ -2,6 +2,7 @@ use super::prelude::*;
 use derive_builder::Builder;
 use onnx_ir::NodeType;
 use std::collections::HashMap;
+use uuid::Uuid;
 // -------------------- NODE KIND -------------------- //
 #[derive(Clone, PartialEq)]
 pub enum NodeKind {
@@ -48,11 +49,11 @@ impl Node {
 
     pub fn from_save_node(
         node: SaveNode,
-        param_map: Option<&mut HashMap<u128, StrongParam>>,
+        param_map: Option<&mut HashMap<u128, (StrongParam, Option<u128>)>>,
     ) -> Self {
         let top = param_map.is_none();
         let mut new_map;
-        let param_map: &mut HashMap<u128, StrongParam> = match param_map {
+        let param_map: &mut HashMap<u128, (StrongParam, Option<u128>)> = match param_map {
             Some(pm) => pm,
             None => {
                 new_map = HashMap::new();
@@ -90,20 +91,15 @@ impl Node {
         };
 
         // Second pass: resolve connections
-        let mut resolve = Vec::new();
-        for (_, strong_param) in param_map.iter_mut() {
-            let param = strong_param.context.try_lock().unwrap();
-            if let ParamKind::Runtime { id, .. } = &param.kind {
-                resolve.push((*id, strong_param.clone()));
-            }
-        }
-
         if top {
-            for (id, strong_param) in resolve {
-                if let Some(target) = param_map.get(&id) {
-                    let mut param = strong_param.context.try_lock().unwrap();
-                    if let ParamKind::Runtime { connection, .. } = &mut param.kind {
-                        *connection = Some(WeakContext::from(target.clone()));
+            let resolve = param_map.clone();
+            for (_, (strong_param, conn)) in resolve {
+                if let Some(conn) = conn {
+                    if let Some(target) = param_map.get(&conn) {
+                        let mut param = strong_param.context.try_lock().unwrap();
+                        if let ParamKind::Runtime { connection, .. } = &mut param.kind {
+                            *connection = Some(WeakContext::from(target.0.clone()));
+                        }
                     }
                 }
             }
@@ -115,7 +111,6 @@ impl Node {
     pub fn get_params(&self) -> Vec<StrongParam> {
         match &self.kind {
             NodeKind::Onnx { onnx } => [onnx.inputs.clone(), onnx.outputs.clone()].concat(),
-
             NodeKind::Bundled { bundle } => {
                 let mut res = Vec::new();
 
@@ -126,7 +121,10 @@ impl Node {
                     res.extend(node_params.into_iter().filter(|p| {
                         let p = p.context.try_lock().unwrap();
                         match &p.kind {
-                            ParamKind::Runtime { connection, .. } => connection.is_some(),
+                            ParamKind::Runtime { connection, .. } => {
+                                println!("{:?}", connection.is_some());
+                                !connection.is_some()
+                            }
                             ParamKind::Static { .. } => true,
                         }
                     }));
@@ -136,10 +134,24 @@ impl Node {
             }
         }
     }
+
+    pub fn id(&self) -> Uuid {
+        Uuid::new_v5(
+            &Uuid::nil(),
+            format!(
+                "{}/{}/{}/{}",
+                self.author, self.name, self.version.version, self.description
+            )
+            .as_bytes(),
+        )
+    }
 }
 
 impl OnnxNode {
-    fn from_save_node(node: SaveOnnxNode, param_map: &mut HashMap<u128, StrongParam>) -> Self {
+    fn from_save_node(
+        node: SaveOnnxNode,
+        param_map: &mut HashMap<u128, (StrongParam, Option<u128>)>,
+    ) -> Self {
         let mut binding = OnnxNodeBuilder::default();
         let mut inputs = Vec::new();
         let mut outputs = Vec::new();
@@ -161,7 +173,11 @@ impl OnnxNode {
                     },
                 },
             });
-            param_map.insert(save_param.id, strong_param.clone());
+            let connected_to = match &save_param.kind {
+                SaveParamKind::Runtime { connected_to, .. } => *connected_to,
+                SaveParamKind::Static { .. } => None,
+            };
+            param_map.insert(save_param.id, (strong_param.clone(), connected_to));
             inputs.push(strong_param);
         }
         for save_param in &node.outputs {
@@ -180,7 +196,11 @@ impl OnnxNode {
                     },
                 },
             });
-            param_map.insert(save_param.id, strong_param.clone());
+            let connected_to = match &save_param.kind {
+                SaveParamKind::Runtime { connected_to, .. } => *connected_to,
+                SaveParamKind::Static { .. } => None,
+            };
+            param_map.insert(save_param.id, (strong_param.clone(), connected_to));
             outputs.push(strong_param);
         }
 

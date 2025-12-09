@@ -29,9 +29,7 @@ pub fn SearchResult(intern: InternSearchResult) -> Element {
     };
 
     rsx! {
-        article {
-            class: "draggable-node",
-            id: "{intern.node.cloned().author}/{intern.node.cloned().name}",
+        article { class: "draggable-node", id: "{intern.node.cloned().id()}",
             h3 {
                 span { id: "name", "{intern.node.cloned().name}" }
             }

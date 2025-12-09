@@ -1,5 +1,6 @@
 use crate::modules::utils::prelude::*;
 use fuzzy_matcher::{skim::SkimMatcherV2, FuzzyMatcher};
+use uuid::Uuid;
 
 // ---------------- QUERY FILTER ---------------- //
 #[derive(Clone)]
@@ -9,6 +10,7 @@ pub enum NodeQueryFilter {
     Author { author: String },
     Environment { env: Environment },
     Name { name: String },
+    Id { id: Uuid },
 }
 
 #[derive(Clone)]
@@ -34,6 +36,7 @@ impl NodeQueryFilter {
                 matcher.fuzzy_match(&node.author, &author).is_some()
             }
             NodeQueryFilter::Environment { env } => env.merge(&node.version.env).is_ok(),
+            NodeQueryFilter::Id { id } => node.id() == id,
         }
     }
 }
