@@ -46,25 +46,29 @@
 }
 .Project .actions .Icon {
   flex-grow: 1;
+  width: 100%;
   color: hsl(var(--color-text-fg));
   margin: 0;
 }
 
-.Project .actions a {
+.Project .actions > * {
+  all: unset;
+  cursor: pointer;
   height: 100%;
   flex-grow: 1;
   border-radius: var(--project-items-border-radius);
   display: flex;
+  justify-content: center;
   align-items: center;
   box-sizing: border-box;
 }
 
-.Project .actions a {
+.Project .actions > * {
   opacity: 0.7;
   scale: 1;
   transition: opacity 0.3s ease-in-out;
 }
-.Project .actions a:hover {
+.Project .actions > *:hover {
   opacity: 1;
 }
 

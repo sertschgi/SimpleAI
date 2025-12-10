@@ -1,8 +1,6 @@
-// %%% components.rs %%%
-
-// %% exports %%
 pub mod breadcrumbs;
 pub mod connection;
+pub mod delete_popup;
 pub mod divider;
 pub mod drag_area;
 pub mod draggable;
@@ -14,6 +12,7 @@ pub mod nav_button;
 pub mod navigation_link;
 pub mod navigation_page;
 pub mod node;
+pub mod popup;
 pub mod project;
 pub mod runtime_param;
 pub mod search;
@@ -24,9 +23,9 @@ pub mod top_nav;
 pub mod viewport;
 pub mod window_decorations;
 
-// %% prelude %%
 pub mod prelude {
     pub use super::breadcrumbs::*;
+    pub use super::delete_popup::*;
     pub use super::divider::*;
     pub use super::drag_area::*;
     pub use super::draggable::*;
@@ -38,6 +37,7 @@ pub mod prelude {
     pub use super::navigation_link::*;
     pub use super::navigation_page::*;
     pub use super::node::*;
+    pub use super::popup::*;
     pub use super::project;
     pub use super::search::*;
     pub use super::search_result::*;
@@ -52,7 +52,6 @@ pub mod prelude {
     }
 }
 
-// %% utils %%
 pub(crate) mod utils {
     pub use crate::utils::*;
 }

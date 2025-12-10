@@ -8,6 +8,7 @@ pub mod core {
     #[derive(Debug, Clone, Routable, PartialEq)]
     #[rustfmt::skip]
     pub enum Route {
+        // #[layout(PopupRoot)]
         #[layout(TopNavLayout)]
             #[route("/")]
             Start {},
