@@ -4,7 +4,7 @@
 use syn::{
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
-    Expr, ExprLit, Lit, LitBool, LitStr, MetaNameValue, Token,
+    Expr, ExprLit, Lit, LitBool, MetaNameValue, Token,
 };
 // % extern %
 use super::kind::ElementKind;

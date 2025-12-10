@@ -12,7 +12,7 @@ pub fn Divider(id: String, orientation: char, children: Element) -> Element {
         div {
             class: "Divider",
             id,
-            onmounted: move |e| {
+            onmounted: move |_| {
                 let script = script.clone();
                 async move {
                     sleep(Duration::from_millis(100)).await;

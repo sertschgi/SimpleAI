@@ -64,7 +64,7 @@ impl ToTokens for Element {
 
 #[derive(Clone)]
 pub struct Attribute {
-    pub spread: Option<Token![..]>,
+    pub _spread: Option<Token![..]>,
     pub name: Ident,
     pub colon: Option<Token![:]>,
     pub value: Option<LitStr>,
@@ -93,7 +93,7 @@ impl Parse for Attribute {
         };
 
         Ok(Attribute {
-            spread,
+            _spread: spread,
             name,
             colon,
             value,

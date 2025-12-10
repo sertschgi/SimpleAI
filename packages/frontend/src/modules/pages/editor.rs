@@ -105,7 +105,7 @@ impl ViewportEvent {
                     json_node
                 ));
             }
-            Self::Save(SaveNodeData { viewport_save }) => {
+            Self::Save(SaveNodeData { .. }) => {
                 // TODO: simple_ai_backend::modules::porject::save_onnx(viewport_save);
                 debug!("Saving...");
             }
@@ -142,7 +142,7 @@ impl From<String> for ViewportEvent {
 pub fn Editor(children: Element) -> Element {
     rsx! {
         main {
-            onmounted: move |e| async move {
+            onmounted: move |_| async move {
                 sleep(Duration::from_millis(100)).await;
 
                 let mut handle = document::eval(CREATE_VIEWPORT);

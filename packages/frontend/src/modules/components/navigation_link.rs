@@ -1,5 +1,5 @@
 use super::utils::*;
-use dioxus::{core::AttributeValue, router::NavigationTarget};
+use dioxus::router::NavigationTarget;
 
 #[item]
 pub fn NavigationLink(

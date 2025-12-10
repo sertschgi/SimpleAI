@@ -1,7 +1,5 @@
 use super::utils::*;
-use super::{
-    breadcrumbs::Breadcrumbs, delete_popup::DeletePopup, window_decorations::WindowDecorations,
-};
+use super::delete_popup::DeletePopup;
 use chrono::{DateTime, Utc};
 
 #[item]

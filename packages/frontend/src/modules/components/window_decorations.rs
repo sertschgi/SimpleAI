@@ -3,7 +3,6 @@ use super::utils::*;
 #[cfg(not(target_family = "wasm"))]
 use dioxus::desktop::window;
 
-use dioxus::core::AttributeValue;
 
 #[cfg(not(target_family = "wasm"))]
 #[item]

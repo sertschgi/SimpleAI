@@ -1,13 +1,9 @@
-// %%% components / search.rs %%%
-
-// %% includes %%
 use super::search_result::{InternSearchResult, SearchResult};
 use super::utils::*;
 use simple_ai_backend::modules::nodes::query::query_nodes;
 use simple_ai_backend::modules::utils::prelude::NodeQueryFilter;
 use tokio::time::*;
 
-// %% main %%
 #[item]
 pub fn Search(#[props(extends = GlobalAttributes)] attributes: Vec<Attribute>) -> Element {
     let mut intern_search_results = use_signal(Vec::<InternSearchResult>::new);
@@ -25,14 +21,6 @@ pub fn Search(#[props(extends = GlobalAttributes)] attributes: Vec<Attribute>) -
                 .map(|result| InternSearchResult::from(result.context.try_lock().unwrap().clone()))
                 .collect::<Vec<InternSearchResult>>(),
         );
-    });
-
-    let future = use_resource(move || async move {
-        // You can create as many eval instances as you want
-        let mut eval = document::eval(r#"console.log("HELLOO")"#);
-        // let mut eval = document::eval(
-        //     r#"console.log("helloworld"); const di = new window.OnnxDragIn(document.getElementById("onnx-drag-in"), document.getElementById("search"), document.getElementById("nodeContainer")); console.log(di);"#,
-        // );
     });
 
     rsx! {

@@ -1,4 +1,3 @@
-use crate::element::function;
 
 use super::rsx_ast::Element;
 

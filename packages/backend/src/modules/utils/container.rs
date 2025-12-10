@@ -29,7 +29,7 @@ pub struct ContainerIter<'a, T> {
 }
 
 impl<T> Container<T> {
-    pub fn iter(&self) -> ContainerIter<T> {
+    pub fn iter(&self) -> ContainerIter<'_, T> {
         ContainerIter {
             iter: self.tree.iter(),
         }

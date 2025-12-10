@@ -3,8 +3,6 @@
 // %% includes %%
 use super::drag_area::DragContext;
 use super::utils::*;
-use dioxus::html::geometry::euclid::default::SideOffsets2D;
-use dioxus::html::geometry::euclid::Rect;
 
 // %% main %%
 #[component]

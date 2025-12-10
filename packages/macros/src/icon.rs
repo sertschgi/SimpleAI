@@ -6,8 +6,6 @@ use dioxus_autofmt::write_block_out;
 use dioxus_rsx_rosetta::{rsx_from_html, Dom};
 use proc_macro2::{Span, TokenStream};
 use quote::*;
-use rstml::node::{Node, NodeAttribute, NodeElement, NodeName, NodeText};
-use std::borrow::Cow;
 use std::str::FromStr;
 use syn::{
     parse::{Parse, ParseStream},
