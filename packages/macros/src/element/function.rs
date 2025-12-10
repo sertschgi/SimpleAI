@@ -1,24 +1,43 @@
 use crate::element::function;
 
-// %%% function.rs %%%
-// %% includes %%
-// % intern %
 use super::rsx_ast::Element;
-// % extern %
+
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{
     parse::{Parse, ParseStream},
     parse2, ItemFn, Macro, Stmt, StmtMacro,
 };
-// % intern %
-// %% main %%
-// % Element Function %
+
+#[derive(Clone)]
+pub enum AstResult {
+    Success(Element),
+    Failure(TokenStream),
+}
+
+impl ToTokens for AstResult {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        match self {
+            Self::Success(e) => e.to_tokens(tokens),
+            Self::Failure(ts) => ts.to_tokens(tokens),
+        }
+    }
+}
+
+impl From<Macro> for AstResult {
+    fn from(mac: Macro) -> Self {
+        match parse2(mac.tokens.clone()) {
+            Ok(e) => Self::Success(e),
+            Err(_) => Self::Failure(mac.tokens),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct ElementFunction {
     pub function: ItemFn,
     pub name: String,
-    pub macro_ast: Element,
+    pub macro_ast: AstResult,
 }
 
 impl ElementFunction {
@@ -38,10 +57,7 @@ impl Parse for ElementFunction {
         let mut function: ItemFn = ItemFn::parse(input)?;
         let name = function.sig.ident.to_string();
 
-        let macro_ast = {
-            let mac = Self::extract_macro_mut(&mut function)?;
-            parse2(mac.tokens.clone())?
-        };
+        let macro_ast = (*Self::extract_macro_mut(&mut function)?).clone().into();
 
         Ok(Self {
             function,

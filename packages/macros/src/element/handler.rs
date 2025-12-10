@@ -2,6 +2,8 @@ use proc_macro2::{Span, TokenStream};
 use quote::*;
 use syn::{parse2, parse_quote, LitStr};
 
+use crate::element::function::AstResult;
+
 use super::{
     attrs::ElementAttrs, function::ElementFunction, kind::ElementKind, manifest::ElementConfig,
 };
@@ -14,7 +16,6 @@ pub struct ElementHandler {
 
 impl ElementHandler {
     pub fn new(attr: TokenStream, item: TokenStream) -> Self {
-        println!("-----------------------------------------------------------------------------");
         Self {
             attrs: parse2(attr).expect("Could not parse the function attributes"),
             function: parse2(item).expect("Could not parse the function itself"),
@@ -51,8 +52,6 @@ impl ElementHandler {
 
         let func = &self.function;
 
-        println!("{}", func.into_token_stream());
-
         quote! {
             #[dioxus::prelude::component]
             #func
@@ -72,49 +71,50 @@ impl ElementHandler {
         let style_file_lit =
             LitStr::new(style_file.to_str().unwrap_or_default(), Span::call_site());
 
-        quote! {
+        let link = quote! {
             document::Link {
                 rel: "stylesheet",
                 href: asset!(#style_file_lit)
             }
+        };
+
+        match &mut self.function.macro_ast {
+            AstResult::Success(e) => link.to_tokens(&mut e.body),
+            AstResult::Failure(ts) => link.to_tokens(ts),
         }
-        .to_tokens(&mut self.function.macro_ast.body);
     }
 
     fn handle_class(&mut self) {
         if self.attrs.no_class {
             return;
         }
-        println!("BEFORE ELM");
-        let elm = {
-            if let Some(elm) = self
-                .function
-                .macro_ast
-                .attrs
-                .iter_mut()
-                .find(|attr| attr.name == "class")
-            {
-                elm
-            } else {
-                self.function
-                    .macro_ast
-                    .attrs
-                    .insert(0, parse_quote! { class: "" });
-                // if only the class attribute is present there needs to be trailing puncuation
-                if self.function.macro_ast.attrs.len() == 1 {
-                    self.function.macro_ast.attrs.push_punct(parse_quote! {,});
-                }
-                self.function.macro_ast.attrs.first_mut().unwrap()
+
+        match &mut self.function.macro_ast {
+            AstResult::Failure(_) => {
+                println!("\x1b[36m[Macro-Warning]:\x1b[0m Could not parse the function body. Not adding a class.");
             }
-        };
-        println!("ELM");
-        let previous_value = match elm.value.clone() {
-            Some(value) => value.value(),
-            None => elm.name.to_string(),
-        };
-        elm.value = Some(LitStr::new(
-            &format!("{} Element {}", previous_value, self.function.name),
-            Span::call_site(),
-        ));
+            AstResult::Success(ast_elm) => {
+                let elm = {
+                    if let Some(elm) = ast_elm.attrs.iter_mut().find(|attr| attr.name == "class") {
+                        elm
+                    } else {
+                        ast_elm.attrs.insert(0, parse_quote! { class: "" });
+                        // if only the class attribute is present there needs to be trailing puncuation
+                        if ast_elm.attrs.len() == 1 {
+                            ast_elm.attrs.push_punct(parse_quote! {,});
+                        }
+                        ast_elm.attrs.first_mut().unwrap()
+                    }
+                };
+                let previous_value = match elm.value.clone() {
+                    Some(value) => value.value(),
+                    None => elm.name.to_string(),
+                };
+                elm.value = Some(LitStr::new(
+                    &format!("{} Element {}", previous_value, self.function.name),
+                    Span::call_site(),
+                ));
+            }
+        }
     }
 }

@@ -1,6 +1,3 @@
-// %%% rsx_body.rs %%%
-// %% includes %%
-
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
 use syn::{
@@ -12,10 +9,6 @@ use syn::{
     Ident, LitStr, Macro, Path, Token,
 };
 
-use dioxus_rsx::CallBody;
-
-// %% main %%
-// % Element %
 #[derive(Clone)]
 pub struct Element {
     pub path: Path,
@@ -43,9 +36,7 @@ impl Parse for Element {
                 attrs.push_punct(content.parse()?);
             }
         }
-        println!("CONTENT {content}");
         let body = content.parse()?;
-        println!("SUCCESS");
         Ok(Self {
             path,
             _brace,
@@ -81,7 +72,6 @@ pub struct Attribute {
 
 impl Parse for Attribute {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        println!("INPUT: {input}");
         let spread: Option<Token![..]> = if input.peek(Token![..]) {
             Some(input.parse()?)
         } else {

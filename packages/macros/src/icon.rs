@@ -53,7 +53,6 @@ impl Parse for Field {
                     } else {
                         p = input.parse::<proc_macro2::TokenTree>().unwrap().to_string();
                         needs_space = false;
-                        // println!("token: [{p}]");
                     }
                     value.push_str(&p);
                 }
@@ -82,7 +81,6 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
     let mut out: TokenStream = quote! {
         use dioxus::{core::AttributeValue, prelude::*};
     };
-    println!("ICON: --------------------------------------------------------------");
     for field in fields.fields {
         let function_name = pascal_case(&format!("{}Icon", field.member));
         let function_ident = Ident::new(&function_name, Span::call_site());
@@ -90,7 +88,6 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
         let svg_body = rsx_from_html(&svg_dom);
         let block = write_block_out(&svg_body).expect("failed writing block");
         let svg = TokenStream::from_str(&block).unwrap();
-        println!("svg: {}", svg);
         let classes = format!("Icon {}", function_name);
         quote! {
             #[component]
@@ -116,9 +113,5 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
         }
         .to_tokens(&mut out);
     }
-    println!(
-        "\n -------------------------------------------- ICON OUT:\n{}",
-        out
-    );
     out
 }

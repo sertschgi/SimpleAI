@@ -121,7 +121,6 @@ fn test_create_bundled_node() {
     };
 
     let res = save_node(bundled_node);
-    println!("{:?}", res);
 
     assert!(res.is_ok());
 }
