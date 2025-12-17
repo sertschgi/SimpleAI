@@ -9,13 +9,23 @@
   border-radius: 5rem;
   transition: background-color 200ms;
 }
+
+.WindowDecorations svg {
+  scale: 0.8;
+}
+
 .WindowDecorations section {
   flex-grow: 1;
   display: flex;
   flex-direction: row;
   margin: 0 0.5rem;
   align-items: center;
+  gap: 0.1rem;
   cursor: pointer;
+}
+
+.WindowDecorations button {
+  all: unset;
 }
 
 .WindowDecorations .Icon:hover {
