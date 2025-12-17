@@ -1,6 +1,6 @@
 pub mod core {
     use super::super::{
-        components::{heading_layout::HeadingLayout, top_nav::TopNavLayout},
+        components::{heading_layout::HeadingLayout, popup::PopupEntry, top_nav::TopNavLayout},
         pages::prelude::*,
     };
     use crate::utils::*;
@@ -8,7 +8,7 @@ pub mod core {
     #[derive(Debug, Clone, Routable, PartialEq)]
     #[rustfmt::skip]
     pub enum Route {
-        // #[layout(PopupRoot)]
+        #[layout(PopupEntry)]
         #[layout(TopNavLayout)]
             #[route("/")]
             Start {},

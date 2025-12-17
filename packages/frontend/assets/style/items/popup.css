@@ -1,2 +1,50 @@
 .Popup {
+  display: none;
+}
+
+.PopupEntry > .Popup {
+  background-color: hsla(var(--color-box), 4%, 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+}
+
+.Popup .banner {
+  display: flex;
+  flex-direction: column;
+  border-radius: 3rem;
+  flex-grow: 0;
+  background-color: hsl(var(--color-box), 10%);
+}
+
+.Popup header {
+  position: relative;
+}
+
+.Popup .content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  justify-items: center;
+  padding: 6rem;
+}
+
+.Popup header button {
+  all: unset;
+  position: absolute;
+  padding: 0.5rem;
+  cursor: pointer;
+  right: 0;
+}
+
+.Popup header button .Icon {
+  border-radius: 10rem;
+  transition: background-color 0.5s;
+}
+.Popup header button .Icon:hover {
+  background-color: hsl(var(--color-button-bg), 30%);
 }

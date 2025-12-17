@@ -9,8 +9,8 @@
   --color-box: var(--color-1);
   --color-box-fg: var(--color-box), 90%;
   --color-box-bg: var(--color-box), 20%;
-  --color-button-fg: var(--color-box-fg);
-  --color-button-bg: var(--color-box-bg);
+  --color-button-fg: var(--color-box);
+  --color-button-bg: var(--color-box);
   --color-icon-bg: transparent;
   --color-icon-fg: var(--color-button-fg);
   --color-input-bg: var(--color-1);
@@ -90,18 +90,18 @@ html {
 button {
   padding: 0.5rem;
   display: flex;
-  background-color: hsl(var(--color-button-bg));
+  background-color: hsl(var(--color-button-bg), 20%);
   color: hsl(var(--color-button-fg));
   justify-content: center;
   align-items: center;
   border-radius: 3rem;
   border: none;
   cursor: pointer;
-  transition: padding 0.2s;
+  transition: background-color 0.5s;
 }
 
 button:hover {
-  padding: 1rem;
+  background-color: hsl(var(--color-button-bg), 30%);
 }
 
 /* .NavbarButton { */

@@ -1,0 +1,18 @@
+.Popup .inner {
+  flex-grow: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.Popup .options {
+  flex-grow: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.Popup button {
+  flex-grow: 0;
+}
