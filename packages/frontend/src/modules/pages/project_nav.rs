@@ -1,7 +1,7 @@
 use super::utils::*;
 
 #[page(no_css = true)]
-pub fn ProjectNav() -> Element {
+pub fn ProjectNav(project_id: uuid::Uuid) -> Element {
     rsx! {
         main {
             NavigationPage {

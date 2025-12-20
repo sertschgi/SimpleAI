@@ -11,6 +11,9 @@ pub struct Project {
 
 #[page]
 pub fn New() -> Element {
+    let mut error_popup_open = use_signal(|| false);
+    let mut error_popup_msg = use_signal(|| "");
+
     let mut proj = Project {
         name: "".into(),
         author: "".into(),
@@ -19,10 +22,13 @@ pub fn New() -> Element {
 
     rsx! {
         main {
+            Popup {
+                p { {error_popup_msg()} }
+            }
             {
-                proj.rsx_creation_form(|e| {
+                proj.rsx_creation_form(move |e| {
                     let p: Project = e.parsed_values().unwrap();
-                    let _ = create_project(
+                    let r = create_project(
                         simple_ai_backend::modules::utils::prelude::Project::from_values(
                             p.name.clone(),
                             p.description,
@@ -31,9 +37,17 @@ pub fn New() -> Element {
                         ),
                         false,
                     );
-                    // TODO: Popup that shows potential error messages + opens project / goes back to home / project page
+                    _ = match r {
+                        // error_popup_msg.push(e.into());
+                        // error_popup_open.set(true);
+                        Ok(project_id) => {
+                            _ = router().push(Route::ProjectNav { project_id });
+                        }
+                        Err(e) => println!("{e}"),
+                    };
                 })
             }
+        
         }
     }
 }

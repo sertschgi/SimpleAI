@@ -15,7 +15,7 @@ pub fn Breadcrumbs() -> Element {
                     to: {
                         assembled.push('/');
                         assembled.push_str(crumb);
-                        assembled.parse::<NavigationTarget<Route>>().unwrap()
+                        assembled.parse::<NavigationTarget<Route>>().unwrap_or(Route::Projects {}.into())
                     },
                     p { {crumb.to_string()} }
                 }

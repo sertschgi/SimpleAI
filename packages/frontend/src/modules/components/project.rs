@@ -1,9 +1,13 @@
-use super::utils::*;
 use super::delete_popup::DeletePopup;
+use super::utils::*;
 use chrono::{DateTime, Utc};
 
 #[item]
-pub fn Project(name: String, date: DateTime<Utc>, desc: String) -> Element {
+pub fn Project(
+    name: String,
+    date: DateTime<Utc>,
+    desc: String, /* TODO: add ids and remove this */
+) -> Element {
     let mut delete_popup_open = use_signal(|| false);
     // TODO: Make a global signal Active Project with the id:
     // TODO: simpleai_backend::project::delete(id) that in ondelete:
@@ -17,7 +21,13 @@ pub fn Project(name: String, date: DateTime<Utc>, desc: String) -> Element {
             }
             div { class: "divider" }
             section { class: "actions",
-                Link { to: Route::ProjectNav {}, class: "open", FolderOpenIcon {} }
+                Link {
+                    to: Route::ProjectNav {
+                        project_id: uuid::Uuid::default(), // TODO: add ids and remove this
+                    },
+                    class: "open",
+                    FolderOpenIcon {}
+                }
                 Link { to: Route::Edit {}, class: "edit", SettingsIcon {} }
                 button {
                     class: "delete",

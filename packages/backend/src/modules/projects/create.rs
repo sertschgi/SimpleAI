@@ -3,9 +3,10 @@ use anyhow::Result;
 use std::fs::{create_dir_all, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use uuid::Uuid;
 
 // #[cfg(feature = "desktop")]
-pub fn create_project(project: Project, overwrite: bool) -> Result<(), String> {
+pub fn create_project(project: Project, overwrite: bool) -> Result<uuid::Uuid, String> {
     let name = project.name.clone();
     let author = project.author.clone();
 
@@ -33,5 +34,5 @@ pub fn create_project(project: Project, overwrite: bool) -> Result<(), String> {
         .write_all(meta_json.as_bytes())
         .map_err(|e| e.to_string())?;
 
-    Ok(())
+    Ok(Uuid::default()) // TODO: add ids and replace this
 }
