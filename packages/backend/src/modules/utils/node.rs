@@ -121,10 +121,7 @@ impl Node {
                     res.extend(node_params.into_iter().filter(|p| {
                         let p = p.context.try_lock().unwrap();
                         match &p.kind {
-                            ParamKind::Runtime { connection, .. } => {
-                                println!("{:?}", connection.is_some());
-                                !connection.is_some()
-                            }
+                            ParamKind::Runtime { connection, .. } => !connection.is_some(),
                             ParamKind::Static { .. } => true,
                         }
                     }));

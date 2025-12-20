@@ -78,7 +78,6 @@ impl ViewportEvent {
                 let params: Vec<VNodeParameter> = node
                     .get_params()
                     .iter()
-                    .filter(|p| p.context.try_lock().unwrap().is_output())
                     .map(|p| {
                         let param = p.context.try_lock().unwrap();
                         VNodeParameter {
@@ -91,6 +90,7 @@ impl ViewportEvent {
                         }
                     })
                     .collect();
+
                 let node = VNode {
                     x,
                     y,
