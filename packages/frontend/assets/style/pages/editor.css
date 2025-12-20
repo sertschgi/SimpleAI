@@ -1,12 +1,11 @@
 #viewport {
-  display: flex;
-  flex-grow: 1;
+  height: inherit;
   overflow: hidden;
 }
 
-#paint {
-  flex-grow: 1;
-}
+/* #paint { */
+/*   flex-grow: 1; */
+/* } */
 
 .Editor {
   display: flex;

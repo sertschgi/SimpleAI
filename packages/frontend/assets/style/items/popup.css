@@ -2,6 +2,10 @@
   display: none;
 }
 
+.PopupEntry {
+  overflow: hidden;
+}
+
 .PopupEntry > .Popup {
   background-color: hsla(var(--color-box), 4%, 70%);
   display: flex;
