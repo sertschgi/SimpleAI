@@ -17,8 +17,8 @@ pub mod core {
                     #[layout(HeadingLayout)]
                     #[route("/")]
                     Projects {},
-                    #[route("/project/:project_id")]
-                    ProjectNav { project_id: uuid::Uuid },
+                    #[route("/project/:id")]
+                    ProjectNav { id: uuid::Uuid },
                     #[route("/edit")]
                     Edit {},
                     #[end_layout]

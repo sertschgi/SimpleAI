@@ -20,10 +20,20 @@ pub fn get_all_projects() -> Result<Vec<Project>, String> {
         let data = std::fs::read_to_string(path)
             .map_err(|e| format!("Failed to read {}: {}", path.display(), e))?;
 
-        let project: Project = serde_json::from_str(&data)
-            .map_err(|e| format!("Failed to deserialize {}: {}", path.display(), e))?;
+        let value = serde_json::from_str::<Project>(&data);
 
-        projects.push(project);
+        match value {
+            Ok(p) => {
+                projects.push(p);
+            }
+            Err(e) => {
+                println!(
+                    "[Warning]: Failed to deserialize {}: {}. skipped.",
+                    path.display(),
+                    e
+                )
+            }
+        }
     }
 
     Ok(projects)

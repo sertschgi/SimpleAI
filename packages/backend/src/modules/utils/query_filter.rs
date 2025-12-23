@@ -2,62 +2,76 @@ use crate::modules::utils::prelude::*;
 use fuzzy_matcher::{skim::SkimMatcherV2, FuzzyMatcher};
 use uuid::Uuid;
 
-// ---------------- QUERY FILTER ---------------- //
 #[derive(Clone)]
 pub enum NodeQueryFilter {
-    Older { date: Date },
-    Newer { date: Date },
-    Author { author: String },
-    Environment { env: Environment },
-    Name { name: String },
-    Id { id: Uuid },
+    Older(Date),
+    Newer(Date),
+    Author(String),
+    Environment(Environment),
+    Name(String),
+    Id(Uuid),
 }
 
 #[derive(Clone)]
 pub enum ProjectQueryFilter {
-    Older { date: Date },
-    Newer { date: Date },
-    Name { name: String },
-    Author { author: String },
-    Node { node: String },
+    Id(Uuid),
+    Older(Date),
+    Newer(Date),
+    Name(String),
+    Author(String),
+    Node(String),
 }
 
 impl NodeQueryFilter {
     pub fn is_ok(self, node: Node) -> bool {
         match self {
-            NodeQueryFilter::Name { name } => {
+            NodeQueryFilter::Name(name) => {
                 let matcher = SkimMatcherV2::default();
                 matcher.fuzzy_match(&node.name, &name).is_some()
             }
-            NodeQueryFilter::Older { date } => date > node.date,
-            NodeQueryFilter::Newer { date } => date < node.date,
-            NodeQueryFilter::Author { author } => {
+            NodeQueryFilter::Older(date) => date > node.date,
+            NodeQueryFilter::Newer(date) => date < node.date,
+            NodeQueryFilter::Author(author) => {
                 let matcher = SkimMatcherV2::default();
                 matcher.fuzzy_match(&node.author, &author).is_some()
             }
-            NodeQueryFilter::Environment { env } => env.merge(&node.version.env).is_ok(),
-            NodeQueryFilter::Id { id } => node.id() == id,
+            NodeQueryFilter::Environment(env) => env.merge(&node.version.env).is_ok(),
+            NodeQueryFilter::Id(id) => node.id() == id,
         }
     }
 }
 
 impl ProjectQueryFilter {
-    pub fn is_ok(self, project: &Project) -> bool {
+    pub fn is_ok(
+        self,
+        Project {
+            id,
+            values:
+                ProjectValues {
+                    name,
+                    node,
+                    date,
+                    author,
+                    desc,
+                },
+        }: &Project,
+    ) -> bool {
         match self {
-            ProjectQueryFilter::Name { name } => {
+            ProjectQueryFilter::Id(qid) => qid == *id,
+            ProjectQueryFilter::Name(qname) => {
                 let matcher = SkimMatcherV2::default();
-                matcher.fuzzy_match(&project.name, &name).is_some()
+                matcher.fuzzy_match(name, &qname).is_some()
             }
-            ProjectQueryFilter::Node { node } => {
+            ProjectQueryFilter::Node(qnode) => {
                 let matcher = SkimMatcherV2::default();
-                matcher.fuzzy_match(&project.node, &node).is_some()
+                matcher.fuzzy_match(node, &qnode).is_some()
             }
-            ProjectQueryFilter::Older { date } => date > project.date,
-            ProjectQueryFilter::Newer { date } => date < project.date,
-            ProjectQueryFilter::Author { author } => {
+            ProjectQueryFilter::Older(qdate) => qdate > *date,
+            ProjectQueryFilter::Newer(qdate) => qdate < *date,
+            ProjectQueryFilter::Author(qauthor) => {
                 let matcher = SkimMatcherV2::default();
-                matcher.fuzzy_match(&project.author, &author).is_some()
-            }
+                matcher.fuzzy_match(author, &qauthor).is_some()
+            } // TODO: add desc query
         }
     }
 }

@@ -1,6 +1,6 @@
 use super::utils::*;
 use serde::{Deserialize, Serialize};
-use simple_ai_backend::modules::projects::create::create_project;
+use simple_ai_backend::modules::{projects::create::create_project, utils::project as bp};
 
 #[derive(Serialize, Deserialize, Formifiable)]
 pub struct Project {
@@ -40,8 +40,8 @@ pub fn New() -> Element {
                     _ = match r {
                         // error_popup_msg.push(e.into());
                         // error_popup_open.set(true);
-                        Ok(project_id) => {
-                            _ = router().push(Route::ProjectNav { project_id });
+                        Ok(bp::Project { id, .. }) => {
+                            _ = router().push(Route::ProjectNav { id });
                         }
                         Err(e) => println!("{e}"),
                     };

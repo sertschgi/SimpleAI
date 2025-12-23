@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use simple_ai_backend::modules::{projects::create::create_project, utils::project as bp};
 
 use super::utils::*;
 
@@ -23,7 +24,7 @@ pub fn Edit() -> Element {
     rsx! {
         main {
             {
-                proj.rsx_creation_form(|e| {
+                proj.rsx_edit_form(|e| {
                     let p: Project = e.parsed_values().unwrap();
                     let r = simple_ai_backend::modules::projects::create::create_project(
                         simple_ai_backend::modules::utils::prelude::Project::from_values(
@@ -37,8 +38,8 @@ pub fn Edit() -> Element {
                     _ = match r {
                         // error_popup_msg.push(e.into());
                         // error_popup_open.set(true);
-                        Ok(project_id) => {
-                            _ = router().push(Route::ProjectNav { project_id });
+                        Ok(bp::Project { id, .. }) => {
+                            _ = router().push(Route::ProjectNav { id });
                         }
                         Err(e) => println!("{e}"),
                     };

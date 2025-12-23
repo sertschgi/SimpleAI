@@ -23,8 +23,8 @@ pub fn Projects() -> Element {
             }
             article { class: "projects-wrapper",
                 div { class: "projects-view",
-                    for res in search_results() {
-                        Project { name: res.name, date: res.date, desc: res.date }
+                    for project in search_results() {
+                        Project { project }
                     }
                 }
             }
