@@ -3,6 +3,8 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::modules::{projects::query::query_projects, utils::query_filter::*};
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Project {
     pub id: Uuid,
@@ -30,7 +32,10 @@ impl Project {
         .into()
     }
     pub fn try_from_id(id: Uuid) -> Result<Self, Error> {
-        todo!() // TODO: query the project using the id
+        query_projects(vec![ProjectQueryFilter::Id(id)])
+            .first()
+            .ok_or(Error::msg(format!("No project with id: {id} found")))
+            .cloned()
     }
     pub fn delete(self) -> Self {
         todo!() // TODO: find the path and delete it

@@ -65,7 +65,7 @@ impl ViewportEvent {
         match self {
             Self::AddNode(AddNodeData { id, x, y }) => {
                 let node = simple_ai_backend::modules::nodes::query::query_nodes(vec![
-                    NodeQueryFilter::Id { id },
+                    NodeQueryFilter::Id(id),
                 ])
                 .tree
                 .first()

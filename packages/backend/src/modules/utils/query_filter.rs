@@ -4,22 +4,23 @@ use uuid::Uuid;
 
 #[derive(Clone)]
 pub enum NodeQueryFilter {
+    Id(Uuid),
+    Name(String),
     Older(Date),
     Newer(Date),
     Author(String),
     Environment(Environment),
-    Name(String),
-    Id(Uuid),
 }
 
 #[derive(Clone)]
 pub enum ProjectQueryFilter {
     Id(Uuid),
+    Name(String),
     Older(Date),
     Newer(Date),
-    Name(String),
     Author(String),
     Node(String),
+    Desc(String),
 }
 
 impl NodeQueryFilter {
@@ -71,7 +72,11 @@ impl ProjectQueryFilter {
             ProjectQueryFilter::Author(qauthor) => {
                 let matcher = SkimMatcherV2::default();
                 matcher.fuzzy_match(author, &qauthor).is_some()
-            } // TODO: add desc query
+            }
+            ProjectQueryFilter::Desc(qdesc) => {
+                let matcher = SkimMatcherV2::default();
+                matcher.fuzzy_match(desc, &qdesc).is_some()
+            }
         }
     }
 }
