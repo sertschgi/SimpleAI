@@ -9,7 +9,8 @@ pub fn HeadingLayout() -> Element {
         "Heading Layout errored because of unsatisfied route elements: {:?}",
         route_elms,
     ));
-    let name = pascal_case(unfmt_name);
+    let parsed_name = pj_name_from_str(&unfmt_name);
+    let name = pascal_case(&parsed_name);
     rsx! {
         main {
             h1 { {name} }
