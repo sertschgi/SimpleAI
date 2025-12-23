@@ -65,7 +65,7 @@ impl ViewportEvent {
         match self {
             Self::AddNode(AddNodeData { id, x, y }) => {
                 let node = simple_ai_backend::modules::nodes::query::query_nodes(vec![
-                    NodeQueryFilter::Id { id },
+                    NodeQueryFilter::Id(id),
                 ])
                 .tree
                 .first()
@@ -78,7 +78,6 @@ impl ViewportEvent {
                 let params: Vec<VNodeParameter> = node
                     .get_params()
                     .iter()
-                    .filter(|p| p.context.try_lock().unwrap().is_output())
                     .map(|p| {
                         let param = p.context.try_lock().unwrap();
                         VNodeParameter {
@@ -91,6 +90,7 @@ impl ViewportEvent {
                         }
                     })
                     .collect();
+
                 let node = VNode {
                     x,
                     y,

@@ -10,7 +10,7 @@ pub fn Search(#[props(extends = GlobalAttributes)] attributes: Vec<Attribute>) -
     let mut search_results = use_signal(|| query_nodes(vec![]));
 
     let input = move |e: FormEvent| {
-        search_results.set(query_nodes(vec![NodeQueryFilter::Name { name: e.value() }]));
+        search_results.set(query_nodes(vec![NodeQueryFilter::Name(e.value())]));
         intern_search_results.clear();
     };
 

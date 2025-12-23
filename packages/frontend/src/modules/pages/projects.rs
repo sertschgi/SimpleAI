@@ -8,9 +8,7 @@ use super::utils::*;
 pub fn Projects() -> Element {
     let mut search_results = use_signal(|| query_projects(vec![]));
     let input = move |e: FormEvent| {
-        search_results.set(query_projects(vec![ProjectQueryFilter::Name {
-            name: e.value(),
-        }]));
+        search_results.set(query_projects(vec![ProjectQueryFilter::Name(e.value())]));
     };
 
     rsx! {
@@ -23,8 +21,8 @@ pub fn Projects() -> Element {
             }
             article { class: "projects-wrapper",
                 div { class: "projects-view",
-                    for res in search_results() {
-                        Project { name: res.name, date: res.date, desc: res.date }
+                    for project in search_results() {
+                        Project { project }
                     }
                 }
             }

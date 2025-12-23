@@ -3,11 +3,14 @@ use anyhow::Result;
 use std::fs::{create_dir_all, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use uuid::Uuid;
 
 // #[cfg(feature = "desktop")]
-pub fn create_project(project: Project, overwrite: bool) -> Result<(), String> {
-    let name = project.name.clone();
-    let author = project.author.clone();
+pub fn create_project(project: Project, overwrite: bool) -> Result<Project, String> {
+    let ProjectValues { name, author, .. } = &project.values;
+
+    let name = name.clone();
+    let author = author.clone();
 
     if !check_name(name.clone()) {
         return Err(format!(
@@ -33,5 +36,5 @@ pub fn create_project(project: Project, overwrite: bool) -> Result<(), String> {
         .write_all(meta_json.as_bytes())
         .map_err(|e| e.to_string())?;
 
-    Ok(())
+    Ok(project)
 }

@@ -98,7 +98,7 @@ class VNode {
     this.height = Math.max(
       48,
       32 +
-      Math.max(this.inputs.length, this.outputs.length) * this.paramSpacing,
+        Math.max(this.inputs.length, this.outputs.length) * this.paramSpacing,
     );
     this.x = x - this.width / 2;
     this.y = y - this.height / 2;
@@ -320,7 +320,6 @@ class Viewport {
       jsonNode.label,
       jsonNode.params,
     );
-    console.log(node);
     this.addNode(node);
   }
 

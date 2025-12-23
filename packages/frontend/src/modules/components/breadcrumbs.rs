@@ -1,3 +1,6 @@
+use simple_ai_backend::modules::utils::project::*;
+use uuid::Uuid;
+
 use super::utils::*;
 
 #[item]
@@ -15,9 +18,9 @@ pub fn Breadcrumbs() -> Element {
                     to: {
                         assembled.push('/');
                         assembled.push_str(crumb);
-                        assembled.parse::<NavigationTarget<Route>>().unwrap()
+                        assembled.parse::<NavigationTarget<Route>>().unwrap_or(Route::Projects {}.into())
                     },
-                    p { {crumb.to_string()} }
+                    p { {pj_name_from_str(crumb)} }
                 }
             }
         }

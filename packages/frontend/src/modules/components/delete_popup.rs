@@ -3,7 +3,7 @@ use super::utils::*;
 
 #[item]
 pub fn DeletePopup(
-    ondelete: fn(),
+    ondelete: Callback,
     #[props(default = use_signal(|| false))] open: Signal<bool>,
 ) -> Element {
     rsx! {
@@ -16,7 +16,7 @@ pub fn DeletePopup(
                         button {
                             onclick: move |_| {
                                 open.set(false);
-                                ondelete()
+                                ondelete.call(());
                             },
                             AcceptIcon {}
                         }

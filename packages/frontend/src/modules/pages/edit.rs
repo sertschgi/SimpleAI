@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use simple_ai_backend::modules::{projects::create::create_project, utils::project as bp};
 
 use super::utils::*;
 
@@ -23,9 +24,9 @@ pub fn Edit() -> Element {
     rsx! {
         main {
             {
-                proj.rsx_creation_form(|e| {
+                proj.rsx_edit_form(|e| {
                     let p: Project = e.parsed_values().unwrap();
-                    let _ = simple_ai_backend::modules::projects::create::create_project(
+                    let r = simple_ai_backend::modules::projects::create::create_project(
                         simple_ai_backend::modules::utils::prelude::Project::from_values(
                             p.name.clone(),
                             p.description,
@@ -34,7 +35,14 @@ pub fn Edit() -> Element {
                         ),
                         true,
                     );
-                    // TODO: Popup that shows potential error messages + opens project / goes back to home / project page
+                    _ = match r {
+                        // error_popup_msg.push(e.into());
+                        // error_popup_open.set(true);
+                        Ok(bp::Project { id, .. }) => {
+                            _ = router().push(Route::ProjectNav { id });
+                        }
+                        Err(e) => println!("{e}"),
+                    };
                 })
             }
         }
