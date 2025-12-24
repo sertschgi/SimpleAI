@@ -5,7 +5,7 @@ pub fn ProjectNav(id: uuid::Uuid) -> Element {
     rsx! {
         main {
             NavigationPage {
-                NavigationLink { to: Route::Editor {}, label: "onnx editor", ProjectsIcon {} }
+                NavigationLink { to: Route::Editor { id }, label: "onnx editor", ProjectsIcon {} }
             }
         }
     }

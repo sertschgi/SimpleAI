@@ -139,7 +139,7 @@ impl From<String> for ViewportEvent {
 //     -> convert to Node of backend (serde json)
 //     -> add something like simple_ai_backend :: onnx :: Project . save_nodes(Vec<Nodes>)
 #[page]
-pub fn Editor(children: Element) -> Element {
+pub fn Editor(id: Uuid, children: Element) -> Element {
     rsx! {
         main {
             onmounted: move |_| async move {
