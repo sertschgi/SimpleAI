@@ -4,7 +4,13 @@
 }
 
 .Projects .projects-wrapper {
+  overflow-y: scroll;
   padding: 1rem 0;
+  height: 1rem;
+}
+
+.Projects .projects-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .Projects .projects-view {

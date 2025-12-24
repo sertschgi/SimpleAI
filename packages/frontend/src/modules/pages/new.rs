@@ -21,7 +21,7 @@ pub fn New() -> Element {
                             f.name,
                             f.desc,
                             f.author,
-                            Some(f.node),
+                            None,
                         ),
                         false,
                     );
