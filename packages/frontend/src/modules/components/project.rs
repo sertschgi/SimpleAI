@@ -26,7 +26,7 @@ pub fn Project(project: b::Project) -> Element {
                     class: "open",
                     FolderOpenIcon {}
                 }
-                Link { to: Route::Edit {}, class: "edit", SettingsIcon {} }
+                Link { to: Route::Edit { id: project.id }, class: "edit", SettingsIcon {} }
                 button {
                     class: "delete",
                     onclick: move |_| { delete_popup_open.set(true) },

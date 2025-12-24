@@ -43,7 +43,7 @@ pub fn entry(
 }
 
 mod formifiable;
-#[proc_macro_derive(Formifiable)]
+#[proc_macro_derive(Formifiable, attributes(ffignore))]
 pub fn formifiable(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     formifiable::macro_impl(syn::parse_macro_input!(item)).into()
 }

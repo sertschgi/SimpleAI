@@ -1,4 +1,6 @@
 pub mod core {
+    use uuid::Uuid;
+
     use super::super::{
         components::{heading_layout::HeadingLayout, popup::PopupEntry, top_nav::TopNavLayout},
         pages::prelude::*,
@@ -17,13 +19,13 @@ pub mod core {
                     #[layout(HeadingLayout)]
                     #[route("/")]
                     Projects {},
-                    #[route("/project/:id")]
-                    ProjectNav { id: uuid::Uuid },
-                    #[route("/edit")]
-                    Edit {},
+                    #[route("/:id")]
+                    ProjectNav { id: Uuid },
+                    #[route("/:id/edit")]
+                    Edit { id: Uuid },
                     #[end_layout]
-                    #[route("/editor")]
-                    Editor {},
+                    #[route("/:id/editor")]
+                    Editor { id: Uuid },
                 #[end_nest]
                 #[layout(HeadingLayout)]
                 #[nest("/new")]

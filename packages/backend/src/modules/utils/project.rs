@@ -1,6 +1,7 @@
 use anyhow::Error;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use simple_ai_macros::Formifiable;
 use uuid::Uuid;
 
 use crate::modules::{projects::query::query_projects, utils::query_filter::*};
@@ -11,9 +12,10 @@ pub struct Project {
     pub values: ProjectValues,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Formifiable)]
 pub struct ProjectValues {
     pub name: String,
+    #[ffignore(all)]
     pub date: DateTime<Utc>,
     pub desc: String,
     pub author: String,
