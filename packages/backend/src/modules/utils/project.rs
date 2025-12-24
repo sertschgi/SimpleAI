@@ -19,6 +19,7 @@ pub struct ProjectValues {
     pub date: DateTime<Utc>,
     pub desc: String,
     pub author: String,
+    #[ffignore(all)]
     pub node: String,
 }
 
