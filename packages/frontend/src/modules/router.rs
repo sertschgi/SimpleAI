@@ -2,7 +2,10 @@ pub mod core {
     use uuid::Uuid;
 
     use super::super::{
-        components::{heading_layout::HeadingLayout, popup::PopupEntry, top_nav::TopNavLayout},
+        components::{
+            cursor_animation::CursorAnimationLayout, heading_layout::HeadingLayout,
+            popup::PopupEntry, top_nav::TopNavLayout,
+        },
         pages::prelude::*,
     };
     use crate::utils::*;
@@ -11,26 +14,30 @@ pub mod core {
     #[rustfmt::skip]
     pub enum Route {
         #[layout(PopupEntry)]
-        #[layout(TopNavLayout)]
-            #[route("/")]
-            Start {},
-            #[end_nest]
-                #[nest("/projects")]
-                    #[layout(HeadingLayout)]
+            #[layout(TopNavLayout)]
+                #[layout(CursorAnimationLayout)]
                     #[route("/")]
-                    Projects {},
-                    #[route("/:id")]
-                    ProjectNav { id: Uuid },
-                    #[route("/:id/edit")]
-                    Edit { id: Uuid },
-                    #[end_layout]
+                    Start {},
+                #[end_layout(CursorAnimationLayout)]
+                #[nest("/projects")]
+                    #[layout(CursorAnimationLayout)]
+                        #[layout(HeadingLayout)]
+                            #[route("/")]
+                            Projects {},
+                            #[route("/:id")]
+                            ProjectNav { id: Uuid },
+                            #[route("/:id/edit")]
+                            Edit { id: Uuid },
+                        #[end_layout]
+                    #[end_layout(CursorAnimationLayout)]
                     #[route("/:id/editor")]
                     Editor { id: Uuid },
                 #[end_nest]
+                #[layout(CursorAnimationLayout)]
                 #[layout(HeadingLayout)]
-                #[nest("/new")]
-                    #[route("/")]
-                    New {},
+                    #[nest("/new")]
+                            #[route("/")]
+                            New {},
     }
 }
 

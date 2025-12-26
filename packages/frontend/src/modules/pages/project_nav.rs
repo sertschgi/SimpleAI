@@ -6,6 +6,7 @@ pub fn ProjectNav(id: uuid::Uuid) -> Element {
         main {
             NavigationPage {
                 NavigationLink { to: Route::Edit { id }, label: "edit", EditIcon {} }
+                NavigationLink { to: Route::Editor { id }, label: "workflow editor", WorkflowIcon {} }
                 NavigationLink { to: Route::Editor { id }, label: "onnx editor", ProjectsIcon {} }
             }
         }

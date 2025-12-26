@@ -12,9 +12,11 @@ pub fn HeadingLayout() -> Element {
     let parsed_name = pj_name_from_str(&unfmt_name);
     let name = pascal_case(&parsed_name);
     rsx! {
-        main {
+        main { id: "cursor_anim_bg",
+
             h1 { {name} }
             article { Outlet::<Route> {} }
+            document::Script { src: asset!("/assets/scripts/cursor-animation.js") }
         }
     }
 }

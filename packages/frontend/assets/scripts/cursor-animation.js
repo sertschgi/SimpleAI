@@ -25,67 +25,70 @@ SOFTWARE.
 
 "use strict";
 
-// Simulation section
+window.runCursorAnimation = () => {
+  console.log("running animation");
 
-function resizeCanvas() {
-  let width = scaleByPixelRatio(canvas.clientWidth);
-  let height = scaleByPixelRatio(canvas.clientHeight);
-  if (canvas.width != width || canvas.height != height) {
-    canvas.width = width;
-    canvas.height = height;
-    return true;
+  let parent_elm = document.getElementById("cursor_anim_bg");
+  let canvas = document.createElement("canvas");
+  parent_elm.appendChild(canvas);
+
+  let cs = getComputedStyle(document.body).backgroundColor;
+  const m = cs.match(
+    /^rgba?\(\s*([0-9]+(?:\.[0-9]+)?)\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*(?:,\s*([0-9.]+)\s*)?\)$/i,
+  );
+
+  runSimulation(canvas, {
+    SIM_RESOLUTION: 128,
+    DYE_RESOLUTION: 1024,
+    CAPTURE_RESOLUTION: 512,
+    DENSITY_DISSIPATION: 1,
+    VELOCITY_DISSIPATION: 1,
+    PRESSURE: 0.5,
+    PRESSURE_ITERATIONS: 20,
+    CURL: 0.8,
+    SPLAT_RADIUS: 0.1,
+    SPLAT_FORCE: 5000,
+    SHADING: true,
+    COLORFUL: false,
+    COLOR_UPDATE_SPEED: 1,
+    PAUSED: false,
+    BACK_COLOR: {
+      r: m[1],
+      g: m[2],
+      b: m[3],
+    },
+    TRANSPARENT: false,
+    BLOOM: false,
+    BLOOM_ITERATIONS: 8,
+    BLOOM_RESOLUTION: 256,
+    BLOOM_INTENSITY: 0.8,
+    BLOOM_THRESHOLD: 0.6,
+    BLOOM_SOFT_KNEE: 0.7,
+    SUNRAYS: false,
+    SUNRAYS_RESOLUTION: 196,
+    SUNRAYS_WEIGHT: 1.0,
+    RANDOM_COLORS: false,
+    SPLAT_HUE: 0.54,
+  });
+};
+
+function runSimulation(canvas, config) {
+  function resizeCanvas() {
+    let width = scaleByPixelRatio(canvas.clientWidth);
+    let height = scaleByPixelRatio(canvas.clientHeight);
+    if (canvas.width != width || canvas.height != height) {
+      canvas.width = width;
+      canvas.height = height;
+      return true;
+    }
+    return false;
   }
-  return false;
-}
 
-function scaleByPixelRatio(input) {
-  let pixelRatio = window.devicePixelRatio || 1;
-  return Math.floor(input * pixelRatio);
-}
+  function scaleByPixelRatio(input) {
+    let pixelRatio = window.devicePixelRatio || 1;
+    return Math.floor(input * pixelRatio);
+  }
 
-let parent_elm = document.getElementById("cursor_anim_bg");
-parent_elm.style.overflow = "hidden";
-let canvas = document.createElement("canvas");
-canvas.style.zIndex = 0;
-canvas.style.width = "100%";
-canvas.style.height = "100%";
-parent_elm.appendChild(canvas);
-
-runSimulation({
-  SIM_RESOLUTION: 128,
-  DYE_RESOLUTION: 1024,
-  CAPTURE_RESOLUTION: 512,
-  DENSITY_DISSIPATION: 1,
-  VELOCITY_DISSIPATION: 1,
-  PRESSURE: 0.5,
-  PRESSURE_ITERATIONS: 20,
-  CURL: 0.8,
-  SPLAT_RADIUS: 0.1,
-  SPLAT_FORCE: 5000,
-  SHADING: true,
-  COLORFUL: false,
-  COLOR_UPDATE_SPEED: 1,
-  PAUSED: false,
-  BACK_COLOR: {
-    r: 0,
-    g: 0,
-    b: 0,
-  },
-  TRANSPARENT: false,
-  BLOOM: false,
-  BLOOM_ITERATIONS: 8,
-  BLOOM_RESOLUTION: 256,
-  BLOOM_INTENSITY: 0.8,
-  BLOOM_THRESHOLD: 0.6,
-  BLOOM_SOFT_KNEE: 0.7,
-  SUNRAYS: false,
-  SUNRAYS_RESOLUTION: 196,
-  SUNRAYS_WEIGHT: 1.0,
-  RANDOM_COLORS: false,
-  SPLAT_HUE: 0.54,
-});
-
-function runSimulation(config) {
   function pointerPrototype() {
     this.id = -1;
     this.texcoordX = 0;
@@ -1309,7 +1312,7 @@ function runSimulation(config) {
 
   updateKeywords();
   initFramebuffers();
-  multipleSplats(parseInt(Math.random() * 20) + 5);
+  // multipleSplats(parseInt(Math.random() * 20) + 5);
 
   let lastUpdateTime = Date.now();
   let colorUpdateTimer = 0.0;

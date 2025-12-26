@@ -1,5 +1,6 @@
 pub mod breadcrumbs;
 // pub mod connection;
+pub mod cursor_animation;
 pub mod delete_popup;
 pub mod divider;
 pub mod drag_area;
@@ -25,6 +26,7 @@ pub mod window_decorations;
 
 pub mod prelude {
     pub use super::breadcrumbs::*;
+    pub use super::cursor_animation::*;
     pub use super::delete_popup::*;
     pub use super::divider::*;
     pub use super::drag_area::*;

@@ -29,10 +29,9 @@ pub fn TopNavLayout() -> Element {
     rsx! {
         div {
             TopNav {}
-            article { id: "cursor_anim_bg",
+            article {
                 section { class: "elms", Outlet::<Route> {} }
             }
-            document::Script { src: asset!("/assets/scripts/cursor-animation.js") }
         }
     }
 }
