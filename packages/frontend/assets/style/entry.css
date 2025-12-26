@@ -73,7 +73,7 @@ p {
   user-select: none;
 }
 
-html {
+body {
   background-color: hsl(var(--color-bg));
   color: hsl(var(--color-text-fg));
 }
