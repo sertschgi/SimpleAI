@@ -55,10 +55,9 @@ pub fn Popup(
 
     let mut popup_context: Signal<PopupContext> = use_context();
 
-    use_resource(move || async move {
+    use_effect(move || {
         if open() {
             popup_context.set(PopupContext { popup: popup() });
-            debug!("open");
         } else {
             popup_context.set(PopupContext { popup: rsx! {} });
         }

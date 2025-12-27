@@ -143,7 +143,7 @@ pub fn Editor(id: Uuid, children: Element) -> Element {
     rsx! {
         main {
             onmounted: move |_| async move {
-                sleep(Duration::from_millis(200)).await;
+                sleep(Duration::from_millis(20)).await;
 
                 let mut handle = document::eval(CREATE_VIEWPORT);
 
