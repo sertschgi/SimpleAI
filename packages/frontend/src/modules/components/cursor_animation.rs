@@ -11,7 +11,7 @@ pub fn CursorAnimationLayout() -> Element {
         main {
             id: "cursor_anim_bg",
             onmount: move |_| async move {
-                sleep(Duration::from_millis(200)).await;
+                sleep(Duration::from_millis(50)).await;
                 document::eval(RUN_CURSOR_ANIMATION);
             },
             article { Outlet::<Route> {} }
