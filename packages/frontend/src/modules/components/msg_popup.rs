@@ -4,7 +4,7 @@ use super::utils::*;
 #[item(no_css = true)]
 pub fn MsgPopup(msg: Signal<String>, open: Signal<bool>) -> Element {
     rsx! {
-        main {
+        main { display: "none",
             if msg() != String::new() {
                 Popup { open,
                     p { {msg()} }

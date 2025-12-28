@@ -4,8 +4,20 @@ use uuid::Uuid;
 
 use super::utils::*;
 
+#[cfg(not(target_family = "wasm"))]
+fn set_size() {
+    use dioxus::desktop::{window, wry::dpi::Pixel, LogicalSize};
+    window().set_max_inner_size(Some(LogicalSize::new(720, 720)));
+    window().set_min_inner_size(Some(LogicalSize::new(720, 720)));
+}
+
+#[cfg(target_family = "wasm")]
+fn set_size() {}
+
 #[page]
 pub fn Edit(id: Uuid) -> Element {
+    set_size();
+
     let pv = Project::try_from_id(id).unwrap().values;
 
     rsx! {

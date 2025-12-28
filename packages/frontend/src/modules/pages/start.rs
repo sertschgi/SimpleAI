@@ -1,11 +1,10 @@
-// %%% pages / start.rs %%%
-
-// %% includes %%
 use super::utils::*;
+use dioxus::desktop::{window, LogicalSize};
 
-// %% main %%
 #[page]
 pub fn Start() -> Element {
+    window().set_max_inner_size(Some(LogicalSize::new(720, 512)));
+    window().set_min_inner_size(Some(LogicalSize::new(720, 512)));
     rsx! {
         main {
             NavigationPage {
