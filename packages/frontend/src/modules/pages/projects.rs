@@ -1,4 +1,5 @@
 use super::super::components::project::Project;
+use dioxus::desktop::{window, LogicalSize};
 use simple_ai_backend::modules::projects::query::query_projects;
 use simple_ai_backend::modules::utils::prelude::ProjectQueryFilter;
 use simple_ai_backend::modules::utils::project as b;
@@ -25,8 +26,20 @@ impl ProjectsContext {
     }
 }
 
+#[cfg(not(target_family = "wasm"))]
+fn set_size() {
+    use dioxus::desktop::{window, wry::dpi::Pixel, LogicalSize};
+    window().set_max_inner_size(Some(LogicalSize::new(720, 1080)));
+    window().set_min_inner_size(Some(LogicalSize::new(720, 1080)));
+}
+
+#[cfg(target_family = "wasm")]
+fn set_size() {}
+
 #[page]
 pub fn Projects() -> Element {
+    set_size();
+
     let projects_ctx = use_signal(|| ProjectsContext::new());
     use_context_provider(|| projects_ctx);
 
