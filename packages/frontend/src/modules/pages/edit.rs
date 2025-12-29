@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use simple_ai_backend::modules::{projects::create::create_project, utils::project::*};
+use simple_ai_backend::modules::utils::project::*;
 use uuid::Uuid;
 
 use super::utils::*;
@@ -18,32 +18,21 @@ fn set_size() {}
 pub fn Edit(id: Uuid) -> Element {
     set_size();
 
-    let pv = Project::try_from_id(id).unwrap().values;
+    let pv = Project::try_from(id).unwrap().values;
+    let onedit = move |e: FormEvent| {
+        // error_popup_msg.push(e.into());
+        // error_popup_open.set(true);
+        // _ = match r {
+        //     Ok(Project { id, .. }) => {
+        //         _ = router().push(Route::ProjectNav { id });
+        //     }
+        //     Err(e) => println!("{e}"),
+        // };
+    };
 
     rsx! {
         main {
-            ProjectValuesEditForm {
-                obj: pv.clone(),
-                onedit: move |e: FormEvent| {
-                    let r = simple_ai_backend::modules::projects::create::create_project(
-                        simple_ai_backend::modules::utils::prelude::Project::from_values(
-                            pv.name.clone(),
-                            pv.desc.clone(),
-                            pv.author.clone(),
-                            Some(pv.name.clone()),
-                        ),
-                        true,
-                    );
-                    _ = match r {
-                        // error_popup_msg.push(e.into());
-                        // error_popup_open.set(true);
-                        Ok(Project { id, .. }) => {
-                            _ = router().push(Route::ProjectNav { id });
-                        }
-                        Err(e) => println!("{e}"),
-                    };
-                },
-            }
+            ProjectValuesEditForm { obj: pv.clone(), onedit }
         }
     }
 }

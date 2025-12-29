@@ -50,10 +50,10 @@ impl ProjectQueryFilter {
             values:
                 ProjectValues {
                     name,
-                    node,
                     date,
                     author,
                     desc,
+                    ..
                 },
         }: &Project,
     ) -> bool {
@@ -62,10 +62,6 @@ impl ProjectQueryFilter {
             ProjectQueryFilter::Name(qname) => {
                 let matcher = SkimMatcherV2::default();
                 matcher.fuzzy_match(name, &qname).is_some()
-            }
-            ProjectQueryFilter::Node(qnode) => {
-                let matcher = SkimMatcherV2::default();
-                matcher.fuzzy_match(node, &qnode).is_some()
             }
             ProjectQueryFilter::Older(qdate) => qdate > *date,
             ProjectQueryFilter::Newer(qdate) => qdate < *date,
@@ -77,6 +73,7 @@ impl ProjectQueryFilter {
                 let matcher = SkimMatcherV2::default();
                 matcher.fuzzy_match(desc, &qdesc).is_some()
             }
+            _ => false,
         }
     }
 }

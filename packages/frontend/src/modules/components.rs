@@ -61,7 +61,7 @@ pub(crate) mod utils {
 
     pub fn pj_name_from_str(string: &str) -> String {
         match uuid::Uuid::parse_str(string) {
-            Ok(id) => simple_ai_backend::modules::utils::project::Project::try_from_id(id)
+            Ok(id) => simple_ai_backend::modules::utils::project::Project::try_from(id)
                 .unwrap()
                 .values
                 .name

@@ -23,15 +23,13 @@ pub fn New() -> Element {
         main {
             ProjectValuesCreationForm {
                 oncreate: move |(_, f): (FormEvent, ProjectValuesFormFields)| {
-                    let r = create_project(
-                        simple_ai_backend::modules::utils::prelude::Project::from_values(
+                    let r = simple_ai_backend::modules::utils::prelude::Project::new(
                             f.name,
                             f.desc,
                             f.author,
-                            None,
-                        ),
-                        false,
-                    );
+                            f.path,
+                        )
+                        .create();
                     _ = match r {
                         Ok(Project { id, .. }) => {
                             _ = router().push(Route::ProjectNav { id });
