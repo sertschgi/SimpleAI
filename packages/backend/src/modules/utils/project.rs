@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 use uuid::Uuid;
 
 pub const PROJECT_FILE_NAME: &'static str = "project.sai.json";
@@ -12,13 +15,17 @@ pub enum ProjectError {
     #[error("Could not get a valid config while trying to get a project: {0}.")]
     InvalidConfig(#[from] ConfigError),
     #[error("Failed to open project file: {0}.")]
-    FailedToOpenProjectFile(String),
+    FailedToOpenProjectFile(PathBuf),
     #[error("Encountered invalid Syntax when deserializing the project file: {0}.")]
     InvalidSyntax(String),
     #[error("No project was found that would have satisfied the query.")]
     ProjectNotFound,
     #[error("Failed to read project directory: {0}.")]
-    FailedToReadProjectDir(String),
+    FailedToReadProjectDir(PathBuf),
+    #[error("Failed to traverse project dir: {0}.")]
+    FailedToTraverseProjectDir(PathBuf),
+    #[error("Failed to read project file: {0}.")]
+    FailedToReadProjectFile(PathBuf),
 }
 
 use chrono::{DateTime, Utc};
@@ -63,41 +70,68 @@ use crate::modules::utils::query_filter::ProjectQueryFilter;
 impl Project {
     pub fn get_all() -> Result<Vec<Self>, ProjectError> {
         use crate::modules::config::Config;
-        use std::{fs::File, io::Read};
+        use std::{
+            fs::{File, ReadDir},
+            io::Read,
+        };
 
-        let dirs = Config::get()?.project_dirs;
+        let dir_paths = Config::get()?.project_dirs;
 
         let mut projects = Vec::<Self>::new();
+        let projects_ref = &mut projects;
 
-        for dir in dirs {
-            match dir.read_dir().map_err(|_| {
-                ProjectError::FailedToReadProjectDir(dir.to_str().unwrap_or_default().into())
-            }) {
-                Ok(d) => {
-                    for entry in d {
-                        let path = entry.unwrap().path();
-                        if let Some(name) = path.file_name() {
-                            if name == PROJECT_FILE_NAME {
-                                match File::open(&path).map_err(move |_| {
-                                    ProjectError::FailedToOpenProjectFile(
-                                        path.display().to_string(),
-                                    )
-                                }) {
-                                    Ok(mut file) => {
-                                        let mut content = String::new();
-                                        file.read_to_string(&mut content);
-                                        match ProjectValues::try_from(content) {
-                                            Ok(values) => projects.push(values.into()),
-                                            Err(e) => eprintln!("{e}, Skipping.."),
-                                        }
-                                    }
-                                    Err(e) => eprintln!("{e}, Skipping.."),
-                                }
-                            }
-                        }
-                    }
+        let ignore_err = move |e: ProjectError| {
+            println!("Warning: {e}, ignoring, skipping project entry.");
+        };
+
+        let mut deser_content = move |content: String| match ProjectValues::try_from(content) {
+            Ok(values) => projects_ref.push(values.into()),
+            Err(e) => ignore_err(e),
+        };
+
+        let mut read_file = move |file: &mut File, file_path: PathBuf| {
+            let mut content = String::new();
+            match file
+                .read_to_string(&mut content)
+                .map_err(|_| ProjectError::FailedToReadProjectFile(file_path))
+            {
+                Ok(_) => deser_content(content),
+                Err(e) => ignore_err(e),
+            };
+        };
+
+        let mut open_file = move |file_path: PathBuf| match File::open(&file_path)
+            .map_err(|_| ProjectError::FailedToOpenProjectFile(file_path.clone()))
+        {
+            Ok(mut file) => read_file(&mut file, file_path),
+            Err(e) => ignore_err(e),
+        };
+
+        let mut check_filename = move |file_path: PathBuf| {
+            if let Some(name) = file_path.file_name() {
+                if name == PROJECT_FILE_NAME {
+                    open_file(file_path);
                 }
-                Err(e) => eprintln!("{e}, Skipping.."),
+            }
+        };
+
+        let mut traverse_files = move |read_dir: ReadDir, dir_path: PathBuf| {
+            for entry in read_dir {
+                match entry.map_err(|_| ProjectError::FailedToTraverseProjectDir(dir_path.clone()))
+                {
+                    Ok(e) => check_filename(e.path()),
+                    Err(e) => ignore_err(e),
+                }
+            }
+        };
+
+        for dir_path in dir_paths {
+            match dir_path
+                .read_dir()
+                .map_err(|_| ProjectError::FailedToReadProjectDir(dir_path.clone()))
+            {
+                Ok(read_dir) => traverse_files(read_dir, dir_path),
+                Err(e) => ignore_err(e),
             }
         }
 
@@ -132,7 +166,7 @@ impl Project {
         }
         .into()
     }
-    pub fn create(self) {
+    pub fn create(self) -> Result<(), ProjectError> {
         todo!()
     }
     pub fn delete(
