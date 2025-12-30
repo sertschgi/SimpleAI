@@ -1,31 +1,37 @@
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::path::PathBuf;
+use thiserror::Error;
 use uuid::Uuid;
 
 pub const PROJECT_FILE_NAME: &'static str = "project.sai.json";
 
+pub type ProjectQueryResult = Result<Project, ProjectQueryError>;
+
+use std::io;
+#[derive(Debug, Error)]
+pub enum ProjectQueryError {
+    #[error("Encountered invalid syntax when deserializing the project file: {0}.")]
+    InvalidSyntax(String),
+    #[error("No project was found that would have satisfied the query.")]
+    ProjectNotFound,
+    #[error("No project found in the given project dir: {0}.")]
+    NoProjectFoundInProjectDir(PathBuf),
+    #[error("Failed to open project file: {0}.")]
+    FailedToOpenProjectFile(io::Error),
+    #[error("Failed to read project directory: {0}.")]
+    FailedToReadProjectDir(io::Error),
+    #[error("Failed to read project file: {0}.")]
+    FailedToReadProjectFile(io::Error),
+}
+
 use crate::modules::config::ConfigError;
-use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum ProjectError {
     #[error("Could not find a project with the id {0}.")]
     NoProjectWithId(Uuid),
     #[error("Could not get a valid config while trying to get a project: {0}.")]
     InvalidConfig(#[from] ConfigError),
-    #[error("Failed to open project file: {0}.")]
-    FailedToOpenProjectFile(PathBuf),
-    #[error("Encountered invalid Syntax when deserializing the project file: {0}.")]
-    InvalidSyntax(String),
-    #[error("No project was found that would have satisfied the query.")]
-    ProjectNotFound,
-    #[error("Failed to read project directory: {0}.")]
-    FailedToReadProjectDir(PathBuf),
-    #[error("Failed to traverse project dir: {0}.")]
-    FailedToTraverseProjectDir(PathBuf),
-    #[error("Failed to read project file: {0}.")]
-    FailedToReadProjectFile(PathBuf),
+    #[error("Could not query project: {0}.")]
+    QueryError(#[from] ProjectQueryError),
 }
 
 use chrono::{DateTime, Utc};
@@ -54,9 +60,9 @@ impl ProjectValues {
 }
 
 impl TryFrom<String> for ProjectValues {
-    type Error = ProjectError;
+    type Error = ProjectQueryError;
     fn try_from(value: String) -> Result<Self, Self::Error> {
-        Ok(serde_json::from_str(&value).map_err(|e| ProjectError::InvalidSyntax(e.to_string()))?)
+        Ok(serde_json::from_str(&value).map_err(|e| Self::Error::InvalidSyntax(e.to_string()))?)
     }
 }
 
@@ -68,72 +74,40 @@ pub struct Project {
 
 use crate::modules::utils::query_filter::ProjectQueryFilter;
 impl Project {
-    pub fn get_all() -> Result<Vec<Self>, ProjectError> {
+    pub fn get_all() -> Result<Vec<Result<Self, ProjectError>>, ProjectError> {
         use crate::modules::config::Config;
         use std::{
-            fs::{File, ReadDir},
+            fs::{DirEntry, File, ReadDir},
             io::Read,
         };
 
         let dir_paths = Config::get()?.project_dirs;
 
-        let mut projects = Vec::<Self>::new();
-        let projects_ref = &mut projects;
+        let projects = dir_paths
+            .iter()
+            .map(|dir_path: &PathBuf| -> ProjectQueryResult {
+                let file_path = dir_path
+                    .read_dir()
+                    .map_err(|e| ProjectQueryError::FailedToReadProjectDir(e))?
+                    .find(|&entry_r| {
+                        if let Ok(entry) = entry_r {
+                            entry.file_name() == PROJECT_FILE_NAME;
+                        }
+                        false
+                    })
+                    .ok_or(ProjectQueryError::NoProjectFoundInProjectDir(*dir_path))?
+                    .unwrap()
+                    .path();
 
-        let ignore_err = move |e: ProjectError| {
-            println!("Warning: {e}, ignoring, skipping project entry.");
-        };
+                let file =
+                    File::open(&file_path).map_err(|e| ProjectError::FailedToOpenProjectFile(e))?;
 
-        let mut deser_content = move |content: String| match ProjectValues::try_from(content) {
-            Ok(values) => projects_ref.push(values.into()),
-            Err(e) => ignore_err(e),
-        };
-
-        let mut read_file = move |file: &mut File, file_path: PathBuf| {
-            let mut content = String::new();
-            match file
-                .read_to_string(&mut content)
-                .map_err(|_| ProjectError::FailedToReadProjectFile(file_path))
-            {
-                Ok(_) => deser_content(content),
-                Err(e) => ignore_err(e),
-            };
-        };
-
-        let mut open_file = move |file_path: PathBuf| match File::open(&file_path)
-            .map_err(|_| ProjectError::FailedToOpenProjectFile(file_path.clone()))
-        {
-            Ok(mut file) => read_file(&mut file, file_path),
-            Err(e) => ignore_err(e),
-        };
-
-        let mut check_filename = move |file_path: PathBuf| {
-            if let Some(name) = file_path.file_name() {
-                if name == PROJECT_FILE_NAME {
-                    open_file(file_path);
-                }
-            }
-        };
-
-        let mut traverse_files = move |read_dir: ReadDir, dir_path: PathBuf| {
-            for entry in read_dir {
-                match entry.map_err(|_| ProjectError::FailedToTraverseProjectDir(dir_path.clone()))
-                {
-                    Ok(e) => check_filename(e.path()),
-                    Err(e) => ignore_err(e),
-                }
-            }
-        };
-
-        for dir_path in dir_paths {
-            match dir_path
-                .read_dir()
-                .map_err(|_| ProjectError::FailedToReadProjectDir(dir_path.clone()))
-            {
-                Ok(read_dir) => traverse_files(read_dir, dir_path),
-                Err(e) => ignore_err(e),
-            }
-        }
+                let mut content = String::new();
+                file.read_to_string(&mut content)
+                    .map_err(|e| ProjectError::FailedToReadProjectFile(e))?;
+                Ok(Project::try_from(content)?)
+            })
+            .collect();
 
         Ok(projects)
     }
@@ -169,12 +143,10 @@ impl Project {
     pub fn create(self) -> Result<(), ProjectError> {
         todo!()
     }
-    pub fn delete(
-        Project {
-            values: ProjectValues { name, author, .. },
-            ..
-        }: Self,
-    ) -> Self {
+    pub fn edit(self) -> Result<(), ProjectError> {
+        todo!()
+    }
+    pub fn delete(self) -> Result<(), ProjectError> {
         todo!()
     }
 }

@@ -21,22 +21,22 @@ pub fn New() -> Element {
 
     rsx! {
         main {
-            ProjectValuesCreationForm {
-                oncreate: move |(_, f): (FormEvent, ProjectValuesFormFields)| {
-                    let r = simple_ai_backend::modules::utils::prelude::Project::new(
-                            f.name,
-                            f.desc,
-                            f.author,
-                            f.path,
-                        )
-                        .create();
-                    _ = match r {
-                        Ok(Project { id, .. }) => {
+            FrontendProjectCreationForm {
+                oncreate: move |(_, f): (FormEvent, FrontendProjectFormFields)| {
+                    let project = simple_ai_backend::modules::utils::prelude::Project::new(
+                        f.name,
+                        f.desc,
+                        f.author,
+                        f.path.into(),
+                    );
+                    let id = project.id;
+                    _ = match project.create() {
+                        Ok(()) => {
                             _ = router().push(Route::ProjectNav { id });
                         }
                         Err(e) => {
                             eprintln!("Error: {e}");
-                            error_popup_msg.set(e);
+                            error_popup_msg.set(e.to_string());
                             error_popup_open.set(true);
                         }
                     };

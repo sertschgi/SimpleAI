@@ -1,8 +1,7 @@
-use serde::Deserialize;
+use super::utils::*;
+
 use simple_ai_backend::modules::utils::project::*;
 use uuid::Uuid;
-
-use super::utils::*;
 
 #[cfg(not(target_family = "wasm"))]
 fn set_size() {
@@ -32,7 +31,7 @@ pub fn Edit(id: Uuid) -> Element {
 
     rsx! {
         main {
-            ProjectValuesEditForm { obj: pv.clone(), onedit }
+            // FrontendProjectEditForm { obj: pv.clone(), onedit }
         }
     }
 }

@@ -8,21 +8,21 @@ use super::utils::*;
 
 #[derive(Clone, PartialEq)]
 pub struct ProjectsContext {
-    pub results: Signal<Vec<b::Project>>,
+    pub results: Signal<Result<Vec<b::Project>, b::ProjectError>>,
 }
 
 impl ProjectsContext {
     pub fn new() -> Self {
         Self {
-            results: Signal::new(query_projects(vec![])),
+            results: Signal::new(b::Project::query_all(vec![])),
         }
     }
     pub fn query_results(&mut self, query: String) {
         self.results
-            .set(query_projects(vec![ProjectQueryFilter::Name(query)]));
+            .set(b::Project::query_all(vec![ProjectQueryFilter::Name(query)]));
     }
     pub fn reload(&mut self) {
-        self.results.set(query_projects(vec![]));
+        self.results.set(b::Project::query_all(vec![]));
     }
 }
 
@@ -57,6 +57,7 @@ pub fn Projects() -> Element {
             }
             article { class: "projects-wrapper",
                 div { class: "projects-view",
+                    match
                     for project in (projects_ctx().results)() {
                         Project { project }
                     }

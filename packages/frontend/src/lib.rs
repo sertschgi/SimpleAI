@@ -1,25 +1,25 @@
-// %%% lib.rs %%%
-
-// %% global exports %%
 pub mod modules;
 
-// %% global prelude %%
 pub mod prelude {
     pub use super::modules::*;
 }
 
-// %% global utils %%
 pub(crate) mod utils {
-    // % dioxus %
+    pub use super::modules::icons::*;
+    pub use crate::modules::router::prelude::*;
     pub use dioxus::html::geometry::{euclid::Vector2D, *};
     pub use dioxus::logger::tracing::*;
     pub use dioxus::prelude::*;
-    // % macros %
     pub use simple_ai_macros::*;
-    // % icons %
-    pub use super::modules::icons::*;
-    // % router %
-    pub use crate::modules::router::prelude::*;
-    // % custom types %
     pub type PageVector = Vector2D<f64, PageSpace>;
+
+    use serde::{Deserialize, Serialize};
+    use simple_ai_macros::Formifiable;
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Formifiable)]
+    pub struct FrontendProject {
+        pub name: String,
+        pub author: String,
+        pub desc: String,
+        pub path: String,
+    }
 }
