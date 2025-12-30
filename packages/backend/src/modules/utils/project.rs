@@ -74,7 +74,7 @@ pub struct Project {
 
 use crate::modules::utils::query_filter::ProjectQueryFilter;
 impl Project {
-    pub fn get_all() -> Result<Vec<Result<Self, ProjectError>>, ProjectError> {
+    pub fn get_all() -> Result<Vec<ProjectQueryResult>, ProjectError> {
         use crate::modules::config::Config;
         use std::{
             fs::{DirEntry, File, ReadDir},
@@ -99,13 +99,14 @@ impl Project {
                     .unwrap()
                     .path();
 
-                let file =
-                    File::open(&file_path).map_err(|e| ProjectError::FailedToOpenProjectFile(e))?;
+                let mut file = File::open(&file_path)
+                    .map_err(|e| ProjectQueryError::FailedToOpenProjectFile(e))?;
 
                 let mut content = String::new();
                 file.read_to_string(&mut content)
-                    .map_err(|e| ProjectError::FailedToReadProjectFile(e))?;
-                Ok(Project::try_from(content)?)
+                    .map_err(|e| ProjectQueryError::FailedToReadProjectFile(e))?;
+
+                ProjectValues::try_from(content)
             })
             .collect();
 
