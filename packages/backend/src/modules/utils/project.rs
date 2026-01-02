@@ -5,6 +5,7 @@ use uuid::Uuid;
 pub const PROJECT_FILE_NAME: &'static str = "project.sai.json";
 
 pub type ProjectQueryResult = Result<Project, ProjectQueryError>;
+pub type ProjectResult<T> = Result<T, ProjectError>;
 
 use std::io;
 #[derive(Debug, Error)]
@@ -21,6 +22,8 @@ pub enum ProjectQueryError {
     FailedToReadProjectDir(io::Error),
     #[error("Failed to read project file: {0}.")]
     FailedToReadProjectFile(io::Error),
+    #[error("Encountered projects with same ids.")]
+    MultipleSameIds(Vec<Project>),
 }
 
 use crate::modules::config::ConfigError;
@@ -32,6 +35,14 @@ pub enum ProjectError {
     InvalidConfig(#[from] ConfigError),
     #[error("Could not query project: {0}.")]
     QueryError(#[from] ProjectQueryError),
+}
+
+use serde::{Deserialize, Serialize};
+use std::io::Read;
+use std::path::PathBuf;
+#[derive(Serialize, Deserialize)]
+pub struct ProjectCache {
+    pub project_dirs: Vec<PathBuf>,
 }
 
 use chrono::{DateTime, Utc};
@@ -74,12 +85,9 @@ pub struct Project {
 
 use crate::modules::utils::query_filter::ProjectQueryFilter;
 impl Project {
-    pub fn get_all() -> Result<Vec<ProjectQueryResult>, ProjectError> {
+    pub fn get_all() -> ProjectResult<Vec<ProjectQueryResult>> {
         use crate::modules::config::Config;
-        use std::{
-            fs::{DirEntry, File, ReadDir},
-            io::Read,
-        };
+        use std::{fs::File, io::Read};
 
         let dir_paths = Config::get()?.project_dirs;
 
@@ -89,13 +97,15 @@ impl Project {
                 let file_path = dir_path
                     .read_dir()
                     .map_err(|e| ProjectQueryError::FailedToReadProjectDir(e))?
-                    .find(|&entry_r| {
-                        if let Ok(entry) = entry_r {
+                    .find(|entry_r| {
+                        if let Ok(entry) = entry_r.clone() {
                             entry.file_name() == PROJECT_FILE_NAME;
                         }
                         false
                     })
-                    .ok_or(ProjectQueryError::NoProjectFoundInProjectDir(*dir_path))?
+                    .ok_or(ProjectQueryError::NoProjectFoundInProjectDir(
+                        dir_path.to_owned().clone(),
+                    ))?
                     .unwrap()
                     .path();
 
@@ -106,30 +116,29 @@ impl Project {
                 file.read_to_string(&mut content)
                     .map_err(|e| ProjectQueryError::FailedToReadProjectFile(e))?;
 
-                ProjectValues::try_from(content)
+                Project::try_from(content)
             })
             .collect();
 
         Ok(projects)
     }
-    pub fn query_all(query_filters: Vec<ProjectQueryFilter>) -> Result<Vec<Self>, ProjectError> {
-        let all_projects = Self::get_all()?;
-
-        Ok(all_projects
-            .iter()
+    pub fn query(query_filters: Vec<ProjectQueryFilter>) -> ProjectResult<Vec<ProjectQueryResult>> {
+        Ok(Self::get_all()?
+            .into_iter()
             .filter(|project| {
-                query_filters
-                    .iter()
-                    .all(|filter| filter.clone().is_ok(project))
+                query_filters.iter().all(|filter| match project {
+                    Ok(p) => filter.is_ok(&p),
+                    Err(_) => true,
+                })
             })
-            .cloned()
             .collect())
     }
-    pub fn query(query_filters: Vec<ProjectQueryFilter>) -> Result<Self, ProjectError> {
-        Ok(Self::query_all(query_filters)?
-            .first()
-            .ok_or(ProjectError::ProjectNotFound)?
-            .clone())
+    pub fn query_save(query_filters: Vec<ProjectQueryFilter>) -> ProjectResult<Vec<Project>> {
+        Ok(Self::get_all()?
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter(|project| query_filters.iter().all(|filter| filter.is_ok(&project)))
+            .collect())
     }
     pub fn new(name: String, desc: String, author: String, path: PathBuf) -> Self {
         ProjectValues {
@@ -152,10 +161,23 @@ impl Project {
     }
 }
 
+impl TryFrom<String> for Project {
+    type Error = ProjectQueryError;
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Ok(ProjectValues::try_from(value)?.into())
+    }
+}
 impl TryFrom<Uuid> for Project {
     type Error = ProjectError;
     fn try_from(id: Uuid) -> Result<Self, Self::Error> {
-        Project::query(vec![ProjectQueryFilter::Id(id)])
+        let mut all = Self::query_save(vec![ProjectQueryFilter::Id(id)])?;
+        if all.len() == 1 {
+            Ok(all.swap_remove(0))
+        } else if all.is_empty() {
+            Err(ProjectQueryError::ProjectNotFound.into())
+        } else {
+            Err(ProjectQueryError::MultipleSameIds(all).into())
+        }
     }
 }
 impl From<ProjectValues> for Project {

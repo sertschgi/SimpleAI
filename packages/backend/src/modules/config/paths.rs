@@ -1,10 +1,10 @@
 use cfg_if::cfg_if;
-use std::path::PathBuf;
+use std::{env, path::PathBuf};
 
-use super::{ConfigError, APP_ID};
+use super::{StorageError, APP_ID};
 
 /// Determines and returns the data directory of the app based on the system
-pub fn determine_app_data_dir() -> Result<PathBuf, ConfigError> {
+pub fn determine_app_data_dir() -> Result<PathBuf, StorageError> {
     cfg_if! {
         // Web (WASM) - use IndexedDB / origin-private filesystem in JS; here return a logical path under "/" for callers
         if #[cfg(all(target_arch = "wasm32", target_family = "wasm"))] {
@@ -63,7 +63,119 @@ pub fn determine_app_data_dir() -> Result<PathBuf, ConfigError> {
         }
     }
 
-    Err(ConfigError::AppDataPathNotDeterminable)
+    Err(StorageError::AppDataPathNotDeterminable)
+}
+
+/// Returns a platform-appropriate cache directory PathBuf.
+/// On success returns the directory path (does not create it).
+pub fn determine_cache_dir() -> Result<PathBuf, CacheDirError> {
+    // WASM (browser) — no real filesystem path
+    #[cfg(target_arch = "wasm32")]
+    {
+        // For browser targets, return a virtual indicator. Use browser storage APIs instead.
+        return Ok(PathBuf::from("browser-cache:"));
+    }
+
+    // Android: prefer ANDROID_CACHE if provided (set by some build systems), else use HOME/Android/data/<package>/cache if package provided via env var
+    #[cfg(target_os = "android")]
+    {
+        if let Ok(dir) = env::var("ANDROID_CACHE") {
+            return Ok(PathBuf::from(dir));
+        }
+
+        // Some apps set ANDROID_APP_PACKAGE at build time; try to use it if available.
+        if let Ok(pkg) = env::var("ANDROID_APP_PACKAGE") {
+            if let Ok(home) = env::var("HOME") {
+                // Typical external cache: /data/data/<pkg>/cache or $HOME/Android/data/<pkg>/cache
+                let candidate1 = PathBuf::from(format!("/data/data/{}/cache", pkg));
+                if candidate1.exists() {
+                    return Ok(candidate1);
+                }
+                let candidate2 = PathBuf::from(home)
+                    .join("Android")
+                    .join("data")
+                    .join(pkg)
+                    .join("cache");
+                return Ok(candidate2);
+            }
+        }
+
+        // Fallback to $HOME/.cache
+        if let Ok(home) = env::var("HOME") {
+            return Ok(PathBuf::from(home).join(".cache"));
+        }
+
+        return Err(CacheDirError::HomeDirUnavailable);
+    }
+
+    // iOS: prefer HOME/Library/Caches
+    #[cfg(target_os = "ios")]
+    {
+        if let Ok(home) = env::var("HOME") {
+            return Ok(PathBuf::from(home).join("Library").join("Caches"));
+        }
+        return Err(CacheDirError::HomeDirUnavailable);
+    }
+
+    // Windows
+    #[cfg(target_os = "windows")]
+    {
+        // Prefer LOCALAPPDATA
+        if let Ok(local) = env::var("LOCALAPPDATA") {
+            return Ok(PathBuf::from(local).join("Cache"));
+        }
+        // Fallback to APPDATA
+        if let Ok(appdata) = env::var("APPDATA") {
+            return Ok(PathBuf::from(appdata).join("Cache"));
+        }
+        // Fallback to USERPROFILE
+        if let Ok(user) = env::var("USERPROFILE") {
+            return Ok(PathBuf::from(user)
+                .join("AppData")
+                .join("Local")
+                .join("Cache"));
+        }
+        return Err(CacheDirError::HomeDirUnavailable);
+    }
+
+    // Unix-like (macOS, Linux, others)
+    #[cfg(unix)]
+    {
+        // macOS
+        #[cfg(target_os = "macos")]
+        {
+            if let Ok(home) = env::var("HOME") {
+                return Ok(PathBuf::from(home).join("Library").join("Caches"));
+            }
+            return Err(CacheDirError::HomeDirUnavailable);
+        }
+
+        // Linux and other Unix
+        #[cfg(all(unix, not(target_os = "macos")))]
+        {
+            // XDG_CACHE_HOME preferred
+            if let Ok(xdg) = env::var("XDG_CACHE_HOME") {
+                return Ok(PathBuf::from(xdg));
+            }
+            // HOME/.cache
+            if let Ok(home) = env::var("HOME") {
+                return Ok(PathBuf::from(home).join(".cache"));
+            }
+            return Err(StorageError::DirNotDeterminable);
+        }
+    }
+
+    // Fallback: try HOME
+    if let Ok(home) = env::var("HOME") {
+        return Ok(PathBuf::from(home).join(".cache"));
+    }
+}
+
+fn create_dir(path: PathBuf) -> Result<PathBuf, StorageError> {
+    if !path.exists() {
+        std::fs::create_dir(&path).map_err(|_| StorageError::DirNotCreatable(path.clone()))?;
+    }
+    Ok(path)
 }
 
 /// Get and create the app data directory.
@@ -74,10 +186,17 @@ pub fn determine_app_data_dir() -> Result<PathBuf, ConfigError> {
 /// # Errors
 /// Returns an error when the directory could not be created or the data path could not be
 /// determined.
-pub fn app_data_dir() -> Result<PathBuf, ConfigError> {
-    let path = determine_app_data_dir()?;
-    if !path.exists() {
-        std::fs::create_dir(&path).map_err(|_| ConfigError::AppDataPathNotCreatable)?;
-    }
-    Ok(path)
+pub fn cache_dir() -> Result<PathBuf, StorageError> {
+    create_dir(determine_cache_dir()?)
+}
+/// Get and create the app data directory.
+///
+/// # Returns
+/// Returns the path of the apps data dir.
+///
+/// # Errors
+/// Returns an error when the directory could not be created or the data path could not be
+/// determined.
+pub fn app_data_dir() -> Result<PathBuf, StorageError> {
+    create_dir(determine_app_data_dir()?)
 }

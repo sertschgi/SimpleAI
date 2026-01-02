@@ -44,7 +44,7 @@ impl NodeQueryFilter {
 
 impl ProjectQueryFilter {
     pub fn is_ok(
-        self,
+        &self,
         Project {
             id,
             values:
@@ -58,13 +58,13 @@ impl ProjectQueryFilter {
         }: &Project,
     ) -> bool {
         match self {
-            ProjectQueryFilter::Id(qid) => qid == *id,
+            ProjectQueryFilter::Id(qid) => qid == id,
             ProjectQueryFilter::Name(qname) => {
                 let matcher = SkimMatcherV2::default();
                 matcher.fuzzy_match(name, &qname).is_some()
             }
-            ProjectQueryFilter::Older(qdate) => qdate > *date,
-            ProjectQueryFilter::Newer(qdate) => qdate < *date,
+            ProjectQueryFilter::Older(qdate) => qdate > date,
+            ProjectQueryFilter::Newer(qdate) => qdate < date,
             ProjectQueryFilter::Author(qauthor) => {
                 let matcher = SkimMatcherV2::default();
                 matcher.fuzzy_match(author, &qauthor).is_some()
