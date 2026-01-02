@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use thiserror::Error;
 use uuid::Uuid;
@@ -26,20 +27,17 @@ pub enum ProjectQueryError {
     MultipleSameIds(Vec<Project>),
 }
 
-use crate::modules::config::ConfigError;
+use crate::modules::storage::CacheError;
 #[derive(Debug, Error)]
 pub enum ProjectError {
     #[error("Could not find a project with the id {0}.")]
     NoProjectWithId(Uuid),
-    #[error("Could not get a valid config while trying to get a project: {0}.")]
-    InvalidConfig(#[from] ConfigError),
+    #[error("Could not get a valid cache dir while trying to get a project: {0}.")]
+    InvalidCache(#[from] CacheError),
     #[error("Could not query project: {0}.")]
     QueryError(#[from] ProjectQueryError),
 }
 
-use serde::{Deserialize, Serialize};
-use std::io::Read;
-use std::path::PathBuf;
 #[derive(Serialize, Deserialize)]
 pub struct ProjectCache {
     pub project_dirs: Vec<PathBuf>,
@@ -48,7 +46,6 @@ pub struct ProjectCache {
 use chrono::{DateTime, Utc};
 pub type ProjectDate = DateTime<Utc>;
 
-use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ProjectValues {
     pub name: String,
@@ -86,10 +83,10 @@ pub struct Project {
 use crate::modules::utils::query_filter::ProjectQueryFilter;
 impl Project {
     pub fn get_all() -> ProjectResult<Vec<ProjectQueryResult>> {
-        use crate::modules::config::Config;
+        use crate::modules::storage::*;
         use std::{fs::File, io::Read};
 
-        let dir_paths = Config::get()?.project_dirs;
+        let dir_paths = Cache::<ProjectCache>::get()?.project_dirs;
 
         let projects = dir_paths
             .iter()
@@ -98,8 +95,8 @@ impl Project {
                     .read_dir()
                     .map_err(|e| ProjectQueryError::FailedToReadProjectDir(e))?
                     .find(|entry_r| {
-                        if let Ok(entry) = entry_r.clone() {
-                            entry.file_name() == PROJECT_FILE_NAME;
+                        if let Ok(entry) = entry_r {
+                            return entry.file_name() == PROJECT_FILE_NAME;
                         }
                         false
                     })

@@ -63,12 +63,12 @@ pub fn determine_app_data_dir() -> Result<PathBuf, StorageError> {
         }
     }
 
-    Err(StorageError::AppDataPathNotDeterminable)
+    Err(StorageError::DirNotDeterminable)
 }
 
 /// Returns a platform-appropriate cache directory PathBuf.
 /// On success returns the directory path (does not create it).
-pub fn determine_cache_dir() -> Result<PathBuf, CacheDirError> {
+pub fn determine_cache_dir() -> Result<PathBuf, StorageError> {
     // WASM (browser) — no real filesystem path
     #[cfg(target_arch = "wasm32")]
     {
@@ -163,11 +163,6 @@ pub fn determine_cache_dir() -> Result<PathBuf, CacheDirError> {
             }
             return Err(StorageError::DirNotDeterminable);
         }
-    }
-
-    // Fallback: try HOME
-    if let Ok(home) = env::var("HOME") {
-        return Ok(PathBuf::from(home).join(".cache"));
     }
 }
 

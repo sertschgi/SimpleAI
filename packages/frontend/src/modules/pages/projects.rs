@@ -8,21 +8,21 @@ use super::utils::*;
 
 #[derive(Clone, PartialEq)]
 pub struct ProjectsContext {
-    pub results: Signal<Result<Vec<b::Project>, b::ProjectError>>,
+    pub results: Signal<b::ProjectResult<Vec<b::ProjectQueryResult>>>,
 }
 
 impl ProjectsContext {
     pub fn new() -> Self {
         Self {
-            results: Signal::new(b::Project::query_all(vec![])),
+            results: Signal::new(b::Project::query(vec![])),
         }
     }
     pub fn query_results(&mut self, query: String) {
         self.results
-            .set(b::Project::query_all(vec![ProjectQueryFilter::Name(query)]));
+            .set(b::Project::query(vec![ProjectQueryFilter::Name(query)]));
     }
     pub fn reload(&mut self) {
-        self.results.set(b::Project::query_all(vec![]));
+        self.results.set(b::Project::query(vec![]));
     }
 }
 
@@ -43,6 +43,8 @@ pub fn Projects() -> Element {
     let projects_ctx = use_signal(|| ProjectsContext::new());
     use_context_provider(|| projects_ctx);
 
+    let projects = use_signal(|| ));
+
     let input = move |e: FormEvent| {
         projects_ctx().query_results(e.value());
     };
@@ -57,8 +59,7 @@ pub fn Projects() -> Element {
             }
             article { class: "projects-wrapper",
                 div { class: "projects-view",
-                    match
-                    for project in (projects_ctx().results)() {
+                    for project in projects() {
                         Project { project }
                     }
                 }

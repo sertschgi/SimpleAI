@@ -34,12 +34,12 @@ where
 {
     pub fn file() -> Result<File, CacheError> {
         let path = paths::cache_dir()?.join(format!("{}.toml", uuid::Uuid::new_v4()));
-        Ok(File::create(path).map_err(|_| StorageError::FileNotCreatable(path))?)
+        Ok(File::create(&path).map_err(|_| StorageError::FileNotCreatable(path))?)
     }
 
     pub fn get() -> Result<T, CacheError> {
         let mut content = String::new();
-        Self::file()?.read_to_string(&mut content);
+        let _ = Self::file()?.read_to_string(&mut content);
         Ok(toml::from_str(&content).map_err(|_| StorageError::InvalidFileSyntax(content))?)
     }
 }
