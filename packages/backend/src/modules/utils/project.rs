@@ -8,8 +8,7 @@ pub const PROJECT_FILE_NAME: &'static str = "project.sai.json";
 pub type ProjectQueryResult = Result<Project, ProjectQueryError>;
 pub type ProjectResult<T> = Result<T, ProjectError>;
 
-use std::io;
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone, PartialEq)]
 pub enum ProjectQueryError {
     #[error("Encountered invalid syntax when deserializing the project file: {0}.")]
     InvalidSyntax(String),
@@ -18,17 +17,17 @@ pub enum ProjectQueryError {
     #[error("No project found in the given project dir: {0}.")]
     NoProjectFoundInProjectDir(PathBuf),
     #[error("Failed to open project file: {0}.")]
-    FailedToOpenProjectFile(io::Error),
+    FailedToOpenProjectFile(String),
     #[error("Failed to read project directory: {0}.")]
-    FailedToReadProjectDir(io::Error),
+    FailedToReadProjectDir(String),
     #[error("Failed to read project file: {0}.")]
-    FailedToReadProjectFile(io::Error),
+    FailedToReadProjectFile(String),
     #[error("Encountered projects with same ids.")]
     MultipleSameIds(Vec<Project>),
 }
 
 use crate::modules::storage::CacheError;
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone, PartialEq)]
 pub enum ProjectError {
     #[error("Could not find a project with the id {0}.")]
     NoProjectWithId(Uuid),
@@ -38,10 +37,8 @@ pub enum ProjectError {
     QueryError(#[from] ProjectQueryError),
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ProjectCache {
-    pub project_dirs: Vec<PathBuf>,
-}
+use crate::modules::storage::*;
+type ProjectCache = Cache<Vec<PathBuf>>;
 
 use chrono::{DateTime, Utc};
 pub type ProjectDate = DateTime<Utc>;
@@ -83,17 +80,16 @@ pub struct Project {
 use crate::modules::utils::query_filter::ProjectQueryFilter;
 impl Project {
     pub fn get_all() -> ProjectResult<Vec<ProjectQueryResult>> {
-        use crate::modules::storage::*;
         use std::{fs::File, io::Read};
 
-        let dir_paths = Cache::<ProjectCache>::get()?.project_dirs;
+        let dir_paths = ProjectCache::get()?.value;
 
         let projects = dir_paths
             .iter()
             .map(|dir_path: &PathBuf| -> ProjectQueryResult {
                 let file_path = dir_path
                     .read_dir()
-                    .map_err(|e| ProjectQueryError::FailedToReadProjectDir(e))?
+                    .map_err(|e| ProjectQueryError::FailedToReadProjectDir(e.to_string()))?
                     .find(|entry_r| {
                         if let Ok(entry) = entry_r {
                             return entry.file_name() == PROJECT_FILE_NAME;
@@ -107,11 +103,11 @@ impl Project {
                     .path();
 
                 let mut file = File::open(&file_path)
-                    .map_err(|e| ProjectQueryError::FailedToOpenProjectFile(e))?;
+                    .map_err(|e| ProjectQueryError::FailedToOpenProjectFile(e.to_string()))?;
 
                 let mut content = String::new();
                 file.read_to_string(&mut content)
-                    .map_err(|e| ProjectQueryError::FailedToReadProjectFile(e))?;
+                    .map_err(|e| ProjectQueryError::FailedToReadProjectFile(e.to_string()))?;
 
                 Project::try_from(content)
             })

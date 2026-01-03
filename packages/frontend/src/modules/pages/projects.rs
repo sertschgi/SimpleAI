@@ -17,6 +17,7 @@ impl ProjectsContext {
             results: Signal::new(b::Project::query(vec![])),
         }
     }
+
     pub fn query_results(&mut self, query: String) {
         self.results
             .set(b::Project::query(vec![ProjectQueryFilter::Name(query)]));
@@ -40,10 +41,26 @@ fn set_size() {}
 pub fn Projects() -> Element {
     set_size();
 
+    let mut error_msg = use_signal(|| String::new());
+    let mut error_open = use_signal(|| false);
+
     let projects_ctx = use_signal(|| ProjectsContext::new());
     use_context_provider(|| projects_ctx);
 
-    let projects = use_signal(|| ));
+    let projects = use_signal(move || match projects_ctx().results.cloned() {
+        Ok(results) => {
+            rsx! {
+                for project_result in results {
+                    Project { project_result }
+                }
+            }
+        }
+        Err(e) => {
+            error_msg.set(e.to_string());
+            error_open.set(true);
+            rsx! {}
+        }
+    });
 
     let input = move |e: FormEvent| {
         projects_ctx().query_results(e.value());
@@ -51,6 +68,7 @@ pub fn Projects() -> Element {
 
     rsx! {
         main {
+            MsgPopup { msg: error_msg, open: error_open }
             input {
                 oninput: input,
                 r#type: "search",
@@ -58,11 +76,7 @@ pub fn Projects() -> Element {
                 id: "search",
             }
             article { class: "projects-wrapper",
-                div { class: "projects-view",
-                    for project in projects() {
-                        Project { project }
-                    }
-                }
+                div { class: "projects-view", {projects} }
             }
         }
     }

@@ -8,7 +8,19 @@ use tokio::time::*;
 use simple_ai_backend::modules::{projects::delete::delete_project, utils::project as b};
 
 #[item]
-pub fn Project(project: b::Project) -> Element {
+pub fn Project(project_result: b::ProjectQueryResult) -> Element {
+    let project = match project_result {
+        Ok(p) => p,
+        Err(e) => {
+            return rsx! {
+                div { class: "Project error",
+                    p { "Error while querying projects." }
+                    p { {e.to_string()} }
+                }
+            };
+        }
+    };
+
     let ps = Signal::new(project);
 
     let b::Project {
