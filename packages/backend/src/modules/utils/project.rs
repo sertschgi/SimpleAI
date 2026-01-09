@@ -26,7 +26,7 @@ pub enum ProjectQueryError {
     MultipleSameIds(Vec<Project>),
 }
 
-use crate::modules::storage::CacheError;
+use crate::modules::storage::{CacheError, StorageError};
 #[derive(Debug, Error, Clone, PartialEq)]
 pub enum ProjectError {
     #[error("Could not find a project with the id {0}.")]
@@ -35,10 +35,15 @@ pub enum ProjectError {
     InvalidCache(#[from] CacheError),
     #[error("Could not query project: {0}.")]
     QueryError(#[from] ProjectQueryError),
+    #[error("Storage Error: {0}.")]
+    StorageError(#[from] StorageError),
 }
 
-use crate::modules::storage::*;
+use crate::modules::storage::Cache;
 type ProjectCache = Cache<Vec<PathBuf>>;
+
+use crate::modules::storage::Storage;
+type ProjectStorage = Storage<Option<Project>>;
 
 use chrono::{DateTime, Utc};
 pub type ProjectDate = DateTime<Utc>;
@@ -77,12 +82,13 @@ pub struct Project {
     pub values: ProjectValues,
 }
 
+use crate::modules::storage::Storeable;
 use crate::modules::utils::query_filter::ProjectQueryFilter;
 impl Project {
     pub fn get_all() -> ProjectResult<Vec<ProjectQueryResult>> {
         use std::{fs::File, io::Read};
 
-        let dir_paths = ProjectCache::get()?.value;
+        let dir_paths: Vec<PathBuf> = ProjectCache::new()?.storage_content()?;
 
         let projects = dir_paths
             .iter()
@@ -144,7 +150,14 @@ impl Project {
         .into()
     }
     pub fn create(self) -> Result<(), ProjectError> {
-        todo!()
+        let path = self.values.path.clone();
+        let mut storage = ProjectStorage::from(path.clone().join(PROJECT_FILE_NAME));
+        storage.storage_save(Some(self))?;
+        let mut cache = ProjectCache::new()?;
+        let mut cache_content = cache.storage_content()?;
+        cache_content.push(path);
+        cache.storage_save(cache_content)?;
+        Ok(())
     }
     pub fn edit(self) -> Result<(), ProjectError> {
         todo!()

@@ -4,7 +4,7 @@ use simple_ai_backend::modules::{projects::create::create_project, utils::projec
 
 #[cfg(not(target_family = "wasm"))]
 fn set_size() {
-    use dioxus::desktop::{window, wry::dpi::Pixel, LogicalSize};
+    use dioxus::desktop::{window, LogicalSize};
     window().set_max_inner_size(Some(LogicalSize::new(720, 720)));
     window().set_min_inner_size(Some(LogicalSize::new(720, 720)));
 }

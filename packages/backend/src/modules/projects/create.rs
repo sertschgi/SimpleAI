@@ -1,6 +1,6 @@
 use crate::modules::utils::{check_name, prelude::*};
 use anyhow::Result;
-use std::fs::{create_dir_all, File};
+use std::fs::{create_dir_all, read_to_string, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use uuid::Uuid;
