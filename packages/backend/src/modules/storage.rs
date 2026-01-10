@@ -18,6 +18,8 @@ pub enum StorageError {
     FileNotReadable(PathBuf, String),
     #[error("The storage file could not be written: '{0}'")]
     FileNotWriteable(PathBuf),
+    #[error("The storage file is empty and could not be serialized: '{0}'")]
+    EmptyFile(PathBuf),
     #[error("Found invalid syntax in storage file '{0}': {1}, contents: >>{2}<<")]
     InvalidFileSyntax(PathBuf, String, String),
 }
@@ -27,7 +29,7 @@ use std::{fs::File, io::Read};
 use uuid::Uuid;
 pub trait Storeable<ST>
 where
-    ST: Serialize + DeserializeOwned + Default,
+    ST: Serialize + DeserializeOwned,
 {
     type Error;
     fn storage_content(&self) -> Result<ST, Self::Error>;
@@ -37,17 +39,21 @@ where
 
 impl<ST> Storeable<ST> for PathBuf
 where
-    ST: Serialize + DeserializeOwned + Default,
+    ST: Serialize + DeserializeOwned,
 {
     type Error = StorageError;
     fn storage_content(&self) -> Result<ST, Self::Error> {
-        let mut file =
-            File::create(&self).map_err(|_| StorageError::FileNotCreatable(self.clone()))?;
+        let mut file = File::options()
+            .write(true)
+            .create(true)
+            .read(true)
+            .open(&self)
+            .map_err(|_| StorageError::FileNotOpenable(self.clone()))?;
         let mut content = String::new();
         file.read_to_string(&mut content)
             .map_err(|e| StorageError::FileNotReadable(self.clone(), e.to_string()))?;
         if content.is_empty() {
-            content = serde_json::to_string(&ST::default()).unwrap()
+            return Err(StorageError::EmptyFile(self.clone()));
         }
         Ok(serde_json::from_str(&content)
             .map_err(|e| StorageError::InvalidFileSyntax(self.clone(), e.to_string(), content))?)
@@ -56,7 +62,7 @@ where
     fn storage_save(&mut self, value: ST) -> Result<(), Self::Error> {
         let mut file =
             File::create(&self).map_err(|_| StorageError::FileNotCreatable(self.clone()))?;
-        file.write(serde_json::to_string(&value).unwrap().as_bytes())
+        file.write(serde_json::to_string_pretty(&value).unwrap().as_bytes())
             .map_err(|_| StorageError::FileNotWriteable(self.clone()))?;
         Ok(())
     }
@@ -85,7 +91,7 @@ impl<ST> From<PathBuf> for Storage<ST> {
 
 impl<ST> Storeable<ST> for Storage<ST>
 where
-    ST: Serialize + DeserializeOwned + Default,
+    ST: Serialize + DeserializeOwned,
 {
     type Error = StorageError;
     fn storage_content(&self) -> Result<ST, Self::Error> {
@@ -126,7 +132,14 @@ where
 {
     type Error = CacheError;
     fn storage_content(&self) -> Result<ST, Self::Error> {
-        Ok(self.path.storage_content()?)
+        let content = self.path.storage_content();
+        match content {
+            Ok(c) => Ok(c),
+            Err(e) => match e {
+                StorageError::EmptyFile(..) => Ok(ST::default()),
+                _ => Err(e.into()),
+            },
+        }
     }
 
     fn storage_save(&mut self, value: ST) -> Result<(), Self::Error> {

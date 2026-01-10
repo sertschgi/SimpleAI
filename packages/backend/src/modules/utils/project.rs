@@ -24,6 +24,8 @@ pub enum ProjectQueryError {
     FailedToReadProjectFile(String),
     #[error("Encountered projects with same ids.")]
     MultipleSameIds(Vec<Project>),
+    #[error("Storage Error while querying project: {0}")]
+    StorageError(#[from] StorageError),
 }
 
 use crate::modules::storage::{CacheError, StorageError};
@@ -43,7 +45,7 @@ use crate::modules::storage::Cache;
 type ProjectCache = Cache<Vec<PathBuf>>;
 
 use crate::modules::storage::Storage;
-type ProjectStorage = Storage<Option<Project>>;
+type ProjectStorage = Storage<Project>;
 
 use chrono::{DateTime, Utc};
 pub type ProjectDate = DateTime<Utc>;
@@ -69,12 +71,12 @@ impl ProjectValues {
     }
 }
 
-impl TryFrom<String> for ProjectValues {
-    type Error = ProjectQueryError;
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        Ok(serde_json::from_str(&value).map_err(|e| Self::Error::InvalidSyntax(e.to_string()))?)
-    }
-}
+// impl TryFrom<String> for ProjectValues {
+//     type Error = ProjectQueryError;
+//     fn try_from(value: String) -> Result<Self, Self::Error> {
+//         Ok(serde_json::from_str(&value).map_err(|e| Self::Error::InvalidSyntax(e.to_string()))?)
+//     }
+// }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Project {
@@ -86,8 +88,6 @@ use crate::modules::storage::Storeable;
 use crate::modules::utils::query_filter::ProjectQueryFilter;
 impl Project {
     pub fn get_all() -> ProjectResult<Vec<ProjectQueryResult>> {
-        use std::{fs::File, io::Read};
-
         let dir_paths: Vec<PathBuf> = ProjectCache::new()?.storage_content()?;
 
         let projects = dir_paths
@@ -108,14 +108,7 @@ impl Project {
                     .unwrap()
                     .path();
 
-                let mut file = File::open(&file_path)
-                    .map_err(|e| ProjectQueryError::FailedToOpenProjectFile(e.to_string()))?;
-
-                let mut content = String::new();
-                file.read_to_string(&mut content)
-                    .map_err(|e| ProjectQueryError::FailedToReadProjectFile(e.to_string()))?;
-
-                Project::try_from(content)
+                Ok(ProjectStorage::new(file_path).storage_content()?)
             })
             .collect();
 
@@ -152,7 +145,7 @@ impl Project {
     pub fn create(self) -> Result<(), ProjectError> {
         let path = self.values.path.clone();
         let mut storage = ProjectStorage::from(path.clone().join(PROJECT_FILE_NAME));
-        storage.storage_save(Some(self))?;
+        storage.storage_save(self)?;
         let mut cache = ProjectCache::new()?;
         let mut cache_content = cache.storage_content()?;
         cache_content.push(path);
@@ -167,12 +160,12 @@ impl Project {
     }
 }
 
-impl TryFrom<String> for Project {
-    type Error = ProjectQueryError;
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        Ok(ProjectValues::try_from(value)?.into())
-    }
-}
+// impl TryFrom<String> for Project {
+//     type Error = ProjectQueryError;
+//     fn try_from(value: String) -> Result<Self, Self::Error> {
+//         Ok(ProjectValues::try_from(value)?.into())
+//     }
+// }
 impl TryFrom<Uuid> for Project {
     type Error = ProjectError;
     fn try_from(id: Uuid) -> Result<Self, Self::Error> {
