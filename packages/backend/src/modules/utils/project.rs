@@ -156,7 +156,16 @@ impl Project {
         todo!()
     }
     pub fn delete(self) -> Result<(), ProjectError> {
-        todo!()
+        let path = self.values.path.clone();
+        let storage = ProjectStorage::from(path.clone().join(PROJECT_FILE_NAME));
+        storage.storage_delete()?;
+        let mut cache = ProjectCache::new()?;
+        let mut cache_content = cache.storage_content()?;
+        println!("before: {:?}", cache_content);
+        cache_content.retain(|p| *p != path);
+        println!("after: {:?}", cache_content);
+        cache.storage_save(cache_content)?;
+        Ok(())
     }
 }
 

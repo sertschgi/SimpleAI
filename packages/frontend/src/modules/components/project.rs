@@ -39,14 +39,15 @@ pub fn Project(project_result: b::ProjectQueryResult) -> Element {
             MsgPopup { msg: err_popup_msg, open: err_popup_open }
             DeletePopup {
                 ondelete: move || async move {
-                    match delete_project(ps()) {
+                    match ps().delete() {
                         Err(e) => {
                             eprintln!("Error: {e}, project id: {id}");
                             sleep(Duration::from_millis(50)).await;
                             err_popup_open.set(true);
-                            err_popup_msg.set(e);
+                            err_popup_msg.set(e.to_string());
                         }
                         Ok(()) => {
+                            sleep(Duration::from_millis(50)).await;
                             println!("Delted project with id: {id}");
                             projects_ctx().reload();
                         }

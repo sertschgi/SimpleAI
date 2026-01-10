@@ -168,7 +168,8 @@ pub fn determine_cache_dir() -> Result<PathBuf, StorageError> {
 
 fn create_dir(path: PathBuf) -> Result<PathBuf, StorageError> {
     if !path.exists() {
-        std::fs::create_dir(&path).map_err(|_| StorageError::DirNotCreatable(path.clone()))?;
+        std::fs::create_dir(&path)
+            .map_err(|e| StorageError::DirNotCreatable(path.clone(), e.to_string()))?;
     }
     Ok(path)
 }

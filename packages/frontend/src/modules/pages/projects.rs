@@ -47,18 +47,21 @@ pub fn Projects() -> Element {
     let projects_ctx = use_signal(|| ProjectsContext::new());
     use_context_provider(|| projects_ctx);
 
-    let projects = use_signal(move || match projects_ctx().results.cloned() {
-        Ok(results) => {
-            rsx! {
-                for project_result in results {
-                    Project { project_result }
+    let projects = use_resource(move || async move {
+        match (projects_ctx().results)() {
+            Ok(results) => {
+                rsx! {
+
+                    for project_result in results {
+                        Project { project_result }
+                    }
                 }
             }
-        }
-        Err(e) => {
-            error_msg.set(e.to_string());
-            error_open.set(true);
-            rsx! {}
+            Err(e) => {
+                error_msg.set(e.to_string());
+                error_open.set(true);
+                rsx! {}
+            }
         }
     });
 
@@ -76,7 +79,7 @@ pub fn Projects() -> Element {
                 id: "search",
             }
             article { class: "projects-wrapper",
-                div { class: "projects-view", {projects} }
+                div { class: "projects-view", {projects()} }
             }
         }
     }

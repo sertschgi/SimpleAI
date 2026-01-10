@@ -8,16 +8,18 @@ use thiserror::Error;
 pub enum StorageError {
     #[error("The storage dir could not be determined")]
     DirNotDeterminable,
-    #[error("The storage dir could not be created. '{0}'")]
-    DirNotCreatable(PathBuf),
-    #[error("The storage file could not be created: '{0}'")]
-    FileNotCreatable(PathBuf),
-    #[error("The storage file could not be opened: '{0}'")]
-    FileNotOpenable(PathBuf),
+    #[error("The storage dir could not be created. '{0}', {1}")]
+    DirNotCreatable(PathBuf, String),
+    #[error("The storage file could not be created: '{0}', {1}")]
+    FileNotCreatable(PathBuf, String),
+    #[error("The storage file could not be opened: '{0}', {1}")]
+    FileNotOpenable(PathBuf, String),
     #[error("The storage file could not be read: '{0}', {1}")]
     FileNotReadable(PathBuf, String),
-    #[error("The storage file could not be written: '{0}'")]
-    FileNotWriteable(PathBuf),
+    #[error("The storage file could not be written: '{0}', {1}")]
+    FileNotWriteable(PathBuf, String),
+    #[error("The storage file could not be deleted: '{0}', {1}")]
+    FileNotDeletable(PathBuf, String),
     #[error("The storage file is empty and could not be serialized: '{0}'")]
     EmptyFile(PathBuf),
     #[error("Found invalid syntax in storage file '{0}': {1}, contents: >>{2}<<")]
@@ -33,8 +35,8 @@ where
 {
     type Error;
     fn storage_content(&self) -> Result<ST, Self::Error>;
-
     fn storage_save(&mut self, value: ST) -> Result<(), Self::Error>;
+    fn storage_delete(&self) -> Result<(), Self::Error>;
 }
 
 impl<ST> Storeable<ST> for PathBuf
@@ -42,13 +44,14 @@ where
     ST: Serialize + DeserializeOwned,
 {
     type Error = StorageError;
+
     fn storage_content(&self) -> Result<ST, Self::Error> {
         let mut file = File::options()
             .write(true)
             .create(true)
             .read(true)
             .open(&self)
-            .map_err(|_| StorageError::FileNotOpenable(self.clone()))?;
+            .map_err(|e| StorageError::FileNotOpenable(self.clone(), e.to_string()))?;
         let mut content = String::new();
         file.read_to_string(&mut content)
             .map_err(|e| StorageError::FileNotReadable(self.clone(), e.to_string()))?;
@@ -60,11 +63,20 @@ where
     }
 
     fn storage_save(&mut self, value: ST) -> Result<(), Self::Error> {
-        let mut file =
-            File::create(&self).map_err(|_| StorageError::FileNotCreatable(self.clone()))?;
-        file.write(serde_json::to_string_pretty(&value).unwrap().as_bytes())
-            .map_err(|_| StorageError::FileNotWriteable(self.clone()))?;
+        let mut file = File::options()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(&self)
+            .map_err(|e| StorageError::FileNotOpenable(self.clone(), e.to_string()))?;
+        file.write_all(serde_json::to_string_pretty(&value).unwrap().as_bytes())
+            .map_err(|e| StorageError::FileNotWriteable(self.clone(), e.to_string()))?;
         Ok(())
+    }
+
+    fn storage_delete(&self) -> Result<(), Self::Error> {
+        Ok(std::fs::remove_file(self)
+            .map_err(|e| StorageError::FileNotDeletable(self.clone(), e.to_string()))?)
     }
 }
 
@@ -100,6 +112,10 @@ where
 
     fn storage_save(&mut self, value: ST) -> Result<(), Self::Error> {
         self.path.storage_save(value)
+    }
+
+    fn storage_delete(&self) -> Result<(), Self::Error> {
+        Ok(<PathBuf as Storeable<ST>>::storage_delete(&self.path)?)
     }
 }
 
@@ -144,5 +160,9 @@ where
 
     fn storage_save(&mut self, value: ST) -> Result<(), Self::Error> {
         Ok(self.path.storage_save(value)?)
+    }
+
+    fn storage_delete(&self) -> Result<(), Self::Error> {
+        Ok(<PathBuf as Storeable<ST>>::storage_delete(&self.path)?)
     }
 }
