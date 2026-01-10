@@ -9,6 +9,9 @@
   border-radius: 5rem;
   transition: background-color 200ms;
 }
+.WindowDecorations .Icon:hover {
+  background-color: hsl(var(--color-1), 30%);
+}
 
 .WindowDecorations svg {
   scale: 0.8;
@@ -28,6 +31,6 @@
   all: unset;
 }
 
-.WindowDecorations .Icon:hover {
-  background-color: hsl(var(--color-1), 30%);
+.WindowDecorations button:hover {
+  all: unset;
 }

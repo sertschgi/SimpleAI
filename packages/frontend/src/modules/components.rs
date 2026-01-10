@@ -9,6 +9,7 @@ pub mod focus_button;
 pub mod focus_button_array;
 pub mod heading_layout;
 pub mod labeled_box;
+pub mod msg_popup;
 pub mod nav_button;
 pub mod navigation_link;
 pub mod navigation_page;
@@ -35,6 +36,7 @@ pub mod prelude {
     pub use super::focus_button_array::*;
     pub use super::heading_layout::*;
     pub use super::labeled_box::*;
+    pub use super::msg_popup::*;
     pub use super::nav_button::*;
     pub use super::navigation_link::*;
     pub use super::navigation_page::*;
@@ -59,7 +61,7 @@ pub(crate) mod utils {
 
     pub fn pj_name_from_str(string: &str) -> String {
         match uuid::Uuid::parse_str(string) {
-            Ok(id) => simple_ai_backend::modules::utils::project::Project::try_from_id(id)
+            Ok(id) => simple_ai_backend::modules::utils::project::Project::try_from(id)
                 .unwrap()
                 .values
                 .name
