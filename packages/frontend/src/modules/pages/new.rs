@@ -1,4 +1,7 @@
-use super::utils::*;
+use super::utils::{
+    formify::frontend_project::{CreateForm, CreateFormFields},
+    *,
+};
 use serde::{Deserialize, Serialize};
 use simple_ai_backend::modules::{projects::create::create_project, utils::project::*};
 
@@ -21,8 +24,8 @@ pub fn New() -> Element {
 
     rsx! {
         main {
-            FrontendProjectCreationForm {
-                oncreate: move |(_, f): (FormEvent, FrontendProjectFormFields)| {
+            CreateForm {
+                callback: move |(_, f): (FormEvent, CreateFormFields)| {
                     let project = simple_ai_backend::modules::utils::prelude::Project::new(
                         f.name,
                         f.desc,

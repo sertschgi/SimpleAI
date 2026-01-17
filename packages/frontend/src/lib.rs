@@ -15,11 +15,13 @@ pub(crate) mod utils {
 
     use serde::{Deserialize, Serialize};
     use simple_ai_macros::Formifiable;
+    use std::path::PathBuf;
     #[derive(Serialize, Deserialize, Clone, PartialEq, Formifiable)]
     pub struct FrontendProject {
+        #[kind(text), ignore(create)]
         pub name: String,
         pub author: String,
         pub desc: String,
-        pub path: String,
+        pub path: PathBuf,
     }
 }
