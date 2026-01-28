@@ -8,6 +8,7 @@ use syn::{
 mod field_attrs;
 mod form;
 mod form_input;
+mod parsed_field;
 
 pub fn macro_impl(item: TokenStream) -> TokenStream {
     let struct_item: ItemStruct = parse2(item).expect("No valid struct!");

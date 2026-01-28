@@ -5,8 +5,9 @@ use syn::{
     ItemStruct, LitStr, Meta, MetaList, Type, TypePath,
 };
 
-use super::field_attrs::FieldAttribute;
+use super::parsed_field::ParsedField;
 
+#[derive(Debug)]
 pub enum Form {
     Create(Vec<ParsedField>),
     Edit(Vec<ParsedField>),

@@ -4,6 +4,15 @@ pub mod kind;
 use ignore::FormIgnoreOpt;
 use kind::FormKindOpt;
 
+pub struct FieldAttributesStates {
+    ignore: FormIgnoreOpt,
+    kind: FormKindOpt,
+}
+
+impl From<Vec<FieldAttribute>> for FieldAttributeStates {
+    fn from(attr: Vec<FieldAttribute>) -> Self {}
+}
+
 pub enum FieldAttributeKind {
     Ignore(FormIgnoreOpt),
     Kind(FormKindOpt),
