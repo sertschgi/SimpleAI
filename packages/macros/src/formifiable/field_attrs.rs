@@ -3,14 +3,32 @@ pub mod kind;
 
 use ignore::FormIgnoreOpt;
 use kind::FormKindOpt;
+use syn::{parse2, Attribute, Fields, Ident, Meta, MetaList};
 
-pub struct FieldAttributesStates {
-    ignore: FormIgnoreOpt,
-    kind: FormKindOpt,
+#[derive(Debug, Default)]
+pub struct FieldAttributeStates {
+    pub ignore: FormIgnoreOpt,
+    pub kind: FormKindOpt,
+}
+
+impl From<Fields> for FieldAttributeStates {
+    fn from(fields: Fields) -> Self {
+        fields.iter().collect()
+    }
 }
 
 impl From<Vec<FieldAttribute>> for FieldAttributeStates {
-    fn from(attr: Vec<FieldAttribute>) -> Self {}
+    fn from(attrs: Vec<FieldAttribute>) -> Self {
+        let mut fas = Self::default();
+        for attr in attrs {
+            match FieldAttributeKind::from(attr) {
+                FieldAttributeKind::Ignore(opt) => fas.ignore = opt,
+                FieldAttributeKind::Kind(opt) => fas.kind = opt,
+                _ => (),
+            }
+        }
+        fas
+    }
 }
 
 pub enum FieldAttributeKind {
@@ -19,8 +37,8 @@ pub enum FieldAttributeKind {
     None,
 }
 
-impl From<&Meta> for FieldAttributeKind {
-    fn from(meta: &Meta) -> Self {
+impl From<Attribute> for FieldAttributeKind {
+    fn from(Attribute { meta, .. }: Attribute) -> Self {
         match meta {
             Meta::List(MetaList { tokens, .. }) => match parse2::<Ident>(tokens.clone()) {
                 Ok(i) => match i.to_string().as_str() {
