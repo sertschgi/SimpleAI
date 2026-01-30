@@ -7,6 +7,8 @@ use syn::{
 
 mod field_attrs;
 mod form;
+mod form_fields;
+mod form_icon;
 mod form_input;
 mod parsed_field;
 

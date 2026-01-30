@@ -2,13 +2,11 @@ use std::collections::HashMap;
 
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{
-    parse::Parse, parse2, parse_quote, token::Token, Attribute, Field, Fields, FieldsNamed, Ident,
-    ItemStruct, LitStr, Meta, MetaList, Type, TypePath,
-};
+use syn::{parse_quote, Fields};
 
-use crate::formifiable::field_attrs::ignore::FormIgnoreOpt;
-
+use super::field_attrs::ignore::FormIgnoreOpt;
+use super::form_fields::FormFields;
+use super::form_icon::FormIcon;
 use super::parsed_field::ParsedField;
 
 pub struct FormTemplate {
