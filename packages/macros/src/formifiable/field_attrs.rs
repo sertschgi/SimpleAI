@@ -14,14 +14,24 @@ pub enum FieldAttributeKind {
 impl From<Attribute> for FieldAttributeKind {
     fn from(Attribute { meta, .. }: Attribute) -> Self {
         match meta {
-            Meta::List(MetaList { tokens, .. }) => match parse2::<Ident>(tokens.clone()) {
-                Ok(i) => match i.to_string().as_str() {
-                    "ignore" => Self::Ignore(parse2(tokens.clone()).unwrap()),
-                    "kind" => Self::Kind(parse2(tokens.clone()).unwrap()),
+            Meta::List(MetaList { tokens, path, .. }) => {
+                match path
+                    .get_ident()
+                    .expect("please provide a valid attribute")
+                    .to_string()
+                    .as_str()
+                {
+                    "omit" => Self::Ignore(parse2(tokens.clone()).expect(
+                        "please provide a valid omit attribute, options: all, none, edit, create",
+                    )),
+                    "kind" => {
+                        Self::Kind(parse2(tokens.clone()).expect(
+                            "please provide a valid kind attribute, options: text, file, dir",
+                        ))
+                    }
                     _ => Self::None,
-                },
-                Err(_) => Self::None,
-            },
+                }
+            }
             _ => Self::None,
         }
     }
@@ -29,7 +39,6 @@ impl From<Attribute> for FieldAttributeKind {
 
 pub struct FieldAttribute {
     kind: FieldAttributeKind,
-    ident: Ident,
 }
 
 impl FieldAttribute {
@@ -38,7 +47,6 @@ impl FieldAttribute {
             .iter()
             .map(|attr| Self {
                 kind: FieldAttributeKind::from(attr.to_owned()),
-                ident: attr.meta.path().get_ident().unwrap().to_owned(),
             })
             .collect()
     }

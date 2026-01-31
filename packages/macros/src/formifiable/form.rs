@@ -4,8 +4,6 @@ use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
 use syn::{parse_quote, parse_str, punctuated::Punctuated, Fields, FnArg, Ident, Token};
 
-use crate::formifiable::parsed_field;
-
 use super::field_attrs::ignore::FormIgnoreOpt;
 use super::form_fields::FormFields;
 use super::form_icon::FormIcon;

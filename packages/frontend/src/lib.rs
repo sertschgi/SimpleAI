@@ -18,10 +18,11 @@ pub(crate) mod utils {
     use std::path::PathBuf;
     #[derive(Serialize, Deserialize, Clone, PartialEq, Formifiable)]
     pub struct FrontendProject {
-        #[kind(text)]
+        #[omit(edit)]
         pub name: String,
         pub author: String,
         pub desc: String,
+        #[kind(dir)]
         pub path: PathBuf,
     }
 }

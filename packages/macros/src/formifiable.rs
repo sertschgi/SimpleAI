@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use proc_macro2::{Span, TokenStream};
 use quote::*;
 use syn::{parse2, Ident, ItemStruct};

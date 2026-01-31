@@ -16,9 +16,14 @@ impl<'a> ToTokens for FormFields<'a> {
         let ident: Ident = parse_str(name).unwrap();
 
         quote! {
-            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Clone)]
+            #[derive(serde::Deserialize, PartialEq, Clone)]
             pub struct #ident {
                 #(#fields),*
+            }
+            impl dioxus::core::IntoAttributeValue for #ident {
+                fn into_value(self) -> dioxus::core::AttributeValue {
+                    dioxus::core::AttributeValue::Any(std::rc::Rc::new(self))
+                }
             }
         }
         .to_tokens(tokens);

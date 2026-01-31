@@ -36,7 +36,7 @@ impl ToTokens for FormInput {
                     class: "FormifyInput",
                     name: #field_name,
                     required: true,
-                    value: #value,
+                    value: #value.clone(),
                     r#type: #input_type,
                     "webkitdirectory": #directory,
                 }
