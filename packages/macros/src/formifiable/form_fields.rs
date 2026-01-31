@@ -1,28 +1,24 @@
-pub struct FormFields {
-    name: String,
-    fields: Vec<Field>,
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens};
+use syn::{parse_str, Ident};
+
+use super::parsed_field::ParsedField;
+
+pub struct FormFields<'a> {
+    pub name: &'a str,
+    pub fields: Vec<ParsedField>,
 }
 
-impl FormFields {
-    pub fn ident(&self) -> Ident {
-        Ident::new(&format!("{}FormFields", self.name), Span::call_site())
-    }
-}
-
-impl ToTokens for FormFields {
+impl<'a> ToTokens for FormFields<'a> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let Self { fields, .. } = self;
+        let Self { name, fields } = self;
 
-        let mut token_fields = TokenStream::new();
-        for field in fields {
-            quote! { #field , }.to_tokens(&mut token_fields);
-        }
+        let ident: Ident = parse_str(name).unwrap();
 
-        let form_fields_name = self.ident();
         quote! {
-        #[derive(serde::Serialize, serde::Deserialize)]
-            pub struct #form_fields_name {
-                #token_fields
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Clone)]
+            pub struct #ident {
+                #(#fields),*
             }
         }
         .to_tokens(tokens);

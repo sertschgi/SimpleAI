@@ -1,31 +1,28 @@
-#[derive(Clone)]
-pub enum FormInputKind {
-    Edit,
-    Create,
-}
+use proc_macro2::{Span, TokenStream};
+use quote::{quote, ToTokens};
+use syn::{parse_quote, parse_str, Expr, LitBool, LitStr};
 
-impl FormInputKind {
-    pub fn name(&self) -> &str {
-        match self {
-            Self::Edit => "Edit",
-            Self::Create => "Create",
-        }
-    }
-}
+use super::field_attrs::kind::FormKindOpt;
+use super::parsed_field::ParsedField;
 
 pub struct FormInput {
-    form_kind: FormInputKind,
-    field: Field,
+    pub field: ParsedField,
+    pub value: Expr,
 }
 
 impl ToTokens for FormInput {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let default_input_type = "text";
-        let field_ident = self.field.ident.clone().unwrap();
-        let field_name = LitStr::new(&field_ident.to_string(), Span::call_site());
-        let input_type = match &self.field.ty {
-            Type::Path(TypePath { path, .. }) if path.is_ident("PathBuf") => "file",
-            _ => default_input_type,
+        let Self { field, value } = self;
+
+        let mut directory = false;
+        let field_name = &field.name;
+        let input_type = match &field.field_states.kind {
+            FormKindOpt::File => "file",
+            FormKindOpt::Dir => {
+                directory = true;
+                "file"
+            }
+            _ => "text",
         };
 
         quote! {
@@ -37,11 +34,11 @@ impl ToTokens for FormInput {
                 }
                 input {
                     class: "FormifyInput",
-                    name: {#field_name},
+                    name: #field_name,
                     required: true,
-                    // value: {obj.#field_ident.clone()},
-                    r#type: {#input_type},
-                    "webkitdirectory": true,
+                    value: #value,
+                    r#type: #input_type,
+                    "webkitdirectory": #directory,
                 }
             }
         }

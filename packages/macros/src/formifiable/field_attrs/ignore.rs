@@ -1,4 +1,8 @@
+use proc_macro2::Span;
+use syn::Ident;
+
 /// all options of the `#[ignore(..)]` directive
+#[derive(Debug, Clone)]
 pub enum FormIgnoreOpt {
     All,
     Create,

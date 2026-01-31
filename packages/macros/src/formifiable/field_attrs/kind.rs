@@ -1,4 +1,8 @@
+use proc_macro2::Span;
+use syn::Ident;
+
 /// all options of the `#[kind(..)]` directive
+#[derive(Debug, Clone)]
 pub enum FormKindOpt {
     Text,
     Dir,

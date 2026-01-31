@@ -3,33 +3,7 @@ pub mod kind;
 
 use ignore::FormIgnoreOpt;
 use kind::FormKindOpt;
-use syn::{parse2, Attribute, Fields, Ident, Meta, MetaList};
-
-#[derive(Debug, Default)]
-pub struct FieldAttributeStates {
-    pub ignore: FormIgnoreOpt,
-    pub kind: FormKindOpt,
-}
-
-impl From<Fields> for FieldAttributeStates {
-    fn from(fields: Fields) -> Self {
-        fields.iter().collect()
-    }
-}
-
-impl From<Vec<FieldAttribute>> for FieldAttributeStates {
-    fn from(attrs: Vec<FieldAttribute>) -> Self {
-        let mut fas = Self::default();
-        for attr in attrs {
-            match FieldAttributeKind::from(attr) {
-                FieldAttributeKind::Ignore(opt) => fas.ignore = opt,
-                FieldAttributeKind::Kind(opt) => fas.kind = opt,
-                _ => (),
-            }
-        }
-        fas
-    }
-}
+use syn::{parse2, Attribute, Ident, Meta, MetaList};
 
 pub enum FieldAttributeKind {
     Ignore(FormIgnoreOpt),
@@ -62,10 +36,36 @@ impl FieldAttribute {
     pub fn parse_all(attrs: Vec<Attribute>) -> Vec<Self> {
         attrs
             .iter()
-            .map(|Attribute { meta, .. }| Self {
-                kind: meta.into(),
-                ident: meta.path().get_ident().unwrap().to_owned(),
+            .map(|attr| Self {
+                kind: FieldAttributeKind::from(attr.to_owned()),
+                ident: attr.meta.path().get_ident().unwrap().to_owned(),
             })
             .collect()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FieldAttributeStates {
+    pub ignore: FormIgnoreOpt,
+    pub kind: FormKindOpt,
+}
+
+impl From<Vec<FieldAttribute>> for FieldAttributeStates {
+    fn from(attrs: Vec<FieldAttribute>) -> Self {
+        let mut fas = Self::default();
+        for attr in attrs {
+            match attr.kind {
+                FieldAttributeKind::Ignore(opt) => fas.ignore = opt,
+                FieldAttributeKind::Kind(opt) => fas.kind = opt,
+                _ => (),
+            }
+        }
+        fas
+    }
+}
+
+impl From<Vec<Attribute>> for FieldAttributeStates {
+    fn from(attrs: Vec<Attribute>) -> Self {
+        Self::from(FieldAttribute::parse_all(attrs))
     }
 }
