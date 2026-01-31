@@ -23,6 +23,6 @@ pub(crate) mod utils {
         pub author: String,
         pub desc: String,
         #[kind(dir)]
-        pub path: String,
+        pub path: PathBuf,
     }
 }

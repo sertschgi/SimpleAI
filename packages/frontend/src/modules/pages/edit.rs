@@ -1,4 +1,7 @@
-use super::utils::*;
+use super::utils::{
+    formify::frontend_project::{EditForm, EditFormFields},
+    *,
+};
 
 use simple_ai_backend::modules::utils::project::*;
 use uuid::Uuid;
@@ -17,21 +20,22 @@ fn set_size() {}
 pub fn Edit(id: Uuid) -> Element {
     set_size();
 
-    let pv = Project::try_from(id).unwrap().values;
-    let onedit = move |e: FormEvent| {
-        // error_popup_msg.push(e.into());
-        // error_popup_open.set(true);
-        // _ = match r {
-        //     Ok(Project { id, .. }) => {
-        //         _ = router().push(Route::ProjectNav { id });
-        //     }
-        //     Err(e) => println!("{e}"),
-        // };
-    };
+    let ProjectValues {
+        author, desc, path, ..
+    } = Project::try_from(id).unwrap().values;
+    let values = EditFormFields { author, desc, path };
+
+    let mut error_popup_open = use_signal(|| false);
+    let mut error_popup_msg = use_signal(|| String::new());
 
     rsx! {
         main {
-            // FrontendProjectEditForm { obj: pv.clone(), onedit }
+            EditForm {
+                values,
+                callback: move |(_, f): (FormEvent, EditFormFields)| {},
+            }
+
+            MsgPopup { msg: error_popup_msg, open: error_popup_open }
         }
     }
 }

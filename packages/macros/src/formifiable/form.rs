@@ -86,7 +86,7 @@ impl<'a> ToTokens for FormTemplate<'a> {
                 rsx! {
                     form {
                         class: "FormifyForm",
-                        onsubmit: move |e| { println!("{:?}", e.values()); callback.call((e.clone(), parsed_values_new(e.values()).expect("failed to parse values on formify")));
+                        onsubmit: move |e| { callback.call((e.clone(), parsed_values_new(e.values()).expect("failed to parse values on formify")));
                         },
 
                         #(#inputs)*

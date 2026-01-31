@@ -228,7 +228,14 @@ input[type="range"]::-webkit-slider-thumb:focus {
 }
 
 .FormifyButton {
+  width: 4rem;
+  height: 4rem;
   border-radius: 5rem;
+}
+
+.FormifyButton svg {
+  width: 2rem;
+  height: 2rem;
 }
 
 .FormifyBox {
@@ -239,6 +246,7 @@ input[type="range"]::-webkit-slider-thumb:focus {
 }
 
 .FormifyText {
+  font-size: 1rem;
 }
 
 .FormifyInput {

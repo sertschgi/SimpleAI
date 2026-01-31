@@ -2,8 +2,6 @@ use super::utils::{
     formify::frontend_project::{CreateForm, CreateFormFields},
     *,
 };
-use serde::{Deserialize, Serialize};
-use simple_ai_backend::modules::{projects::create::create_project, utils::project::*};
 
 #[cfg(not(target_family = "wasm"))]
 fn set_size() {
