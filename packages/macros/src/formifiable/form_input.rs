@@ -1,9 +1,95 @@
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{parse_quote, parse_str, Expr, LitBool, LitStr};
+use syn::Expr;
 
 use super::field_attrs::kind::FormKindOpt;
 use super::parsed_field::ParsedField;
+
+#[derive(Debug, Clone)]
+pub struct FormInputCommonOpts {
+    field_name: String,
+    value: Expr,
+    required: bool,
+}
+
+impl ToTokens for FormInputCommonOpts {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        let FormInputCommonOpts {
+            field_name,
+            value,
+            required,
+        } = &self;
+        quote! {
+            name: #field_name,
+            required: #required,
+            value: #value.clone(),
+        }
+        .to_tokens(tokens);
+    }
+}
+
+pub struct FormInputText {
+    opts: FormInputCommonOpts,
+}
+impl ToTokens for FormInputText {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        let Self { opts } = &self;
+        quote! {
+            input {
+                #opts
+                class: "FormifyTextInput",
+                r#type: "text",
+            }
+        }
+        .to_tokens(tokens);
+    }
+}
+
+pub struct FormInputFile {
+    pub opts: FormInputCommonOpts,
+    pub directory: bool,
+}
+impl ToTokens for FormInputFile {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        let Self { opts, directory } = &self;
+        let FormInputCommonOpts {
+            field_name,
+            value,
+            required,
+        } = opts;
+        let text_input = FormInputText { opts: opts.clone() };
+        quote! {
+            section {
+                class: "FormifyFileInput",
+
+                #text_input
+
+                input {
+                    required: false,
+                    class: "FormifyFileInputButton",
+                    r#type: "file",
+                    "webkitdirectory": #directory,
+                    onchange: move |e| { #value.set(e.parsed::<SerializedFileData>.expect("could not parse file input").path().to_os_string().to_string()) }
+                }
+            }
+        }
+        .to_tokens(tokens);
+    }
+}
+
+pub enum FormInputKind {
+    File(FormInputFile),
+    Text(FormInputText),
+}
+
+impl ToTokens for FormInputKind {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        match self {
+            Self::File(f) => f.to_tokens(tokens),
+            Self::Text(f) => f.to_tokens(tokens),
+        }
+    }
+}
 
 pub struct FormInput {
     pub field: ParsedField,
@@ -14,15 +100,24 @@ impl ToTokens for FormInput {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let Self { field, value } = self;
 
-        let mut directory = false;
         let field_name = &field.name;
-        let input_type = match &field.field_states.kind {
-            FormKindOpt::File => "file",
-            FormKindOpt::Dir => {
-                directory = true;
-                "file"
-            }
-            _ => "text",
+
+        let opts = FormInputCommonOpts {
+            field_name: field_name.clone(),
+            value: value.clone(),
+            required: true,
+        };
+
+        let input = match field.field_states.kind {
+            FormKindOpt::Text => FormInputKind::Text(FormInputText { opts }),
+            FormKindOpt::File => FormInputKind::File(FormInputFile {
+                opts,
+                directory: false,
+            }),
+            FormKindOpt::Dir => FormInputKind::File(FormInputFile {
+                opts,
+                directory: true,
+            }),
         };
 
         quote! {
@@ -32,14 +127,7 @@ impl ToTokens for FormInput {
                     class: "FormifyText",
                     #field_name
                 }
-                input {
-                    class: "FormifyInput",
-                    name: #field_name,
-                    required: true,
-                    value: #value.clone(),
-                    r#type: #input_type,
-                    "webkitdirectory": #directory,
-                }
+                #input
             }
         }
         .to_tokens(tokens);

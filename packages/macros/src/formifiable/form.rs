@@ -10,7 +10,6 @@ use super::form_icon::FormIcon;
 use super::form_input::FormInput;
 use super::parsed_field::ParsedField;
 
-
 pub struct FormTemplate<'a> {
     pub name: &'a str,
     pub icon: FormIcon<'a>,
@@ -38,55 +37,10 @@ impl<'a> ToTokens for FormTemplate<'a> {
 
             #[component]
             pub fn #func_ident(callback: Callback<(FormEvent, #fields_ident)>, #extra) -> Element {
-            
-
-                use dioxus::prelude::FormValue;
-                pub fn parsed_values_new<T>(values: Vec<(String, FormValue)>) -> Result<T, serde_json::Error>
-                where
-                    T: serde::de::DeserializeOwned,
-                {
-                    let mut map = serde_json::Map::new();
-                    for (key, value) in values {
-                        let entry = map
-                            .entry(key.clone())
-                            .or_insert_with(|| serde_json::Value::Array(Vec::new()));
-
-                        match value {
-                            FormValue::Text(text) => {
-                                entry
-                                    .as_array_mut()
-                                    .expect("entry should be an array")
-                                    .push(serde_json::Value::String(text.clone()));
-                            }
-                            // we create the serialized variant with no bytes
-                            // SerializedFileData, if given a real path, will read the bytes from disk (synchronously)
-                            FormValue::File(Some(file_data)) => {
-                                entry
-                                    .as_array_mut()
-                                    .expect("entry should be an array")
-                                    .push(serde_json::Value::String(file_data.path().into_os_string().into_string().unwrap()));
-                            }
-                            _ => {}
-                        }
-                    }
-
-                    // Go through the map and convert single-element arrays to just the element
-                    let map = map
-                        .into_iter()
-                        .map(|(k, v)| match v {
-                            serde_json::Value::Array(arr) if arr.len() == 1 => (k, arr.into_iter().next().unwrap()),
-                            _ => (k, v),
-                        })
-                        .collect::<serde_json::Map<String, serde_json::Value>>();
-
-                    serde_json::from_value(serde_json::Value::Object(map))
-                }
-
-
                 rsx! {
                     form {
                         class: "FormifyForm",
-                        onsubmit: move |e| { callback.call((e.clone(), parsed_values_new(e.values()).expect("failed to parse values on formify")));
+                        onsubmit: move |e| { callback.call((e.clone(), e.parsed_values().expect("failed to parse values on formify")));
                         },
 
                         #(#inputs)*
