@@ -251,3 +251,13 @@ input[type="range"]::-webkit-slider-thumb:focus {
 
 .FormifyInput {
 }
+
+.FormifyFileInput {
+  display: flex;
+  gap: 1rem;
+}
+
+.FormifyFileInputButton {
+  cursor: pointer;
+  width: 10rem;
+}

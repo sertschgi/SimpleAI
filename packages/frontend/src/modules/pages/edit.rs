@@ -23,17 +23,18 @@ pub fn Edit(id: Uuid) -> Element {
     let ProjectValues {
         author, desc, path, ..
     } = Project::try_from(id).unwrap().values;
-    let values = EditFormFields { author, desc, path };
+
+    let values = use_signal(move || EditFormFields { author, desc, path });
 
     let mut error_popup_open = use_signal(|| false);
     let mut error_popup_msg = use_signal(|| String::new());
 
     rsx! {
         main {
-            // EditForm {
-            //     values,
-            //     callback: move |(_, f): (FormEvent, EditFormFields)| {},
-            // }
+            EditForm {
+                values,
+                callback: move |(_, f): (FormEvent, EditFormFields)| {},
+            }
 
             MsgPopup { msg: error_popup_msg, open: error_popup_open }
         }
