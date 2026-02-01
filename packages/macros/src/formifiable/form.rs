@@ -45,18 +45,19 @@ impl<'a> ToTokens for FormTemplate<'a> {
         let icon_ident: Ident = parse_str(icon.name).unwrap();
 
         quote! {
-
-
             #icon
             #form_fields
 
             #[component]
             pub fn #func_ident(callback: Callback<(FormEvent, #fields_ident)>, #(#value_attributes)* #extra_name: Signal<#form_fields_ident>) -> Element {
+                fn parse_values(e: FormEvent) -> #form_fields_ident {
+                    e.parsed_values().expect("failed to parse values on formify")
+                }
+
                 rsx! {
                     form {
                         class: "FormifyForm",
-                        onsubmit: move |e| { callback.call((e.clone(), e.parsed_values().expect("failed to parse values on formify")));
-                        },
+                        onsubmit: move |e| { callback.call((e.clone(), parse_values(e.clone()))); },
 
                         #(#inputs)*
 

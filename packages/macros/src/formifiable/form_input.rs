@@ -70,7 +70,7 @@ impl ToTokens for FormInputFile {
                     r#type: "file",
                     "webkitdirectory": #directory,
                     onchange: move |e| {
-                        let mut new_value = #value();
+                        let mut new_value = parse_values(e.clone());
                         new_value.#field_ident = match e.values().last().unwrap().1.clone() {
                             FormValue::File(Some(data)) => data.path(),
                             _ => PathBuf::default()
