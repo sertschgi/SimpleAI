@@ -22,7 +22,7 @@ impl<'a> ToTokens for FormFields<'a> {
             }
             impl dioxus::core::IntoAttributeValue for #ident {
                 fn into_value(self) -> dioxus::core::AttributeValue {
-                    dioxus::core::AttributeValue::Any(std::rc::Rc::new(self))
+                    dioxus::core::AttributeValue::None
                 }
             }
         }

@@ -29,8 +29,8 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
         }
     };
 
-    println!("MACRO DEBUG: {}", r.to_token_stream().to_string());
-    std::thread::sleep(std::time::Duration::from_millis(500));
+    // println!("MACRO DEBUG: {}", r.to_token_stream().to_string());
+    // std::thread::sleep(std::time::Duration::from_millis(500));
 
     r
 }
