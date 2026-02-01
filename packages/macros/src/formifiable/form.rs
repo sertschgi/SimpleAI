@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
+use syn::Attribute;
 use syn::{parse_quote, parse_str, punctuated::Punctuated, Fields, FnArg, Ident, Token};
 
 use super::field_attrs::ignore::FormIgnoreOpt;
@@ -13,9 +14,8 @@ use super::parsed_field::ParsedField;
 pub struct FormTemplate<'a> {
     pub name: &'a str,
     pub icon: FormIcon<'a>,
-    pub fields: FormFields<'a>,
-    pub inputs: Vec<FormInput>,
-    pub extra: Punctuated<FnArg, Token![,]>,
+    pub fields: Vec<ParsedField>,
+    pub value_attribute: Attribute,
 }
 
 impl<'a> ToTokens for FormTemplate<'a> {
@@ -24,19 +24,32 @@ impl<'a> ToTokens for FormTemplate<'a> {
             name,
             icon,
             fields,
-            inputs,
-            extra,
+            value_attribute,
         } = self;
+        let form_fields = FormFields {
+            name: &format!("{}Fields", &name),
+            fields: fields.clone(),
+        };
+        let form_fields_ident: Ident = parse_str(form_fields.name).unwrap();
+        let extra_name: Ident = parse_str("values").unwrap();
+        let inputs: Vec<FormInput> = fields
+            .clone()
+            .iter()
+            .map(|field| FormInput {
+                field: field.clone(),
+                value: parse_quote! { #extra_name },
+            })
+            .collect();
         let func_ident: Ident = parse_str(name).unwrap();
-        let fields_ident: Ident = parse_str(&fields.name).unwrap();
+        let fields_ident: Ident = parse_str(&form_fields.name).unwrap();
         let icon_ident: Ident = parse_str(icon.name).unwrap();
 
         quote! {
             #icon
-            #fields
+            #form_fields
 
             #[component]
-            pub fn #func_ident(callback: Callback<(FormEvent, #fields_ident)>, #extra) -> Element {
+            pub fn #func_ident(callback: Callback<(FormEvent, #fields_ident)>, #value_attribute #extra_name: Signal<#form_fields_ident>) -> Element {
                 rsx! {
                     form {
                         class: "FormifyForm",
@@ -66,7 +79,7 @@ pub enum FormKind {
 }
 
 impl FormKind {
-    pub fn to_form_template(&self, parsed_fields: Vec<ParsedField>) -> FormTemplate {
+    pub fn to_form_template(&self, fields: Vec<ParsedField>) -> FormTemplate {
         match self {
             Self::Create => FormTemplate {
                 name: "CreateForm",
@@ -74,47 +87,18 @@ impl FormKind {
                     name: "CreateFormIcon",
                     svg: r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.0001 10.9999L22.0002 10.9997L22.0002 12.9997L13.0001 12.9999L13.0001 21.9998L11.0001 21.9998L11.0001 12.9999L2.00004 13.0001L2 11.0001L11.0001 10.9999L11 2.00025L13 2.00024L13.0001 10.9999Z"></path></svg>"#,
                 },
-                fields: FormFields {
-                    name: "CreateFormFields",
-                    fields: parsed_fields.clone(),
-                },
-                inputs: parsed_fields
-                    .clone()
-                    .iter()
-                    .map(|field| FormInput {
-                        field: field.clone(),
-                        value: parse_quote! { {""} },
-                    })
-                    .collect(),
-                extra: parse_quote! {},
+                fields,
+                value_attribute: parse_quote! { #[default = Signal::default()] },
             },
-            Self::Edit => {
-                let fields = FormFields {
-                    name: "EditFormFields",
-                    fields: parsed_fields.clone(),
-                };
-
-                let form_fields_ident: Ident = parse_str(fields.name).unwrap();
-                let extra_name: Ident = parse_str("values").unwrap();
-
-                FormTemplate {
-                    name: "EditForm",
-                    icon: FormIcon {
-                        name: "EditFormIcon",
-                        svg: r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.7279 9.57627L14.3137 8.16206L5 17.4758V18.89H6.41421L15.7279 9.57627ZM17.1421 8.16206L18.5563 6.74785L17.1421 5.33363L15.7279 6.74785L17.1421 8.16206ZM7.24264 20.89H3V16.6473L16.435 3.21231C16.8256 2.82179 17.4587 2.82179 17.8492 3.21231L20.6777 6.04074C21.0682 6.43126 21.0682 7.06443 20.6777 7.45495L7.24264 20.89Z"></path></svg>"#,
-                    },
-                    fields,
-                    inputs: parsed_fields
-                        .clone()
-                        .iter()
-                        .map(|field| FormInput {
-                            field: field.clone(),
-                            value: parse_quote! { #extra_name },
-                        })
-                        .collect(),
-                    extra: parse_quote! { #extra_name: #form_fields_ident },
-                }
-            }
+            Self::Edit => FormTemplate {
+                name: "EditForm",
+                icon: FormIcon {
+                    name: "EditFormIcon",
+                    svg: r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.7279 9.57627L14.3137 8.16206L5 17.4758V18.89H6.41421L15.7279 9.57627ZM17.1421 8.16206L18.5563 6.74785L17.1421 5.33363L15.7279 6.74785L17.1421 8.16206ZM7.24264 20.89H3V16.6473L16.435 3.21231C16.8256 2.82179 17.4587 2.82179 17.8492 3.21231L20.6777 6.04074C21.0682 6.43126 21.0682 7.06443 20.6777 7.45495L7.24264 20.89Z"></path></svg>"#,
+                },
+                fields,
+                value_attribute: parse_quote! {},
+            },
         }
     }
 }
