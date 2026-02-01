@@ -16,7 +16,7 @@ impl<'a> ToTokens for FormFields<'a> {
         let ident: Ident = parse_str(name).unwrap();
 
         quote! {
-            #[derive(serde::Deserialize, PartialEq, Clone)]
+            #[derive(serde::Deserialize, PartialEq, Clone, Default)]
             pub struct #ident {
                 #(#fields),*
             }

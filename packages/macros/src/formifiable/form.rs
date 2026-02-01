@@ -15,7 +15,7 @@ pub struct FormTemplate<'a> {
     pub name: &'a str,
     pub icon: FormIcon<'a>,
     pub fields: Vec<ParsedField>,
-    pub value_attribute: Attribute,
+    pub value_attributes: Vec<Attribute>,
 }
 
 impl<'a> ToTokens for FormTemplate<'a> {
@@ -24,7 +24,7 @@ impl<'a> ToTokens for FormTemplate<'a> {
             name,
             icon,
             fields,
-            value_attribute,
+            value_attributes,
         } = self;
         let form_fields = FormFields {
             name: &format!("{}Fields", &name),
@@ -45,11 +45,13 @@ impl<'a> ToTokens for FormTemplate<'a> {
         let icon_ident: Ident = parse_str(icon.name).unwrap();
 
         quote! {
+
+
             #icon
             #form_fields
 
             #[component]
-            pub fn #func_ident(callback: Callback<(FormEvent, #fields_ident)>, #value_attribute #extra_name: Signal<#form_fields_ident>) -> Element {
+            pub fn #func_ident(callback: Callback<(FormEvent, #fields_ident)>, #(#value_attributes)* #extra_name: Signal<#form_fields_ident>) -> Element {
                 rsx! {
                     form {
                         class: "FormifyForm",
@@ -88,7 +90,7 @@ impl FormKind {
                     svg: r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.0001 10.9999L22.0002 10.9997L22.0002 12.9997L13.0001 12.9999L13.0001 21.9998L11.0001 21.9998L11.0001 12.9999L2.00004 13.0001L2 11.0001L11.0001 10.9999L11 2.00025L13 2.00024L13.0001 10.9999Z"></path></svg>"#,
                 },
                 fields,
-                value_attribute: parse_quote! { #[default = Signal::default()] },
+                value_attributes: parse_quote! { #[props(default = Signal::default())] },
             },
             Self::Edit => FormTemplate {
                 name: "EditForm",
@@ -97,7 +99,7 @@ impl FormKind {
                     svg: r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.7279 9.57627L14.3137 8.16206L5 17.4758V18.89H6.41421L15.7279 9.57627ZM17.1421 8.16206L18.5563 6.74785L17.1421 5.33363L15.7279 6.74785L17.1421 8.16206ZM7.24264 20.89H3V16.6473L16.435 3.21231C16.8256 2.82179 17.4587 2.82179 17.8492 3.21231L20.6777 6.04074C21.0682 6.43126 21.0682 7.06443 20.6777 7.45495L7.24264 20.89Z"></path></svg>"#,
                 },
                 fields,
-                value_attribute: parse_quote! {},
+                value_attributes: parse_quote! {},
             },
         }
     }

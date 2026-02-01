@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::Expr;
+use syn::{parse_str, Expr, Ident};
 
 use super::field_attrs::kind::FormKindOpt;
 use super::parsed_field::ParsedField;
@@ -19,10 +19,11 @@ impl ToTokens for FormInputCommonOpts {
             value,
             required,
         } = &self;
+        let field_ident: Ident = parse_str(&field_name).unwrap();
         quote! {
             name: #field_name,
             required: #required,
-            value: #value.clone(),
+            value: #value().#field_ident.to_string(),
         }
         .to_tokens(tokens);
     }
@@ -53,11 +54,10 @@ impl ToTokens for FormInputFile {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let Self { opts, directory } = &self;
         let FormInputCommonOpts {
-            field_name,
-            value,
-            required,
+            value, field_name, ..
         } = opts;
         let text_input = FormInputText { opts: opts.clone() };
+        let field_ident: Ident = parse_str(&field_name).unwrap();
         quote! {
             section {
                 class: "FormifyFileInput",
@@ -69,7 +69,14 @@ impl ToTokens for FormInputFile {
                     class: "FormifyFileInputButton",
                     r#type: "file",
                     "webkitdirectory": #directory,
-                    onchange: move |e| { #value.set(e.parsed::<SerializedFileData>.expect("could not parse file input").path().to_os_string().to_string()) }
+                    onchange: move |e| {
+                        let mut new_value = #value();
+                        new_value.#field_ident = match e.values().last().unwrap().1.clone() {
+                            FormValue::File(Some(data)) => data.path(),
+                            _ => PathBuf::default()
+                        };
+                        #value.set(new_value);
+                    }
                 }
             }
         }

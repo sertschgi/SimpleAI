@@ -30,10 +30,10 @@ pub fn Edit(id: Uuid) -> Element {
 
     rsx! {
         main {
-            EditForm {
-                values,
-                callback: move |(_, f): (FormEvent, EditFormFields)| {},
-            }
+            // EditForm {
+            //     values,
+            //     callback: move |(_, f): (FormEvent, EditFormFields)| {},
+            // }
 
             MsgPopup { msg: error_popup_msg, open: error_popup_open }
         }

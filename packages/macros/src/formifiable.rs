@@ -24,13 +24,17 @@ pub fn macro_impl(item: TokenStream) -> TokenStream {
                 use std::path::PathBuf;
                 use dioxus::prelude::*;
 
+                trait PathExt { fn to_string(&self) -> String; }
+
+                impl PathExt for PathBuf { fn to_string(&self) -> String {self.clone().into_os_string().into_string().unwrap()} }
+
                 #forms
             }
         }
     };
 
-    // println!("MACRO DEBUG: {}", r.to_token_stream().to_string());
-    // std::thread::sleep(std::time::Duration::from_millis(500));
+    println!("MACRO DEBUG: {}", r.to_token_stream().to_string());
+    std::thread::sleep(std::time::Duration::from_millis(500));
 
     r
 }
