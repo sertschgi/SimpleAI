@@ -7,6 +7,7 @@ class Divider {
     this.orientation = orientation;
     this.firstPane = this.divider.previousSibling;
     this.secondPane = this.divider.nextSibling;
+    this.parent = this.divider.parentElement;
 
     this._startFirstPane = null;
     this._startCursor = null;

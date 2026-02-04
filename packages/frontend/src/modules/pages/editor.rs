@@ -64,6 +64,7 @@ struct SaveNodeData {
 enum ViewportEvent {
     AddNode(AddNodeData),
     Save(SaveNodeData),
+    NodeFocused(Uuid),
 }
 
 impl ViewportEvent {
@@ -114,6 +115,10 @@ impl ViewportEvent {
             Self::Save(SaveNodeData { .. }) => {
                 // TODO: simple_ai_backend::modules::porject::save_onnx(viewport_save);
                 debug!("Saving...");
+            }
+            Self::NodeFocused(id) => {
+                // TODO: Fetch the Nodes static params and save the node
+                debug!("focused...");
             }
         }
     }
@@ -191,7 +196,11 @@ pub fn Editor(id: Uuid, children: Element) -> Element {
         main { onmounted,
             section { id: "viewport" }
             Divider { id: "editor-aside-viewport", orientation: 'v' }
-            aside { Search {} }
+            aside {
+                article {}
+                Divider { id: "editor-aside-aside", orientation: 'v' }
+                article { Search {} }
+            }
             document::Script { src: asset!("/assets/scripts/onnx-viewport.js"), defer: true }
         }
     }

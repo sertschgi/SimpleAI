@@ -13,6 +13,11 @@
 }
 
 aside {
-  min-width: 300px;
+  min-width: 600px;
   background-color: hsl(var(--color-1), 10%);
+  display: flex;
+}
+
+aside > article {
+  min-width: 300px;
 }
