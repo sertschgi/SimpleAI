@@ -3,13 +3,13 @@ use derive_builder::Builder;
 use onnx_ir::NodeType;
 use std::collections::HashMap;
 use uuid::Uuid;
-// -------------------- NODE KIND -------------------- //
+
 #[derive(Clone, PartialEq)]
 pub enum NodeKind {
     Onnx { onnx: OnnxNode },
     Bundled { bundle: NodeContainer },
 }
-// -------------------- NODE -------------------- //
+
 pub type StrongNode = StrongContext<Node>;
 pub type WeakNode = WeakContext<Node>;
 

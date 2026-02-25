@@ -1,52 +1,13 @@
 /**
  * A reusable, instantiable node-editor viewport module.
  * Usage:
- *   import { Viewport, Node, Parameter } from './viewport.js';
+ *   import { Viewport, VNode, Parameter, Connection } from './viewport.js';
  *   const vp = new Viewport(document.getElementById('editor'));
- *   vp.addNode(new Nodule(100,100,'A',[new Parameter('output','outA')]));
+ *   vp.addNode(new VNode(100,100,'A',[new Parameter('output','outA')]));
  *  ... etc.
  **/
 
-options = {
-  grid: { spacing: 40, dotRadius: 2 },
-  zoom: { min: 0.4, max: 2.5 },
-  param: { dotRadius: 10 },
-  conn: { dotRadius: 10, lineWidth: 3 },
-};
-
-theme = {
-  node: {
-    text: "#ffffff",
-    fill: "#193c4d",
-    font: "bold 17px sans-serif",
-    stroke: "#00000000",
-    focus: {
-      text: "#ffffff",
-      fill: "#193c4d",
-      stroke: "#ffffffaa",
-    },
-  },
-  param: {
-    text: "#ffffff",
-    font: "14px sans-serif",
-    input: { fill: "#ffffffaa", stroke: "#00000000" },
-    output: { fill: "#ffffffaa", stroke: "#00000000" },
-  },
-  conn: {
-    stroke: "#ffffffaa",
-    from: { fill: "#ffffffaa", stroke: "#00000000" },
-    to: { fill: "#ffffffaa", stroke: "#00000000" },
-    focus: {
-      stroke: "#ffffff",
-      from: { fill: "#ffffffaa", stroke: "#00000000" },
-      to: { fill: "#ffffffaa", stroke: "#00000000" },
-    },
-  },
-  grid: "#ffffff22",
-};
-
 function drawRoundedRect(ctx, x, y, width, height, radius = 6, options = {}) {
-  //
   // radius can be a number or an object {tl, tr, br, bl}
   const r =
     typeof radius === "number"
@@ -92,33 +53,30 @@ function drawRoundedRect(ctx, x, y, width, height, radius = 6, options = {}) {
   }
 }
 
-class Parameter {
+class VNodeParameter {
   constructor(type = "input", name = "") {
     this.type = type; // "input" or "output"
     this.name = name;
+    // visual defaults (can be overridden externally)
+    this.radius = 10;
+    this.fillInput = "#48e";
+    this.fillOutput = "#fa3";
+    this.textColor = "#fff";
+    this.font = "15px sans-serif";
   }
 
   // draw the parameter socket and its label. `pos` is {x,y}.
   draw(ctx, pos, isInput) {
     ctx.beginPath();
-    ctx.arc(
-      pos.x,
-      pos.y,
-      window.app.vp.options.param.dotRadius,
-      0,
-      2 * Math.PI,
-    );
-    ctx.fillStyle = isInput
-      ? window.app.vp.theme.param.input.fill
-      : window.app.vp.theme.param.output.fill;
-    ctx.strokeStyle = isInput
-      ? window.app.vp.theme.param.input.stroke
-      : window.app.vp.theme.param.output.stroke;
+    ctx.arc(pos.x, pos.y, this.radius, 0, 2 * Math.PI);
+    ctx.fillStyle = isInput ? this.fillInput : this.fillOutput;
     ctx.fill();
+    // ctx.stroke();
 
-    ctx.fillStyle = window.app.vp.theme.param.text;
-    let margin = window.app.vp.options.param.dotRadius + 5;
-    ctx.font = window.app.vp.theme.param.font;
+    ctx.fillStyle = this.textColor;
+
+    let margin = this.radius + 5;
+    ctx.font = this.font;
     ctx.textBaseline = "middle";
     if (isInput) {
       ctx.textAlign = "left";
@@ -130,51 +88,59 @@ class Parameter {
   }
 }
 
-class Nodule {
-  constructor(pos = { x: 0, y: 0 }, label = "Node", params = []) {
+class VNode {
+  constructor(x = 0, y = 0, label = "Node", params = []) {
     this.label = label;
     this.params = params.map((p) =>
-      p instanceof Parameter ? p : new Parameter(p.type, p.name),
+      p instanceof VNodeParameter ? p : new VNodeParameter(p.type, p.name),
     );
     this.inputs = this.params.filter((p) => p.type === "input");
     this.outputs = this.params.filter((p) => p.type === "output");
 
     this.paramSpacing = 30;
-    this.headingSpace = 60;
-
-    let fitToGrid = (s) =>
-      Math.ceil(s / window.app.vp.options.grid.spacing) *
-      window.app.vp.options.grid.spacing;
-
-    this.width = fitToGrid(160);
-    this.height = fitToGrid(
+    this.width = 160;
+    this.height =
       50 +
-        Math.max(this.inputs.length, this.outputs.length) * this.paramSpacing,
-    );
+      Math.max(this.inputs.length, this.outputs.length) * this.paramSpacing;
+    this.coords = { x: x - this.width / 2, y: y - this.height / 2 };
+    this.fillStyle = "#193c4d";
+    this.strokeStyle = "#58a";
+    this.titleColor = "#fff";
+    this.titleFont = "bold 17px sans-serif";
+    this.heading_space = 60;
+  }
 
-    this.pos = { x: pos.x - this.width / 2, y: pos.y - this.height / 2 };
+  fitCoords() {
+    return {
+      x:
+        Math.round((this.coords.x - this.dragOffsetX) / this.gridSpacing) *
+        this.gridSpacing,
+      y:
+        Math.round((this.coords.y - this.dragOffsetY) / this.gridSpacing) *
+        this.gridSpacing,
+    };
   }
 
   getInputCoords(i) {
     return {
-      x: this.pos.x,
-      y: this.pos.y + this.headingSpace + i * this.paramSpacing,
+      x: this.coords.x,
+      y: this.coords.y + this.heading_space + i * this.paramSpacing,
     };
   }
 
   getOutputCoords(i) {
     return {
-      x: this.pos.x + this.width,
-      y: this.pos.y + this.headingSpace + i * this.paramSpacing,
+      x: this.coords.x + this.width,
+      y: this.coords.y + this.heading_space + i * this.paramSpacing,
     };
   }
 
   contains(px, py) {
     return (
-      px > this.pos.x &&
-      px < this.pos.x + this.width &&
-      py > this.pos.y &&
-      py < this.pos.y + this.height
+      px > this.coords.x &&
+      px < this.coords.x + this.width &&
+      py > this.coords.y &&
+      py < this.coords.y + this.height
     );
   }
 
@@ -194,28 +160,24 @@ class Nodule {
     return null;
   }
 
-  drawTheme(ctx, theme) {
-    let coordsToGrid = ({ x, y }) => {
-      return {
-        x:
-          Math.round(x / window.app.vp.options.grid.spacing) *
-          options.grid.spacing,
-        y:
-          Math.round(y / window.app.vp.options.grid.spacing) *
-          options.grid.spacing,
-      };
-    };
+  fitToGrid(gridSpacing) {
+    this.width = Math.ceil(this.width / gridSpacing) * gridSpacing;
+    this.height = Math.ceil(this.height / gridSpacing) * gridSpacing;
+  }
 
-    this.pos = coordsToGrid(this.pos);
+  draw(ctx, viewport) {
+    let p = this.fitCoords();
 
-    ctx.fillStyle = theme.fill;
-    drawRoundedRect(ctx, this.pos.x, this.pos.y, this.width, this.height, 15);
+    this.fitToGrid(viewport.gridSpacing);
 
-    ctx.fillStyle = theme.text;
-    ctx.font = window.app.vp.theme.node.font;
+    ctx.fillStyle = this.fillStyle;
+    drawRoundedRect(ctx, p.x, p.y, this.width, this.height, 15);
+
+    ctx.fillStyle = this.titleColor;
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
-    ctx.fillText(this.label, this.pos.x + this.width / 2, this.pos.y + 25);
+    ctx.font = this.titleFont;
+    ctx.fillText(this.label, p.x + this.width / 2, p.y + 25);
 
     this.inputs.forEach((input, i) => {
       input.draw(ctx, this.getInputCoords(i), true);
@@ -225,20 +187,17 @@ class Nodule {
       output.draw(ctx, this.getOutputCoords(i), false);
     });
   }
-  draw(ctx) {
-    this.drawTheme(ctx, window.app.vp.theme.node);
-  }
-  drawFocus(ctx) {
-    this.drawTheme(ctx, window.app.vp.theme.node.focus);
-  }
 }
 
-class Connection {
+class VConnection {
   constructor(fromNode, fromOutput, toNode, toInput) {
     this.fromNode = fromNode;
     this.fromOutput = fromOutput;
     this.toNode = toNode;
     this.toInput = toInput;
+
+    this.color = "#fb0";
+    this.width = 3;
   }
 
   hit(px, py) {
@@ -259,66 +218,44 @@ class Connection {
     }
     return false;
   }
-  static drawRaw(theme, from, to, ctx) {
-    ctx.strokeStyle = theme.stroke;
-    ctx.lineWidth = window.app.vp.options.conn.lineWidth;
-    // path
+  draw(ctx /*, viewport - not required here but kept for parity */) {
+    const from = this.fromNode.getOutputCoords(this.fromOutput);
+    const to = this.toNode.getInputCoords(this.toInput);
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = this.width;
     ctx.beginPath();
     ctx.moveTo(from.x, from.y);
     ctx.bezierCurveTo(from.x + 40, from.y, to.x - 40, to.y, to.x, to.y);
     ctx.stroke();
-    // circles
-    ctx.fillStyle = theme.from;
-    ctx.beginPath();
-    ctx.arc(
-      from.x,
-      from.y,
-      window.app.vp.options.conn.dotRadius,
-      0,
-      2 * Math.PI,
-    );
-    ctx.fill();
-    ctx.fillStyle = theme.to;
-    ctx.beginPath();
-    ctx.arc(to.x, to.y, window.app.vp.options.conn.dotRadius, 0, 2 * Math.PI);
-    ctx.fill();
-  }
-  drawTheme(theme, ctx) {
-    Connection.drawRaw(
-      theme,
-      this.fromNode.getOutputCoords(this.fromOutput),
-      this.toNode.getInputCoords(this.toInput),
-      ctx,
-    );
-  }
-  draw(ctx) {
-    this.drawTheme(window.app.vp.theme.conn, ctx);
-  }
-  drawFocus(ctx) {
-    this.drawTheme(window.app.vp.theme.conn.focus, ctx);
-  }
-  static drawPreview(from, to, ctx) {
-    Connection.drawRaw(window.app.vp.theme.conn, from, to, ctx);
   }
 }
 
 class Viewport {
-  constructor(dioxus, containerElement) {
+  constructor(dioxus, containerElement, options = {}) {
     if (!(containerElement instanceof HTMLElement)) {
       throw new Error("Viewport constructor requires a DOM container element");
     }
 
     this.dioxus = dioxus;
 
-    this.zoom = 1;
-    this.offset = { x: 0, y: 0 };
+    // options and defaults
+    this.gridSpacing = options.gridSpacing || 40;
+    this.dotRadius = options.dotRadius || 2;
+    this.minZoom = options.minZoom || 0.4;
+    this.maxZoom = options.maxZoom || 2.5;
+
+    // internal state
+    this.zoom = options.zoom || 1;
+    this.offsetX = options.offsetX || 0;
+    this.offsetY = options.offsetY || 0;
 
     this.nodes = [];
     this.connections = [];
 
     this.mouse = { x: 0, y: 0 };
     this.draggingNode = null;
-    this.dragOffset = { x: 0, y: 0 };
+    this.dragOffsetX = 0;
+    this.dragOffsetY = 0;
     this.connectingFrom = null; // { node, outIdx }
     this.isPanning = false;
     this.panStart = { x: 0, y: 0 };
@@ -373,8 +310,12 @@ class Viewport {
   }
 
   handleAddNode(jsonNode) {
-    let node = new Nodule(jsonNode.pos, jsonNode.label, jsonNode.params);
-    console.log("node: ", node);
+    let node = new VNode(
+      jsonNode.x,
+      jsonNode.y,
+      jsonNode.label,
+      jsonNode.params,
+    );
     this.addNode(node);
   }
 
@@ -396,8 +337,8 @@ class Viewport {
   // convert canvas pixel coords to editor coordinates (considering transform)
   toEditor(x, y) {
     return {
-      x: (x - this.offset.x) / this.zoom,
-      y: (y - this.offset.y) / this.zoom,
+      x: (x - this.offsetX) / this.zoom,
+      y: (y - this.offsetY) / this.zoom,
     };
   }
 
@@ -416,62 +357,80 @@ class Viewport {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     // apply zoom + pan transform
-    ctx.setTransform(this.zoom, 0, 0, this.zoom, this.offset.x, this.offset.y);
+    ctx.setTransform(this.zoom, 0, 0, this.zoom, this.offsetX, this.offsetY);
 
     // Grid dots
-    ctx.fillStyle = window.app.vp.theme.grid;
-    const w = (this.canvas.width - this.offset.x) / this.zoom;
-    const h = (this.canvas.height - this.offset.y) / this.zoom;
+    ctx.fillStyle = "#3a3c40";
+    const w = (this.canvas.width - this.offsetX) / this.zoom;
+    const h = (this.canvas.height - this.offsetY) / this.zoom;
     const startX =
-      Math.floor(
-        -this.offset.x / this.zoom / window.app.vp.options.grid.spacing,
-      ) * window.app.vp.options.grid.spacing;
+      Math.floor(-this.offsetX / this.zoom / this.gridSpacing) *
+      this.gridSpacing;
     const startY =
-      Math.floor(
-        -this.offset.y / this.zoom / window.app.vp.options.grid.spacing,
-      ) * window.app.vp.options.grid.spacing;
-    for (
-      let x = startX;
-      x < w + window.app.vp.options.grid.spacing;
-      x += window.app.vp.options.grid.spacing
-    ) {
-      for (
-        let y = startY;
-        y < h + window.app.vp.options.grid.spacing;
-        y += window.app.vp.options.grid.spacing
-      ) {
+      Math.floor(-this.offsetY / this.zoom / this.gridSpacing) *
+      this.gridSpacing;
+    for (let x = startX; x < w + this.gridSpacing; x += this.gridSpacing) {
+      for (let y = startY; y < h + this.gridSpacing; y += this.gridSpacing) {
         ctx.beginPath();
-        ctx.arc(x, y, window.app.vp.options.grid.dotRadius, 0, 2 * Math.PI);
+        ctx.arc(x, y, this.dotRadius, 0, 2 * Math.PI);
         ctx.fill();
       }
     }
 
     // Live connect preview
     if (this.connectingFrom) {
-      Connection.drawPreview(
-        this.connectingFrom.node.getOutputCoords(this.connectingFrom.outIdx),
-        this.mouse,
-        this.ctx,
+      const from = this.connectingFrom.node.getOutputCoords(
+        this.connectingFrom.outIdx,
       );
-    }
-
-    // VNodes
-    for (let n of this.nodes) {
-      console.log("drawing nodes");
-      if (n === this.selectedNode) {
-        n.drawFocus(this.ctx);
-      } else {
-        n.draw(this.ctx);
-      }
+      ctx.strokeStyle = "#fb0";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.bezierCurveTo(
+        from.x + 40,
+        from.y,
+        this.mouse.x - 40,
+        this.mouse.y,
+        this.mouse.x,
+        this.mouse.y,
+      );
+      ctx.stroke();
     }
 
     // Connections
     for (let c of this.connections) {
       if (c === this.selectedConnection) {
-        c.drawFocus(this.ctx);
+        // Highlight selected connection
+        this.ctx.save();
+        this.ctx.shadowColor = "#fb0";
+        this.ctx.shadowBlur = 8;
+        c.draw(this.ctx, this);
+        this.ctx.restore();
+        // Optional: thicker
+        this.ctx.save();
+        this.ctx.strokeStyle = "#f00";
+        this.ctx.lineWidth = 7;
+        c.draw(this.ctx, this);
+        this.ctx.restore();
       } else {
-        c.draw(this.ctx);
+        c.draw(this.ctx, this);
       }
+    }
+
+    // VNodes
+    for (let n of this.nodes) {
+      if (n === this.selectedNode) {
+        // Highlight selected node
+        this.ctx.save();
+        this.ctx.strokeStyle = "#fb0";
+        drawRoundedRect(this.ctx, n.x, n.y, n.width, n.height, 19, {
+          stroke: true,
+          fill: false,
+          lineWidth: 5,
+        });
+        this.ctx.restore();
+      }
+      n.draw(this.ctx, this);
     }
 
     // reset transform for any overlay drawing in screen space if desired
@@ -510,8 +469,8 @@ class Viewport {
     for (let node of this.nodes) {
       if (node.contains(p.x, p.y)) {
         this.draggingNode = node;
-        this.dragOffsetX = p.x - node.pos.x;
-        this.dragOffsetY = p.y - node.pos.y;
+        this.dragOffsetX = p.x - node.x;
+        this.dragOffsetY = p.y - node.y;
         this.selectedNode = node;
         this.selectedConnection = null;
         this.draw();
@@ -521,8 +480,8 @@ class Viewport {
 
     // start panning
     this.isPanning = true;
-    this.panOrigin.x = this.offset.x;
-    this.panOrigin.y = this.offset.y;
+    this.panOrigin.x = this.offsetX;
+    this.panOrigin.y = this.offsetY;
     this.panStart.x = e.offsetX;
     this.panStart.y = e.offsetY;
     this.selectedNode = null;
@@ -534,14 +493,11 @@ class Viewport {
     const p = this.toEditor(e.offsetX, e.offsetY);
     this.mouse = p;
     if (this.draggingNode) {
-      this.draggingNode.pos = {
-        x: p.x - this.dragOffsetX,
-        y: p.y - this.dragOffsetY,
-      };
+      this.draggingNode.coords = p;
       this.draw();
     } else if (this.isPanning) {
-      this.offset.x = this.panOrigin.x + (e.offsetX - this.panStart.x);
-      this.offset.y = this.panOrigin.y + (e.offsetY - this.panStart.y);
+      this.offsetX = this.panOrigin.x + (e.offsetX - this.panStart.x);
+      this.offsetY = this.panOrigin.y + (e.offsetY - this.panStart.y);
       this.draw();
     } else if (this.connectingFrom) {
       this.draw();
@@ -558,7 +514,7 @@ class Viewport {
         let inIdx = node.inputHit(p.x, p.y);
         if (inIdx !== null && node !== this.connectingFrom.node) {
           this.connections.push(
-            new Connection(
+            new VConnection(
               this.connectingFrom.node,
               this.connectingFrom.outIdx,
               node,
@@ -582,13 +538,13 @@ class Viewport {
       my = e.offsetY;
     const before = this.toEditor(mx, my);
     this.zoom = Math.max(
-      window.app.vp.options.zoom.min,
-      Math.min(window.app.vp.options.zoom.max, this.zoom * scale),
+      this.minZoom,
+      Math.min(this.maxZoom, this.zoom * scale),
     );
     const after = this.toEditor(mx, my);
     // Adjust offsets so that the point under the mouse stays stationary in editor space
-    this.offset.x += (after.x - before.x) * this.zoom;
-    this.offset.y += (after.y - before.y) * this.zoom;
+    this.offsetX += (after.x - before.x) * this.zoom;
+    this.offsetY += (after.y - before.y) * this.zoom;
     this.draw();
     e.preventDefault();
   }
@@ -637,4 +593,6 @@ class Viewport {
   }
 }
 
-window.app = { vp: { Parameter, Node: Nodule, Viewport, options, theme } };
+window.Parameter = VNodeParameter;
+window.VNode = VNode;
+window.Viewport = Viewport;

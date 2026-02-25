@@ -1,146 +1,21 @@
+pub mod event;
+pub mod save;
+pub mod vnode;
+
 use super::utils::*;
-use serde::{Deserialize, Serialize};
+use event::ViewportEvent;
 use serde_json::Value as JsonValue;
-use simple_ai_backend::modules::utils::{node::NodeKind, prelude::NodeQueryFilter};
 use tokio::time::*;
 use uuid::Uuid;
 
-// TODO: implement this the right way
-use dioxus::desktop::window;
-
 const CREATE_VIEWPORT: &str = r#"
-    window.activeOnnxViewport = new window.Viewport(
+    console.log("making viewport");
+    window.activeOnnxViewport = new window.app.vp.Viewport(
       dioxus,
       document.getElementById("viewport"),
     );
+    console.log("viewport: ", window.activeOnnxViewport);
 "#;
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-struct VNodeParameter {
-    r#type: String,
-    name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct VNode {
-    x: f32,
-    y: f32,
-    label: String,
-    params: Vec<VNodeParameter>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct VConnection {
-    from_node: VNode,
-    from_output: VNodeParameter,
-    to_node: VNode,
-    to_input: VNodeParameter,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct ViewportSave {
-    nodes: Vec<VNode>,
-    connections: Vec<VConnection>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct AddNodeData {
-    id: Uuid,
-    x: f32,
-    y: f32,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct SaveNodeData {
-    viewport_save: ViewportSave,
-}
-
-/// # handy for json representation:
-/// let dbg: String = ViewportEvent::AddNode(Uuid::default()).into();
-/// debug!("{}", dbg);
-///
-/// ``` { AddNode: ".." } ```
-#[derive(Serialize, Deserialize, Debug)]
-enum ViewportEvent {
-    AddNode(AddNodeData),
-    Save(SaveNodeData),
-    NodeFocused(Uuid),
-}
-
-impl ViewportEvent {
-    pub fn exec(self) {
-        match self {
-            Self::AddNode(AddNodeData { id, x, y }) => {
-                let node = simple_ai_backend::modules::nodes::query::query_nodes(vec![
-                    NodeQueryFilter::Id(id),
-                ])
-                .tree
-                .first()
-                .unwrap()
-                .context
-                .try_lock()
-                .unwrap() // TODO: That thing panics if no correct node exists
-                .clone();
-
-                let params: Vec<VNodeParameter> = node
-                    .get_params()
-                    .iter()
-                    .map(|p| {
-                        let param = p.context.try_lock().unwrap();
-                        VNodeParameter {
-                            r#type: if param.is_input() {
-                                "input".into()
-                            } else {
-                                "output".into()
-                            },
-                            name: param.name.clone(),
-                        }
-                    })
-                    .collect();
-
-                let node = VNode {
-                    x,
-                    y,
-                    label: node.name.clone(),
-                    params,
-                };
-
-                let json_node = serde_json::to_string(&node).unwrap();
-
-                document::eval(&format!(
-                    r#"window.activeOnnxViewport.handleAddNode({})"#,
-                    json_node
-                ));
-            }
-            Self::Save(SaveNodeData { .. }) => {
-                // TODO: simple_ai_backend::modules::porject::save_onnx(viewport_save);
-                debug!("Saving...");
-            }
-            Self::NodeFocused(id) => {
-                // TODO: Fetch the Nodes static params and save the node
-                debug!("focused...");
-            }
-        }
-    }
-}
-
-impl From<JsonValue> for ViewportEvent {
-    fn from(value: JsonValue) -> Self {
-        serde_json::from_value(value).expect("Could not convert ViewportEvent from json")
-    }
-}
-
-impl Into<String> for ViewportEvent {
-    fn into(self) -> String {
-        serde_json::to_string(&self).expect("Could not convert ViewportEvent to json.")
-    }
-}
-
-impl From<String> for ViewportEvent {
-    fn from(value: String) -> Self {
-        serde_json::from_str(&value).expect("Could not convert ViewportEvent from json string.")
-    }
-}
 
 #[cfg(not(target_family = "wasm"))]
 fn set_size() {

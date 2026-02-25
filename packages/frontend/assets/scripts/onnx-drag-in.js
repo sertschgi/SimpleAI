@@ -41,7 +41,8 @@ class OnnxDragIn {
     this.draggingChild.style.left = "initial";
     this.draggingChild.style.top = "initial";
     window.activeOnnxViewport.addNodeFromId(this.draggingChild.id, {
-      position: { x: e.x, y: e.y },
+      x: e.x,
+      y: e.y,
     });
     this.draggingChild = null;
   }

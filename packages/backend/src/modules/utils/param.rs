@@ -1,14 +1,13 @@
 use super::prelude::*;
 use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
-// -------------------- RUNTIME PARAM KIND -------------------- //
+
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
 pub enum RuntimeParamKind {
     Input,
     Output,
 }
 
-// -------------------- PARAM KIND -------------------- //
 pub type Connection = WeakContext<Param>;
 #[derive(Clone, PartialEq)]
 pub enum ParamKind {
@@ -22,7 +21,6 @@ pub enum ParamKind {
     },
 }
 
-// -------------------- PARAM  -------------------- //
 pub type StrongParam = StrongContext<Param>;
 pub type WeakParam = WeakContext<Param>;
 #[derive(Builder, Clone, PartialEq)]
